@@ -28,6 +28,9 @@ Midpoint is a web application designed to help users find convenient meeting loc
   - Add, get, delete pinned stores
   - Add, get, delete calendar events
 
+### Database
+- **PostgreSQL**: Supports complex queries for managing users, plans, roles, permissions, trips, checkpoints, ratings, and locations effectively.
+
 ### Deployment
 - Deployed on VM using **Docker** and **Docker Compose**
 - Accessible to the general public
@@ -46,7 +49,10 @@ Midpoint is a web application designed to help users find convenient meeting loc
   - Live cursor tracking and following (like Figma)
 
 - **Long-Running Task:**
-  - Generating the midpoint based on average distance, user input, and ratings
+  - Generating the midpoint based on average distance, user input, and ratings. Due to the complexity of processing user input, fetching and analyzing ratings with sentiment analysis, and computing an optimal midpoint, this operation may take 10+ seconds.
+
+- **Webhook Integration:**
+  - Use webhook to send emails inviting new users to join a plan.
 
 ## Milestones
 
@@ -60,6 +66,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 - Setup group views and user profile/settings
 - Backend: Start API with CRUD operations
 - Docker setup
+- Setup Webhooks
 
 ### Beta Version
 - Implement user authentication
@@ -87,10 +94,16 @@ Midpoint is a web application designed to help users find convenient meeting loc
 ### Google Maps API
 - [API Picker](https://developers.google.com/maps/documentation/api-picker?_gl=1*baor44*_up*MQ..*_ga*MTI5NzI2NzE3OS4xNzE3NDUwMzc5*_ga_NRWSTWS78N*MTcxNzQ1MDM3OC4xLjAuMTcxNzQ1MDM3OC4wLjAuMA..)
 
+### Additional Resources
+- [Bootstrap](https://getbootstrap.com/)
+- [Sendgrid](https://sendgrid.com/en-us)
+
 ### Our Documents
 - [Figma](https://www.figma.com/design/hCrCt9lviPd83UQcCELCH7/Midpoint?node-id=0-1&t=X58tu3tPYz5Yr6Sy-1)
+- [JIRA](https://project-spiders.atlassian.net/jira/software/projects/SPI/boards/1)
 
 ## Our Team: Spiders
-- Catherine Sun | [cat.sun@mail.utoronto.ca](mailto:cat.sun@mail.utoronto.ca)
-- Madison Majarais | [madison.majarais@mail.utoronto.ca](mailto:madison.majarais@mail.utoronto.ca)
-- Rachel Kwan | [rachelhoyan.kwan@mail.utoronto.ca](mailto:rachelhoyan.kwan@mail.utoronto.ca)
+
+| | | |
+| - | - | - |
+| <img src="https://avatars.githubusercontent.com/u/59343226?s=88&amp;v=4" width="44" height="44" alt="@catherine-sun"> <br> Catherine Sun <br> [cat.sun@mail.utoronto.ca](mailto:cat.sun@mail.utoronto.ca) | <img src="https://avatars.githubusercontent.com/u/100644292?s=88&amp;v=4" width="44" height="44" alt="@MadisonMajarais"> <br> Madison Majarais <br> [madison.majarais@mail.utoronto.ca](mailto:madison.majarais@mail.utoronto.ca) | <img src="https://avatars.githubusercontent.com/u/57234754?s=88&amp;v=4" width="44" height="44" alt="@rkwan05"> <br> Rachel Kwan <br> [rachelhoyan.kwan@mail.utoronto.ca](mailto:rachelhoyan.kwan@mail.utoronto.ca) |
