@@ -2,12 +2,11 @@
   <nav>
     <RouterLink to="/">Home</RouterLink>
   </nav>
-  <RouterView/>
+  <RouterView />
 </template>
 
 <script>
-  export default {};
+export default {};
 </script>
 
-<style>
-</style>
+<style></style>

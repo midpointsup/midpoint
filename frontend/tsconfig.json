@@ -8,7 +8,12 @@
     "jsxFragmentFactory": "Fragment",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "preserveValueImports": false,
+    "importsNotUsedAsValues": "remove",
+    "verbatimModuleSyntax": true,
+    "pretty": true,
+    "strict": true
   },
 
   "references": [
