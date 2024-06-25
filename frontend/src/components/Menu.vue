@@ -122,7 +122,11 @@
         <li>
           <hr class="dropdown-divider" />
         </li>
-        <li><a class="dropdown-item" href="#"><RouterLink to="/login">Sign out</RouterLink></a></li>
+        <li>
+          <a class="dropdown-item" href="#"
+            ><RouterLink to="/login">Sign out</RouterLink></a
+          >
+        </li>
       </ul>
     </div>
   </div>
@@ -155,9 +159,7 @@
               <h6>Recommendations</h6>
             </li>
           </ul>
-          <button @click="clearSelection" class="btn mt-3">
-            Back
-          </button>
+          <button @click="clearSelection" class="btn mt-3">Back</button>
         </div>
         <div v-else>
           <h6>My Plans</h6>
