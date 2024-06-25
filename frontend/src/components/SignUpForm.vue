@@ -70,7 +70,7 @@ export default {
     signup() {
       document
         .querySelector(".signup-form")
-        .addEventListener("signup-form", function (e) {
+        .addEventListener("submit", function (e) {
           e.preventDefault();
         });
     },

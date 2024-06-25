@@ -4,7 +4,7 @@ export default {
     login() {
       document
         .querySelector(".login-form")
-        .addEventListener("login-form", function (e) {
+        .addEventListener("submit", function (e) {
           e.preventDefault();
         });
     },
