@@ -1,21 +1,21 @@
 <template>
-    <div id="layout" class="login-background">
-     <LoginForm class="login-container"></LoginForm>
+    <div id="layout" class="signup-background">
+     <SignUpForm class="signup-container"></SignUpForm>
     </div>
   </template>
   
   <script>
-    import LoginForm from '../components/LoginForm.vue';
+    import SignUpForm from '../components/SignUpForm.vue';
   export default {
 
     components: {
-      LoginForm
+      SignUpForm
     },
   };
   </script>
   
   <style>
-    .login-container {
+    .signup-container {
     margin: auto;
     position: fixed;
     top: 50%;
@@ -23,7 +23,7 @@
     transform: translate(-50%, -50%);
   }
 
-  .login-background {
+  .signup-background {
     background-color: var(--secondary);
   }
 
