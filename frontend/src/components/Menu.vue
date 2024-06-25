@@ -122,7 +122,7 @@
         <li>
           <hr class="dropdown-divider" />
         </li>
-        <li><a class="dropdown-item" href="#">Sign out</a></li>
+        <li><a class="dropdown-item" href="#"><RouterLink to="/login">Sign out</RouterLink></a></li>
       </ul>
     </div>
   </div>
@@ -155,7 +155,7 @@
               <h6>Recommendations</h6>
             </li>
           </ul>
-          <button @click="clearSelection" class="btn btn-secondary mt-3">
+          <button @click="clearSelection" class="btn mt-3">
             Back
           </button>
         </div>
@@ -185,7 +185,7 @@
                 <hr />
                 <!-- tags -->
                 <p>Scarborough Town Center</p>
-                <span class="badge bg-primary">Jan 18-24</span>
+                <span class="badge">Jan 18-24</span>
               </a>
             </li>
           </ul>
@@ -256,7 +256,7 @@
           placeholder="Enter date"
           autofocus
         />
-        <button @click="addPlan" class="btn btn-primary mt-3">Create</button>
+        <button @click="addPlan" class="btn mt-3">Create</button>
       </div>
     </div>
   </div>
@@ -385,7 +385,7 @@ export default {
 }
 
 .category-icon.selected {
-  background-color: lightblue;
+  background-color: var(--secondary);
 }
 
 #categoryContainer {
@@ -415,5 +415,9 @@ export default {
 
 .icon {
   margin-right: 10px;
+}
+
+.badge {
+  background-color: var(--primary);
 }
 </style>

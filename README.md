@@ -11,6 +11,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 - **Explore Map:** Real-time map exploration and live route changes.
 - **Real-Time Interaction:** Follow other users' cursors and see live ratings for pinned places.
 - **User Profiles:** Show calendar availability, send email invites, import/export Google Calendar, and automatically add plans to calendars.
+- **Invite Friends**: Send emails to invite new users to join a plan using SendGrid API.
 
 ### Other Features
 
@@ -44,7 +45,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 
 ### Third-Party API Interaction
 
-- **Mapbox** and **Google Maps Platform**
+- **Mapbox**, **Google Maps Platform** and **SendGrid**
 
 ### Authentication
 
@@ -62,7 +63,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
   - Generating the midpoint based on average distance, user input, and ratings. Due to the complexity of processing user input, fetching and analyzing ratings with sentiment analysis, and computing an optimal midpoint, this operation may take 10+ seconds.
 
 - **Webhook Integration:**
-  - Use webhook to send emails inviting new users to join a plan.
+  - Users can view sent/read status on outgoing emails using SendGrid's webhooks.
 
 ## Milestones
 
@@ -77,7 +78,6 @@ Midpoint is a web application designed to help users find convenient meeting loc
 - Setup group views and user profile/settings
 - Backend: Start API with CRUD operations
 - Docker setup
-- Setup Webhooks
 
 ### Beta Version
 
@@ -89,6 +89,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
   - Live changing routes
   - Live cursor tracking
 - Finalize user profile settings
+- Setup invite emails using SendGrid API
 
 ### Final Version
 
@@ -112,7 +113,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 ### Additional Resources
 
 - [Bootstrap](https://getbootstrap.com/)
-- [Sendgrid](https://sendgrid.com/en-us)
+- [Sendgrid API](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/api-getting-started)
 
 ### Our Documents
 
