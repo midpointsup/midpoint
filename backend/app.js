@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { sequelize } from "./datasource.js";
+import { userRouter } from "./routers/user_router.js";
 
 export const app = express();
 const PORT = process.env.PORT;
@@ -21,6 +22,8 @@ try {
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+app.use("api/users", userRouter);
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body);
