@@ -145,20 +145,18 @@
       <hr />
       <div v-if="plansPage" class="nav nav-pills flex-column mb-auto">
         <div v-if="selectedPlan" class="nav nav-pills flex-column mb-auto">
-          <h4>{{ selectedPlan }}</h4>
-          <ul class="nav nav-pills flex-column mb-auto">
-            <li>
-              <h6>Members</h6>
-            </li>
-
-            <li>
-              <h6>Bookmarks</h6>
-            </li>
-
-            <li>
-              <h6>Recommendations</h6>
-            </li>
-          </ul>
+          <h4>{{ selectedPlan.name }}</h4>
+          <MiddleForm
+            :numMembers="selectedPlan.members.length"
+            :startLocation="currentUser.location"
+            @add-location="updateCurrentLocation"
+            @clear-location="clearCurrentLocation"
+          >
+            <MembersList
+              :members="selectedPlan.members"
+              :you="currentUser"
+            ></MembersList>
+          </MiddleForm>
           <button @click="clearSelection" class="btn mt-3">Back</button>
         </div>
         <div v-else>
@@ -183,7 +181,7 @@
                     d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"
                   />
                 </svg>
-                {{ plan }}
+                {{ plan.name }}
                 <hr />
                 <!-- tags -->
                 <p>Scarborough Town Center</p>
@@ -267,12 +265,27 @@
 <script>
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
+import MiddleForm from "@/components/MiddleForm.vue";
+import MembersList from "@/components/MembersList.vue";
 export default {
+  components: {
+    MiddleForm,
+    MembersList,
+  },
   data() {
     return {
       showInput: false,
       newPlanName: "",
-      plans: ["Spiders", "Lunch Buddies"],
+      plans: [
+        {
+          name: "Spiders",
+          members: ["Bug", "Butter", "Fly"],
+        },
+        {
+          name: "Lunch Buddies",
+          members: [],
+        },
+      ],
       selectedPlan: null,
       newMemberName: "",
       membersList: [],
@@ -287,6 +300,10 @@ export default {
       isSidebarOpen: false,
       plansPage: true,
       createPlan: false,
+      currentUser: {
+        name: "Rachel",
+        location: "",
+      },
     };
   },
   methods: {
@@ -342,10 +359,20 @@ export default {
     },
     addPlan() {
       if (this.newPlanName.trim()) {
-        this.plans.push(this.newPlanName.trim());
+        this.plans.push({
+          name: this.newPlanName.trim(),
+          members: membersList,
+        });
+        this.membersList = [];
         this.newPlanName = ""; // Reset input field
         this.showInput = false; // Hide input field
       }
+    },
+    updateCurrentLocation(location) {
+      this.currentUser.location = location;
+    },
+    clearCurrentLocation() {
+      this.currentUser.location = "";
     },
   },
 };
