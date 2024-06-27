@@ -1,9 +1,4 @@
 <template>
-  <gmpx-api-loader
-    key="import.meta.env.VITE_GOOGLE_MAPS_API"
-    solution-channel="GMP_CCS_autocomplete_v3"
-  >
-  </gmpx-api-loader>
   <div class="column-display">
     <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
       <li @click="toggleSidebar" v-if="!isSidebarOpen">
@@ -316,12 +311,7 @@ export default {
     };
   },
   mounted() {
-    function initMap() {
-      this.infowindow = new google.maps.InfoWindow();
-      this.placePicker = document.getElementById("place-picker");
-      this.infowindowContent = document.getElementById("infowindow-content");
-      this.infowindow.setContent(this.infowindowContent);
-    }
+    this.loadGoogleMapsScript();
 
     if (this.placePicker) {
       this.placePicker.addEventListener("gmpx-placechange", () => {
@@ -330,26 +320,37 @@ export default {
         if (!place.location) {
           window.alert("No details available for input: '" + place.name + "'");
           this.infowindow.close();
-          // marker.position = null;
           return;
-        }
-
-        if (place.viewport) {
-          // map.innerMap.fitBounds(place.viewport);
-        } else {
-          // map.center = place.location;
-          // map.zoom = 17;
         }
 
         this.infowindowContent.children["place-name"].textContent =
           place.displayName;
         this.infowindowContent.children["place-address"].textContent =
           place.formattedAddress;
-        // this.infowindow.open(map.innerMap, marker);
       });
     }
   },
   methods: {
+    initMap() {
+      this.infowindow = new google.maps.InfoWindow();
+      this.placePicker = document.getElementById("place-picker");
+      this.infowindowContent = document.getElementById("infowindow-content");
+      this.infowindow.setContent(this.infowindowContent);
+    },
+    loadGoogleMapsScript() {
+      if (typeof google === "undefined") {
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${
+          import.meta.env.VITE_GOOGLE_MAPS_API
+        }`;
+        script.async = true;
+        script.defer = true;
+        script.onload = this.initMap;
+        document.head.appendChild(script);
+      } else {
+        this.initMap();
+      }
+    },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
@@ -404,7 +405,7 @@ export default {
       if (this.newPlanName.trim()) {
         this.plans.push({
           name: this.newPlanName.trim(),
-          members: membersList,
+          members: this.membersList,
         });
         this.membersList = [];
         this.newPlanName = ""; // Reset input field
