@@ -123,9 +123,9 @@
           <hr class="dropdown-divider" />
         </li>
         <li>
-          <a class="dropdown-item" href="#"
-            ><RouterLink to="/login">Sign out</RouterLink></a
-          >
+          <a class="dropdown-item" href="#">
+            <RouterLink to="/login">Sign out</RouterLink>
+          </a>
         </li>
       </ul>
     </div>
@@ -225,12 +225,12 @@
 
         <br />
         Where do you want to meet?
-        <input
-          class="form-control"
-          type="text"
-          placeholder="Enter location"
-          autofocus
-        />
+        <gmpx-place-picker id="place-picker" for-map="map"></gmpx-place-picker>
+        <div id="infowindow-content">
+          <span id="place-name" class="title" style="font-weight: bold"></span
+          ><br />
+          <span id="place-address"></span>
+        </div>
 
         <br />
         Select Categories
@@ -265,6 +265,7 @@
 <script>
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
+import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
 export default {
@@ -274,6 +275,9 @@ export default {
   },
   data() {
     return {
+      placePicler: null,
+      infowindowContent: null,
+      infowindow: null,
       showInput: false,
       newPlanName: "",
       plans: [
@@ -306,7 +310,47 @@ export default {
       },
     };
   },
+  mounted() {
+    this.loadGoogleMapsScript();
+
+    if (this.placePicker) {
+      this.placePicker.addEventListener("gmpx-placechange", () => {
+        const place = this.placePicker.value;
+
+        if (!place.location) {
+          window.alert("No details available for input: '" + place.name + "'");
+          this.infowindow.close();
+          return;
+        }
+
+        this.infowindowContent.children["place-name"].textContent =
+          place.displayName;
+        this.infowindowContent.children["place-address"].textContent =
+          place.formattedAddress;
+      });
+    }
+  },
   methods: {
+    initMap() {
+      this.infowindow = new google.maps.InfoWindow();
+      this.placePicker = document.getElementById("place-picker");
+      this.infowindowContent = document.getElementById("infowindow-content");
+      this.infowindow.setContent(this.infowindowContent);
+    },
+    loadGoogleMapsScript() {
+      if (typeof google === "undefined") {
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${
+          import.meta.env.VITE_GOOGLE_MAPS_API
+        }`;
+        script.async = true;
+        script.defer = true;
+        script.onload = this.initMap;
+        document.head.appendChild(script);
+      } else {
+        this.initMap();
+      }
+    },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
@@ -361,7 +405,7 @@ export default {
       if (this.newPlanName.trim()) {
         this.plans.push({
           name: this.newPlanName.trim(),
-          members: membersList,
+          members: this.membersList,
         });
         this.membersList = [];
         this.newPlanName = ""; // Reset input field
