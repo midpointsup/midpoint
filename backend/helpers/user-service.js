@@ -18,5 +18,17 @@ const userService = (function () {
     }).then((res) => res.json);
   };
 
+  module.googleAuth = function (code) {
+    return fetch(
+      "http://localhost:5173/auth",
+      {
+        method: "POST",
+        headers: { 
+          Authorization: code
+         },
+      }
+    ).then((res) => res.json);
+  }
+
   return module;
 })();

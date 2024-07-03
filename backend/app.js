@@ -2,6 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import { sequelize } from "./datasource.js";
 import { userRouter } from "./routers/user_router.js";
+import { OAuth2Client } from "google-auth-library";
+const oauth2Client = new OAuth2Client();
+
 
 export const app = express();
 const PORT = process.env.PORT;
