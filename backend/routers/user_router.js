@@ -3,6 +3,7 @@ import { Router } from "express";
 import multer from "multer";
 import bcrypt from "bcrypt";
 import path from "path";
+import { AccessToken } from "../models/accessTokens.js";
 
 const upload = multer({ dest: "uploads/" });
 export const userRouter = Router();
@@ -64,4 +65,40 @@ userRouter.post("/signin", async (req, res) => {
     return res.status(401).json({ error: "Incorrect username or password" });
   }
   return res.status(200).json(user);
+});
+
+userRouter.get("/me", async (req, res) => {
+    try {
+        if (!req.headers.authorization) {
+            return res.status(401).json({ error: "Missing authorization header" });
+        }
+    const bearer = req.headers.authorization.split(" ")[1];
+
+
+  const token = await AccessToken.findOne({
+        where: {
+        access_token: bearer,
+        },
+        include: User,
+    }); 
+    if (!token) {
+        return res.status(401).json({ error: "Invalid token" });
+    }
+    const userId = token.UserId;
+    const user = await User.findOne({
+        where: {
+        id: userId,
+        },
+    });
+    if (!user) {
+        return res.status(404).json({ error: "User not found" });
+    }
+    return res.status(200).json({
+        username: user.username,
+        email: user.email,
+        picture: user.picture,
+    });
+} catch {
+    return res.status(500).json({ error: "Failed to get user" });
+}
 });
