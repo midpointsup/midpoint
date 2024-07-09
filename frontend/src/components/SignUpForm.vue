@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 export default {
   methods: {
@@ -86,15 +86,22 @@ export default {
     form.addEventListener(
       "submit",
       function (event) {
-        if (!form.checkValidity() && form.password !== form.re-enter-password) {
+        if (
+          !form.checkValidity() &&
+          form.password !== form.re - enter - password
+        ) {
           event.preventDefault();
           event.stopPropagation();
         } else {
-          userSerice.signup(form.username, form.email, form.password).then(function (res) {
-            if (res.error) {
-              document.querySelector(".invalid-credentials").classList.remove("hidden");
-            }
-          });
+          userSerice
+            .signup(form.username, form.email, form.password)
+            .then(function (res) {
+              if (res.error) {
+                document
+                  .querySelector(".invalid-credentials")
+                  .classList.remove("hidden");
+              }
+            });
         }
 
         form.classList.add("was-validated");

@@ -9,7 +9,7 @@ export const GoogleToken = sequelize.define("GoogleToken", {
   },
   refresh_token: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
 });
 

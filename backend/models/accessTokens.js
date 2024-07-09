@@ -9,7 +9,7 @@ export const AccessToken = sequelize.define("AccessToken", {
   },
   expires_in: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
   },
 });
 

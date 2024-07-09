@@ -308,7 +308,7 @@ export default {
       currentUser: {
         name: "Rachel",
         location: "",
-        profilePicture: ""
+        profilePicture: "",
       },
     };
   },
@@ -334,11 +334,10 @@ export default {
 
     userService.getMe().then((res) => {
       if (!res.error) {
-      console.log("Profile Picture:", res);
-      this.currentUser.profilePicture = res.picture;
-      this.currentUser.name = res.username;
+        console.log("Profile Picture:", res);
+        this.currentUser.profilePicture = res.picture;
+        this.currentUser.name = res.username;
       }
-;
     });
   },
   methods: {

@@ -38,15 +38,15 @@ userRouter.post("/signup", upload.single("picture"), async (req, res) => {
 });
 
 userRouter.post("/signin", async (req, res) => {
-    if (
-        req.body.username === undefined ||
-        req.body.email === undefined ||
-        req.body.password === undefined
-      ) {
-        return res
-          .status(400)
-          .json({ error: "Missing username, email or password" });
-      }
+  if (
+    req.body.username === undefined ||
+    req.body.email === undefined ||
+    req.body.password === undefined
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Missing username, email or password" });
+  }
   const user = await User.findOne({
     where: {
       email: req.body.username,
@@ -68,37 +68,36 @@ userRouter.post("/signin", async (req, res) => {
 });
 
 userRouter.get("/me", async (req, res) => {
-    try {
-        if (!req.headers.authorization) {
-            return res.status(401).json({ error: "Missing authorization header" });
-        }
+  try {
+    if (!req.headers.authorization) {
+      return res.status(401).json({ error: "Missing authorization header" });
+    }
     const bearer = req.headers.authorization.split(" ")[1];
 
-
-  const token = await AccessToken.findOne({
-        where: {
+    const token = await AccessToken.findOne({
+      where: {
         access_token: bearer,
-        },
-        include: User,
-    }); 
+      },
+      include: User,
+    });
     if (!token) {
-        return res.status(401).json({ error: "Invalid token" });
+      return res.status(401).json({ error: "Invalid token" });
     }
     const userId = token.UserId;
     const user = await User.findOne({
-        where: {
+      where: {
         id: userId,
-        },
+      },
     });
     if (!user) {
-        return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
     return res.status(200).json({
-        username: user.username,
-        email: user.email,
-        picture: user.picture,
+      username: user.username,
+      email: user.email,
+      picture: user.picture,
     });
-} catch {
+  } catch {
     return res.status(500).json({ error: "Failed to get user" });
-}
+  }
 });

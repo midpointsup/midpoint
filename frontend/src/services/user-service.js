@@ -2,7 +2,7 @@ let userService = (function () {
   "use strict";
 
   const module = {};
-const baseUrl = "http://localhost:3000";
+  const baseUrl = "http://localhost:3000";
 
   module.signup = function (username, email, password) {
     return fetch(`${baseUrl}/api/users/signup`, {
@@ -22,20 +22,20 @@ const baseUrl = "http://localhost:3000";
 
   module.storeToken = function (token) {
     localStorage.setItem("token", token);
-  }
+  };
 
   module.getToken = function () {
     return localStorage.getItem("token");
-  }
+  };
 
   module.getMe = function () {
     return fetch(`${baseUrl}/api/users/me`, {
       method: "GET",
-      headers: { "Authorization": `Bearer ${module.getToken()}` },
+      headers: { Authorization: `Bearer ${module.getToken()}` },
     }).then((res) => res.json());
-};
+  };
 
-return module;
+  return module;
 })();
 
 export default userService;

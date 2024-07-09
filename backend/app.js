@@ -8,17 +8,17 @@ import cors from "cors";
 export const app = express();
 const PORT = process.env.PORT;
 
-
-app.use(cors({
-  origin: 'http://localhost:5173', // Only allow requests from this origin,
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Only allow requests from this origin,
+    credentials: true,
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(express.static("static"));
-
 
 try {
   await sequelize.authenticate();
