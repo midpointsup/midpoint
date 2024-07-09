@@ -37,6 +37,15 @@ userRouter.post("/signup", upload.single("picture"), async (req, res) => {
 });
 
 userRouter.post("/signin", async (req, res) => {
+    if (
+        req.body.username === undefined ||
+        req.body.email === undefined ||
+        req.body.password === undefined
+      ) {
+        return res
+          .status(400)
+          .json({ error: "Missing username, email or password" });
+      }
   const user = await User.findOne({
     where: {
       email: req.body.username,

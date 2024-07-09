@@ -1,3 +1,5 @@
+//import exp = require("constants");
+
 const userService = (function () {
   "user strict";
 
@@ -18,5 +20,11 @@ const userService = (function () {
     }).then((res) => res.json);
   };
 
+  module.storeToken = function (token) {
+    localStorage.setItem("token", token);
+  }
+  
   return module;
 })();
+
+export default userService;

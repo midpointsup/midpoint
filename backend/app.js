@@ -2,14 +2,23 @@ import express from "express";
 import bodyParser from "body-parser";
 import { sequelize } from "./datasource.js";
 import { userRouter } from "./routers/user_router.js";
+import { googleOAuthRouter } from "./routers/google_oauth_router.js";
+import cors from "cors";
 
 export const app = express();
 const PORT = process.env.PORT;
+
+
+app.use(cors({
+  origin: 'http://localhost:5173', // Only allow requests from this origin,
+  credentials: true
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(express.static("static"));
+
 
 try {
   await sequelize.authenticate();
@@ -24,6 +33,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRouter);
+app.use("/api/oauth", googleOAuthRouter);
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body);
