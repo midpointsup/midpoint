@@ -14,7 +14,7 @@ export const User = sequelize.define("User", {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   picture: {
     type: DataTypes.JSON,

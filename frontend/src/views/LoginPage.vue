@@ -1,14 +1,23 @@
 <template>
   <div id="layout" class="login-background">
-    <LoginForm class="login-container"></LoginForm>
+    <div class="container login-container">
+      <div class="row">
+        <LoginForm class=""></LoginForm>
+      </div>
+      <div class="row">
+        <GoogleLoginForm class=""></GoogleLoginForm>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import GoogleLoginForm from "@/components/GoogleLoginForm.vue";
 import LoginForm from "../components/LoginForm.vue";
 export default {
   components: {
     LoginForm,
+    GoogleLoginForm,
   },
 };
 </script>

@@ -55,6 +55,9 @@
           <label for="re-enter-password">Re-Enter Password</label>
           <div class="invalid-feedback">Password required</div>
         </div>
+        <div class="hidden invalid-credentials">
+          Incorrect Username or Password
+        </div>
         <div class="row container mx-auto mb-3">
           <button type="submit" class="btn w-100">Log In</button>
         </div>
@@ -65,6 +68,8 @@
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+
 export default {
   methods: {
     signup() {
@@ -81,9 +86,22 @@ export default {
     form.addEventListener(
       "submit",
       function (event) {
-        if (!form.checkValidity()) {
+        if (
+          !form.checkValidity() &&
+          form.password !== form.re - enter - password
+        ) {
           event.preventDefault();
           event.stopPropagation();
+        } else {
+          userSerice
+            .signup(form.username, form.email, form.password)
+            .then(function (res) {
+              if (res.error) {
+                document
+                  .querySelector(".invalid-credentials")
+                  .classList.remove("hidden");
+              }
+            });
         }
 
         form.classList.add("was-validated");
