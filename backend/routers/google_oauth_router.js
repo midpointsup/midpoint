@@ -9,8 +9,6 @@ import crypto from "crypto";
 
 export const googleOAuthRouter = Router();
 
-googleOAuthRouter.use(cors({ origin: "http://localhost:5173" }));
-
 googleOAuthRouter.post("/", async (req, res) => {
   try {
     const oAuth2Client = new OAuth2Client(
