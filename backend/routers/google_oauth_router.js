@@ -64,14 +64,12 @@ googleOAuthRouter.post("/", async (req, res) => {
       return res.status(500).json({ error: "Unable to generate access token" });
     }
 
-    return res
-      .status(200)
-      .json({
-        username: userResponse.data.name,
-        email: userResponse.data.email,
-        picture: userResponse.data.picture,
-        token: accessToken.access_token,
-      });
+    return res.status(200).json({
+      username: userResponse.data.name,
+      email: userResponse.data.email,
+      picture: userResponse.data.picture,
+      token: accessToken.access_token,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Failed to save code" });
   }
