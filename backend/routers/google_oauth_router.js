@@ -1,5 +1,4 @@
 import { Router } from "express";
-import cors from "cors";
 import axios from "axios";
 import { OAuth2Client } from "google-auth-library";
 import { GoogleToken } from "../models/googleTokens.js";

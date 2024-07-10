@@ -1,5 +1,6 @@
 import { sequelize } from "../datasource.js";
 import { DataTypes } from "sequelize";
+//import { Plan } from "./plan.js";
 
 export const User = sequelize.define("User", {
   username: {
@@ -21,3 +22,6 @@ export const User = sequelize.define("User", {
     allowNull: true,
   },
 });
+
+//Plan.hasMany(User);
+//User.belongsTo(Plan);
