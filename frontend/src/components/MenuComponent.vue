@@ -106,7 +106,7 @@
         aria-expanded="false"
       >
         <img
-          :src="currentUser.profilePicture"
+          src="https://avatars.githubusercontent.com/u/57234754?s=400&u=7928d03725e3a137f7c37cd146c6cf0177b4765a&v=4"
           alt=""
           width="32"
           height="32"
@@ -268,7 +268,6 @@ import "bootstrap";
 import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
-import userService from "../services/user-service.js";
 export default {
   components: {
     MiddleForm,
@@ -308,7 +307,6 @@ export default {
       currentUser: {
         name: "Rachel",
         location: "",
-        profilePicture: "",
       },
     };
   },
@@ -331,14 +329,6 @@ export default {
           place.formattedAddress;
       });
     }
-
-    userService.getMe().then((res) => {
-      if (!res.error) {
-        console.log("Profile Picture:", res);
-        this.currentUser.profilePicture = res.picture;
-        this.currentUser.name = res.username;
-      }
-    });
   },
   methods: {
     initMap() {
@@ -348,18 +338,6 @@ export default {
       this.infowindow.setContent(this.infowindowContent);
     },
     loadGoogleMapsScript() {
-      if (typeof google === "undefined") {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${
-          import.meta.env.VITE_GOOGLE_MAPS_API
-        }`;
-        script.async = true;
-        script.defer = true;
-        script.onload = this.initMap;
-        document.head.appendChild(script);
-      } else {
-        this.initMap();
-      }
     },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
