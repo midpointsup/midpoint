@@ -1,15 +1,25 @@
 <template>
   <div class="middle-form-wrapper" v-if="showInput">
     What is your starting location?
-    <form class="middle-form">
-      <input
-        class="form-control"
-        type="text"
-        placeholder="Enter location"
-        autofocus
-        v-model="startLoc"
-      />
-      <button @click="addLocation" class="btn">Done</button>
+    <form class="outer-middle-form">
+      <form class="middle-form">
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Enter location"
+          autofocus
+          v-model="startLoc"
+        />
+        <button @click="addLocation" class="btn">Done</button>
+      </form>
+
+      <label for="travelMode">Travel Mode:</label>
+      <select class="form-select" v-model="travelMode">
+        <option value="DRIVE">Drive</option>
+        <option value="WALK">Walk</option>
+        <option value="BIKE">Bike</option>
+        <option value="TRANSIT">Transit</option>
+      </select>
     </form>
   </div>
   <ul class="mb-auto middle-info">
@@ -23,6 +33,7 @@
   </ul>
   <slot></slot>
   <button class="btn" @click="generateMiddle">Meet in the middle!</button>
+  <button class="btn" @click="getDirections">Get Directions</button>
 </template>
 
 <script>
@@ -32,6 +43,8 @@ export default {
     return {
       showInput: !this.startLocation,
       startLoc: this.startLocation ?? "",
+      midpoint: {},
+      travelMode: "DRIVE", // Default travel mode
     };
   },
   props: {
@@ -50,11 +63,11 @@ export default {
       this.$emit("clear-location");
     },
     async generateMiddle() {
-      console.log("generateMiddle", this.startLoc);
+      console.log("generateMiddle", this.startLoc, this.travelMode);
       const location = [
         {
-          address: "The Rocks Sydney New South Wales Australia",
-          mode: "driving",
+          address: this.startLoc,
+          mode: this.travelMode,
           radius: 1500,
         },
       ];
@@ -63,14 +76,15 @@ export default {
           this.displayPlaces(response.places).then(() => {
             console.log("displayPlaces");
           });
-          console.log("response", response);
+          this.midpoint = response.midpoint;
+          console.log("response", response, this.midpoint);
         }
       });
     },
     async displayPlaces(places) {
       const map = new google.maps.Map(document.getElementById("map"), {
-        center: places[0].geometry.location,
         zoom: 15,
+        center: places[0].geometry.location,
       });
       places.forEach((place) => {
         const marker = new google.maps.Marker({
@@ -93,6 +107,32 @@ export default {
         });
       });
     },
+    async getDirections() {
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 7,
+      });
+      directionsRenderer.setMap(map);
+
+      const travelModes = {
+        DRIVE: google.maps.TravelMode.DRIVING,
+        WALK: google.maps.TravelMode.WALKING,
+        BIKE: google.maps.TravelMode.BICYCLING,
+        TRANSIT: google.maps.TravelMode.TRANSIT,
+      };
+
+      const request = {
+        origin: this.startLoc,
+        destination: this.midpoint.address,
+        travelMode: travelModes[this.travelMode],
+      };
+      directionsService.route(request, (result, status) => {
+        if (status == "OK") {
+          directionsRenderer.setDirections(result);
+        }
+      });
+    },
   },
 };
 </script>
@@ -101,6 +141,13 @@ export default {
 .middle-form-wrapper {
   margin: 10px 0px;
 }
+
+.outer-middle-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .middle-form {
   display: flex;
   align-items: center;
@@ -108,11 +155,13 @@ export default {
   gap: 10px;
   height: 100%;
 }
+
 .middle-info {
   margin-top: 20px;
   padding: 0;
   list-style: none;
 }
+
 .location {
   width: 100%;
   padding: 5px;
