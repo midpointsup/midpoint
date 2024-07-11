@@ -61,20 +61,19 @@ export default {
       routeService.middle(location, "restaurant", "cruise").then((response) => {
         if (response) {
           this.displayPlaces(response.places).then(() => {
-            console.log("response displayPlaces");
+            console.log("displayPlaces");
           });
           console.log("response", response);
         }
       });
     },
     async displayPlaces(places) {
-      //for each place, create a marke
+
       const map = new google.maps.Map(document.getElementById("map"), {
         center: places[0].geometry.location,
         zoom: 15,
       });
       places.forEach((place) => {
-        console.log("place", place);
         const marker = new google.maps.Marker({
           position: place.geometry.location,
           map,
