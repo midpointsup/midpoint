@@ -347,8 +347,7 @@ export default {
       this.infowindowContent = document.getElementById("infowindow-content");
       this.infowindow.setContent(this.infowindowContent);
     },
-    loadGoogleMapsScript() {
-    },
+    loadGoogleMapsScript() {},
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },

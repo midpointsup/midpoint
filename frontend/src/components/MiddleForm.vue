@@ -50,14 +50,20 @@ export default {
       this.$emit("clear-location");
     },
     async generateMiddle() {
-      console.log('generateMiddle', this.startLoc);      
-      const location = [{address:"The Rocks Sydney New South Wales Australia", mode: 'driving', radius: 1500}];
-      routeService.middle(location, 'restaurant', 'cruise').then((response) => {
-        if(response) {
-         this.displayPlaces(response.places).then(() => {
-           console.log('response displayPlaces');
+      console.log("generateMiddle", this.startLoc);
+      const location = [
+        {
+          address: "The Rocks Sydney New South Wales Australia",
+          mode: "driving",
+          radius: 1500,
+        },
+      ];
+      routeService.middle(location, "restaurant", "cruise").then((response) => {
+        if (response) {
+          this.displayPlaces(response.places).then(() => {
+            console.log("response displayPlaces");
           });
-          console.log('response', response);
+          console.log("response", response);
         }
       });
     },
@@ -68,7 +74,7 @@ export default {
         zoom: 15,
       });
       places.forEach((place) => {
-        console.log('place', place);
+        console.log("place", place);
         const marker = new google.maps.Marker({
           position: place.geometry.location,
           map,
@@ -77,9 +83,9 @@ export default {
 
         const contentString =
           '<div id="content">' +
-            `${place.name} <br>` +
-            `${place.vicinity} <br>`
-          "</div>";
+          `${place.name} <br>` +
+          `${place.vicinity} <br>`;
+        ("</div>");
 
         const infowindow = new google.maps.InfoWindow({
           content: contentString,
@@ -87,9 +93,8 @@ export default {
         marker.addListener("click", () => {
           infowindow.open(map, marker);
         });
-        
       });
-    }
+    },
   },
 };
 </script>
