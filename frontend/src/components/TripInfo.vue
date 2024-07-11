@@ -8,13 +8,13 @@ import io from "socket.io-client";
 export default {
   created() {
     const socket = io("http://localhost:3000");
-    
+
     socket.on("connect", () => {
       console.log("connected");
     });
 
     socket.on("trip", (trip) => {
-      console.log("trip")
+      console.log("trip");
       console.log(trip);
     });
   },
