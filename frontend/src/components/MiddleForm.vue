@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import {routeService} from "../../../backend/helpers/route-service.js";
+import routeService from "../services/route-service.js";
 export default {
   data() {
     return {
@@ -50,12 +50,46 @@ export default {
       this.$emit("clear-location");
     },
     async generateMiddle() {
-      console.log('generateMiddle', this.startLoc);
-      const location = {latitude: 42.3601, longitude: -71.0589, mode: 'driving', radius: 10};
-      routeService.middle(location, 'restaurant').then((response) => {
-        console.log('response', response);
+      console.log('generateMiddle', this.startLoc);      
+      const location = [{address:"The Rocks Sydney New South Wales Australia", mode: 'driving', radius: 1500}];
+      routeService.middle(location, 'restaurant', 'cruise').then((response) => {
+        if(response) {
+         this.displayPlaces(response.places).then(() => {
+           console.log('response displayPlaces');
+          });
+          console.log('response', response);
+        }
       });
     },
+    async displayPlaces(places) {
+      //for each place, create a marke
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: places[0].geometry.location,
+        zoom: 15,
+      });
+      places.forEach((place) => {
+        console.log('place', place);
+        const marker = new google.maps.Marker({
+          position: place.geometry.location,
+          map,
+          title: place.name,
+        });
+
+        const contentString =
+          '<div id="content">' +
+            `${place.name} <br>` +
+            `${place.vicinity} <br>`
+          "</div>";
+
+        const infowindow = new google.maps.InfoWindow({
+          content: contentString,
+        });
+        marker.addListener("click", () => {
+          infowindow.open(map, marker);
+        });
+        
+      });
+    }
   },
 };
 </script>
