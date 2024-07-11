@@ -1,20 +1,60 @@
 <template>
-  <div ref="mapContainer" class="map-container"></div>
+  <div id="map"></div>
 </template>
 
 <script>
-import mapboxgl from "mapbox-gl";
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 export default {
+  beforeMount() {
+    ((g) => {
+      var h,
+        a,
+        k,
+        p = "The Google Maps JavaScript API",
+        c = "google",
+        l = "importLibrary",
+        q = "__ib__",
+        m = document,
+        b = window;
+      b = b[c] || (b[c] = {});
+      var d = b.maps || (b.maps = {}),
+        r = new Set(),
+        e = new URLSearchParams(),
+        u = () =>
+          h ||
+          (h = new Promise(async (f, n) => {
+            await (a = m.createElement("script"));
+            e.set("libraries", [...r] + "");
+            for (k in g)
+              e.set(
+                k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()),
+                g[k]
+              );
+            e.set("callback", c + ".maps." + q);
+            a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+            d[q] = f;
+            a.onerror = () => (h = n(Error(p + " could not load.")));
+            a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+            m.head.append(a);
+          }));
+      d[l]
+        ? console.warn(p + " only loads once. Ignoring:", g)
+        : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+    })({ key: import.meta.env.VITE_GOOGLE_MAPS_API, v: "weekly" });
+  },
   mounted() {
-    const map = new mapboxgl.Map({
-      container: this.$refs.mapContainer,
-      style: "mapbox://styles/mapbox/streets-v12", // Replace with your preferred map style
-      center: [-71.224518, 42.213995],
-      zoom: 9,
-    });
+    let map;
 
-    this.map = map;
+    async function initMap() {
+      const { Map } = await google.maps.importLibrary("maps");
+
+      map = new Map(document.getElementById("map"), {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 8,
+      });
+      console.log("initMap", map);
+    }
+
+    initMap();
   },
   unmounted() {
     this.map.remove();
@@ -24,7 +64,8 @@ export default {
 </script>
 
 <style>
-.map-container {
+#map {
+  height: 100%;
   flex: 1;
 }
 </style>

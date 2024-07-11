@@ -49,7 +49,6 @@ planRouter.post("/", async (req, res) => {
     membersList.forEach(async (member) => {
       await plan.addUser(member);
     });
-
     return res.json({
       name: plan.name,
       memberCount: plan.memberCount,
@@ -105,7 +104,6 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
     transportationMethod,
     radius,
   } = req.body;
-
   if (
     !startLocation ||
     !startTime ||

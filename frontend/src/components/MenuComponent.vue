@@ -347,20 +347,7 @@ export default {
       this.infowindowContent = document.getElementById("infowindow-content");
       this.infowindow.setContent(this.infowindowContent);
     },
-    loadGoogleMapsScript() {
-      if (typeof google === "undefined") {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${
-          import.meta.env.VITE_GOOGLE_MAPS_API
-        }`;
-        script.async = true;
-        script.defer = true;
-        script.onload = this.initMap;
-        document.head.appendChild(script);
-      } else {
-        this.initMap();
-      }
-    },
+    loadGoogleMapsScript() {},
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },

@@ -22,10 +22,11 @@
     </li>
   </ul>
   <slot></slot>
-  <button class="btn" disabled>Meet in the middle!</button>
+  <button class="btn" @click="generateMiddle">Meet in the middle!</button>
 </template>
 
 <script>
+import routeService from "../services/route-service.js";
 export default {
   data() {
     return {
@@ -47,6 +48,50 @@ export default {
     editLocation() {
       this.showInput = true;
       this.$emit("clear-location");
+    },
+    async generateMiddle() {
+      console.log("generateMiddle", this.startLoc);
+      const location = [
+        {
+          address: "The Rocks Sydney New South Wales Australia",
+          mode: "driving",
+          radius: 1500,
+        },
+      ];
+      routeService.middle(location, "restaurant", "cruise").then((response) => {
+        if (response) {
+          this.displayPlaces(response.places).then(() => {
+            console.log("displayPlaces");
+          });
+          console.log("response", response);
+        }
+      });
+    },
+    async displayPlaces(places) {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: places[0].geometry.location,
+        zoom: 15,
+      });
+      places.forEach((place) => {
+        const marker = new google.maps.Marker({
+          position: place.geometry.location,
+          map,
+          title: place.name,
+        });
+
+        const contentString =
+          '<div id="content">' +
+          `${place.name} <br>` +
+          `${place.vicinity} <br>`;
+        ("</div>");
+
+        const infowindow = new google.maps.InfoWindow({
+          content: contentString,
+        });
+        marker.addListener("click", () => {
+          infowindow.open(map, marker);
+        });
+      });
     },
   },
 };
