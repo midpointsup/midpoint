@@ -26,6 +26,7 @@ planRouter.post("/", async (req, res) => {
     if (!ownerUser) {
       return res.status(404).json({ error: "Owner not found" });
     }
+
     let membersList = [];
     for (const member of members) {
       const user = await User.findOne({
