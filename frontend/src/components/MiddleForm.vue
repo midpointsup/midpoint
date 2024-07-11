@@ -68,7 +68,6 @@ export default {
       });
     },
     async displayPlaces(places) {
-
       const map = new google.maps.Map(document.getElementById("map"), {
         center: places[0].geometry.location,
         zoom: 15,
