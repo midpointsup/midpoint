@@ -9,11 +9,11 @@ export const Trip = sequelize.define("Trip", {
     allowNull: false,
   },
   startTime: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.TIME,
     allowNull: false,
   },
   endLocation: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   transportationMethod: {

@@ -10,7 +10,6 @@ export const Plan = sequelize.define("Plan", {
   memberCount: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    unique: true,
   },
   ownerId: {
     type: DataTypes.INTEGER,
