@@ -11,8 +11,8 @@ const routeService = (function () {
 
     return fetch(`
       ${baseUrl}/api/routes/middle?locations=${encodedLocations}&category=${category}&keyword=${keyword}`, {
-       method: "GET",
-       headers: { "Content-Type": "application/json" },
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
     }).then((res) => {
       console.log('res in middle service: ', res);
       return res.json();
