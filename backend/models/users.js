@@ -21,6 +21,3 @@ export const User = sequelize.define("User", {
     allowNull: true,
   },
 });
-
-//Plan.hasMany(User);
-//User.belongsTo(Plan);

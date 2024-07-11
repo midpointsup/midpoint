@@ -61,9 +61,6 @@ export default {
             this.userDetails = userDetails;
             userService.storeToken(userDetails.token);
           });
-
-        // Redirect to the homepage ("/")
-        //this.$router.push("/rex");
       } catch (error) {
         console.error("Failed to send authorization code:", error);
       }
