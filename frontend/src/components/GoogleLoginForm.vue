@@ -29,7 +29,6 @@ export default {
   },
   methods: {
     login() {
-      console.log("clientid", import.meta.env.VITE_CLIENT_ID);
       googleSdkLoaded((google) => {
         google.accounts.oauth2
           .initCodeClient({
@@ -39,7 +38,6 @@ export default {
             callback: (response) => {
               console.log("Response received:", response);
               if (response.code) {
-                //console.log("Authorization Code:", response.code);
                 this.sendCodeToBackend(response.code);
               }
             },
@@ -63,9 +61,6 @@ export default {
             this.userDetails = userDetails;
             userService.storeToken(userDetails.token);
           });
-
-        // Redirect to the homepage ("/")
-        //this.$router.push("/rex");
       } catch (error) {
         console.error("Failed to send authorization code:", error);
       }

@@ -17,6 +17,7 @@
     "cors": "^2.8.5",
     "mapbox-gl": "^3.4.0",
     "pinia": "^2.0.21",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.2.38",
     "vue-router": "^4.3.3"
   },
