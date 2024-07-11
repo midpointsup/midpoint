@@ -116,10 +116,15 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-
   try {
-
-    console.log(startLocation, startTime, endLocation, transportationMethod, radius, req.params.id)
+    console.log(
+      startLocation,
+      startTime,
+      endLocation,
+      transportationMethod,
+      radius,
+      req.params.id
+    );
     const trip = await Trip.create({
       startLocation: startLocation,
       startTime: startTime,
