@@ -8,6 +8,7 @@ import { registerIOListeners } from "./socket.js";
 import cors from "cors";
 import { planRouter } from "./routers/plan_router.js";
 import http from "http";
+import { routesRouter } from "./routers/routes_router.js";
 
 export const app = express();
 const PORT = process.env.PORT;
@@ -50,6 +51,7 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRouter);
 app.use("/api/oauth", googleOAuthRouter);
 app.use("/api/plans", planRouter);
+app.use("/api/routes", routesRouter);
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body);

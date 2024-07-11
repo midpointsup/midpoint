@@ -22,10 +22,11 @@
     </li>
   </ul>
   <slot></slot>
-  <button class="btn" disabled>Meet in the middle!</button>
+  <button class="btn" @click="generateMiddle">Meet in the middle!</button>
 </template>
 
 <script>
+import {routeService} from "../../../backend/helpers/route-service.js";
 export default {
   data() {
     return {
@@ -47,6 +48,13 @@ export default {
     editLocation() {
       this.showInput = true;
       this.$emit("clear-location");
+    },
+    async generateMiddle() {
+      console.log('generateMiddle', this.startLoc);
+      const location = {latitude: 42.3601, longitude: -71.0589, mode: 'driving', radius: 10};
+      routeService.middle(location, 'restaurant').then((response) => {
+        console.log('response', response);
+      });
     },
   },
 };
