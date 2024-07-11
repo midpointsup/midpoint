@@ -26,7 +26,6 @@ planRouter.post("/", async (req, res) => {
     if (!ownerUser) {
       return res.status(404).json({ error: "Owner not found" });
     }
-
     let membersList = [];
     for (const member of members) {
       const user = await User.findOne({
@@ -39,6 +38,8 @@ planRouter.post("/", async (req, res) => {
       }
       membersList.push(user.id);
     }
+    console.log(ownerUser);
+    console.log("here2");
 
     const plan = await Plan.create({
       ownerId: ownerUser.id,
@@ -49,7 +50,7 @@ planRouter.post("/", async (req, res) => {
     membersList.forEach(async (member) => {
       await plan.addUser(member);
     });
-
+    console.log("here4");
     return res.json({
       name: plan.name,
       memberCount: plan.memberCount,
@@ -105,7 +106,7 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
     transportationMethod,
     radius,
   } = req.body;
-
+  console.log("a");
   if (
     !startLocation ||
     !startTime ||
@@ -116,15 +117,8 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  console.log("b");
   try {
-    console.log(
-      startLocation,
-      startTime,
-      endLocation,
-      transportationMethod,
-      radius,
-      req.params.id
-    );
     const trip = await Trip.create({
       startLocation: startLocation,
       startTime: startTime,
@@ -134,11 +128,12 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
       PlanId: req.params.id,
       UserId: req.params.memberId,
     });
-
+    console.log("c");
     req.io.emit("trip", trip);
-
+    console.log("d");
     return res.json(trip);
   } catch (e) {
+    console.log(e);
     return res.status(422).json({ error: e });
   }
 });
