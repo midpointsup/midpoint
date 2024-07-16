@@ -3,13 +3,18 @@
     What is your starting location?
     <form class="outer-middle-form">
       <form class="middle-form">
-        <input
-          class="form-control"
-          type="text"
-          placeholder="Enter location"
-          autofocus
-          v-model="startLoc"
-        />
+        <gmpx-place-picker
+          placeholder="Enter a place"
+          id="place-picker"
+          for-map="map"
+          :value="startLoc"
+          @gmpx-placechange="handleLocationChange"
+        ></gmpx-place-picker>
+        <div id="infowindow-content">
+          <span id="place-name" class="title" style="font-weight: bold"></span
+          ><br />
+          <span id="place-address"></span>
+        </div>
         <button @click="addLocation" class="btn">Done</button>
       </form>
 
@@ -33,6 +38,7 @@
   </ul>
   <slot></slot>
   <button class="btn" @click="generateMiddle">Meet in the middle!</button>
+  <br />
   <button class="btn" @click="getDirections">Get Directions</button>
 </template>
 
@@ -44,14 +50,36 @@ export default {
       showInput: !this.startLocation,
       startLoc: this.startLocation ?? "",
       midpoint: {},
-      travelMode: "DRIVE", // Default travel mode
+      travelMode: "DRIVE",
     };
   },
   props: {
-    numMembers: Number,
     startLocation: String,
   },
+  mounted() {
+    this.placePicker = document.getElementById("place-picker");
+    if (this.placePicker) {
+      this.placePicker.addEventListener("gmpx-placechange", () => {
+        const place = this.placePicker.value;
+        this.startLoc = this.placePicker.value.formattedAddress;
+
+        if (!place.location) {
+          window.alert("No details available for input: '" + place.name + "'");
+          this.infowindow.close();
+          return;
+        }
+
+        this.infowindowContent.children["place-name"].textContent =
+          place.displayName;
+        this.infowindowContent.children["place-address"].textContent =
+          place.formattedAddress;
+      });
+    }
+  },
   methods: {
+    handleLocationChange(newLocation) {
+      this.startLoc = newLocation.target.value.formattedAddress;
+    },
     addLocation() {
       if (this.startLoc?.trim()) {
         this.showInput = false;
@@ -63,7 +91,6 @@ export default {
       this.$emit("clear-location");
     },
     async generateMiddle() {
-      console.log("generateMiddle", this.startLoc, this.travelMode);
       const location = [
         {
           address: this.startLoc,
@@ -73,11 +100,8 @@ export default {
       ];
       routeService.middle(location, "restaurant", "cruise").then((response) => {
         if (response) {
-          this.displayPlaces(response.places).then(() => {
-            console.log("displayPlaces");
-          });
+          this.displayPlaces(response.places).then(() => {});
           this.midpoint = response.midpoint;
-          console.log("response", response, this.midpoint);
         }
       });
     },

@@ -79,5 +79,3 @@ routesRouter.get("/middle", async (req, res) => {
 
   return res.json({ midpoint: midpoint, places: places });
 });
-
-routesRouter.get("/route", async (req, res) => {});

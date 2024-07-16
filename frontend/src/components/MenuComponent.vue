@@ -134,7 +134,7 @@
   <div v-if="isSidebarOpen" id="menu">
     <div
       class="d-flex flex-column flex-shrink-0 p-3 bg-light"
-      style="width: 280px; height: 100%"
+      id="menuContainer"
     >
       <a
         href="/"
@@ -147,8 +147,11 @@
         <div v-if="selectedPlan" class="nav nav-pills flex-column mb-auto">
           <h4>{{ selectedPlan.name }}</h4>
           <MiddleForm
-            :numMembers="selectedPlan.members.length"
-            :startLocation="currentUser.location"
+            :startLocation="
+              selectedPlan.members.find(
+                (member) => member.id === currentUser.id
+              ).Trips[0].startLocation
+            "
             @add-location="updateCurrentLocation"
             @clear-location="clearCurrentLocation"
           >
@@ -158,6 +161,13 @@
             ></MembersList>
           </MiddleForm>
           <button @click="clearSelection" class="btn mt-3">Back</button>
+          <button
+            v-if="selectedPlan.ownerId === currentUser.id"
+            @click="confirmDelete(selectedPlan.id)"
+            class="btn btn-danger mt-3"
+          >
+            Delete Plan
+          </button>
         </div>
         <div v-else>
           <h6>My Plans</h6>
@@ -168,7 +178,7 @@
               class="planContainer"
               @click="selectPlan(plan)"
             >
-              <a href="#" class="nav-link link-dark">
+              <a href="#" class="nav-link link-dark" :id="plan.id">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -184,8 +194,10 @@
                 {{ plan.name }}
                 <hr />
                 <!-- tags -->
-                <p>Scarborough Town Center</p>
-                <span class="badge">Jan 18-24</span>
+                <p>{{ plan.address ? plan.address : "TBD" }}</p>
+                <span class="badge">{{
+                  plan.date && plan.date.slice(0, 10)
+                }}</span>
               </a>
             </li>
           </ul>
@@ -214,7 +226,7 @@
 
         <div class="mt-3">
           <span
-            class="badge badge-pill bg-primary"
+            class="badge badge-pill"
             v-for="(member, index) in membersList"
             :key="index"
           >
@@ -233,17 +245,15 @@
         </div>
 
         <br />
-        Select Categories
+        Select Category
         <div id="categoryContainer">
           <div
             v-for="category in categories"
             :key="category.id"
-            :data-key="category.id"
+            :data-key="category.name"
             class="category-icon"
-            @click="toggleCategorySelection(category.id)"
+            @click="toggleCategorySelection(category.name)"
           >
-            <!-- <img :src="category.icon" :alt="category.name"
-                        :class="{'selected': selectedCategoryIds.includes(category.id)}"> -->
             <span>{{ category.name }}</span>
           </div>
         </div>
@@ -251,12 +261,17 @@
         <br />
         Date
         <input
+          id="date"
           class="form-control"
           type="text"
           placeholder="Enter date"
           autofocus
         />
         <button @click="addPlan" class="btn mt-3">Create</button>
+
+        <span v-if="success" class="alert alert-success" role="alert">
+          Plan created successfully!
+        </span>
       </div>
     </div>
   </div>
@@ -269,6 +284,7 @@ import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
 import userService from "../services/user-service.js";
+import planService from "../services/plan-service.js";
 export default {
   components: {
     MiddleForm,
@@ -276,21 +292,15 @@ export default {
   },
   data() {
     return {
-      placePicler: null,
+      placePicker: null,
       infowindowContent: null,
       infowindow: null,
       showInput: false,
+      date: "",
+      place: "",
       newPlanName: "",
-      plans: [
-        {
-          name: "Spiders",
-          members: ["Bug", "Butter", "Fly"],
-        },
-        {
-          name: "Lunch Buddies",
-          members: [],
-        },
-      ],
+      plans: [],
+      success: false,
       selectedPlan: null,
       newMemberName: "",
       membersList: [],
@@ -301,52 +311,37 @@ export default {
         { id: 4, name: "Grocery", icon: "" },
         { id: 5, name: "Schools", icon: "" },
       ],
-      selectedCategoryIds: [],
+      selectedCategory: "",
       isSidebarOpen: false,
       plansPage: true,
       createPlan: false,
       currentUser: {
-        name: "Rachel",
-        location: "",
+        name: "",
         profilePicture: "",
+        id: "",
       },
     };
   },
   mounted() {
     this.loadGoogleMapsScript();
 
-    if (this.placePicker) {
-      this.placePicker.addEventListener("gmpx-placechange", () => {
-        const place = this.placePicker.value;
-
-        if (!place.location) {
-          window.alert("No details available for input: '" + place.name + "'");
-          this.infowindow.close();
-          return;
-        }
-
-        this.infowindowContent.children["place-name"].textContent =
-          place.displayName;
-        this.infowindowContent.children["place-address"].textContent =
-          place.formattedAddress;
-      });
-    }
-
     userService.getMe().then((res) => {
       if (!res.error) {
         console.log("Profile Picture:", res);
         this.currentUser.profilePicture = res.picture;
         this.currentUser.name = res.username;
+        this.currentUser.id = res.id;
+
+        planService.getPlansForMember(res.id).then((res) => {
+          if (!res.error) {
+            this.plans = res;
+            console.log("Plans:", this.plans);
+          }
+        });
       }
     });
   },
   methods: {
-    initMap() {
-      this.infowindow = new google.maps.InfoWindow();
-      this.placePicker = document.getElementById("place-picker");
-      this.infowindowContent = document.getElementById("infowindow-content");
-      this.infowindow.setContent(this.infowindowContent);
-    },
     loadGoogleMapsScript() {},
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
@@ -375,45 +370,121 @@ export default {
     showInputField() {
       this.showInput = true;
     },
-    toggleCategorySelection(categoryId) {
-      const index = this.selectedCategoryIds.indexOf(categoryId);
-      if (index > -1) {
+    toggleCategorySelection(categoryName) {
+      if (this.selectedCategory === categoryName) {
         document
-          .querySelector(`[data-key='${categoryId}']`)
+          .querySelector(`[data-key='${categoryName}']`)
           .classList.remove("selected");
-        this.selectedCategoryIds.splice(index, 1);
       } else {
         document
-          .querySelector(`[data-key='${categoryId}']`)
+          .querySelector(`[data-key='${categoryName}']`)
           .classList.add("selected");
-        this.selectedCategoryIds.push(categoryId);
       }
+      this.selectedCategory = categoryName;
+
+      //unselect all other categories
+      this.categories
+        .filter((category) => category.name !== categoryName)
+        .forEach((category) => {
+          document
+            .querySelector(`[data-key='${category.name}']`)
+            .classList.remove("selected");
+        });
     },
     addMember() {
       if (this.newMemberName.trim() !== "") {
         this.membersList.push(this.newMemberName);
-        this.newMemberName = ""; // Clear the input field
+        this.newMemberName = "";
       }
     },
     removeMember(index) {
-      this.membersList.splice(index, 1); // Remove the member at the given index
+      this.membersList.splice(index, 1);
     },
-    addPlan() {
+    async addPlan() {
       if (this.newPlanName.trim()) {
-        this.plans.push({
-          name: this.newPlanName.trim(),
-          members: this.membersList,
-        });
-        this.membersList = [];
-        this.newPlanName = ""; // Reset input field
-        this.showInput = false; // Hide input field
+        this.placePicker = document.querySelector("#place-picker");
+        if (this.placePicker) {
+          this.placePicker.addEventListener("gmpx-placechange", () => {
+            this.place = this.placePicker.value;
+          });
+        }
+
+        planService
+          .createPlan(
+            this.newPlanName.trim(),
+            this.currentUser.id,
+            [...this.membersList, this.currentUser.name],
+            this.selectedCategory,
+            this.place.formattedAddress,
+            this.date
+          )
+          .then((res) => {
+            // create trips for all members with their ids
+            new Promise((resolve, reject) => {
+              res.members.forEach((member) => {
+                planService.createTrip(res.id, member.id, {});
+              });
+              resolve();
+            }).then(() => {
+              planService.getPlansForMember(this.currentUser.id).then((res) => {
+                if (!res.error) {
+                  this.plans = res;
+                }
+              });
+              this.membersList = [];
+              this.newPlanName = "";
+              this.showInput = false;
+              this.success = true;
+            });
+          });
       }
     },
-    updateCurrentLocation(location) {
-      this.currentUser.location = location;
+    async confirmDelete(planId) {
+      if (confirm("Are you sure you want to delete this plan?")) {
+        await this.deletePlan(planId);
+      }
+    },
+    async deletePlan(planId) {
+      planService.deletePlan(planId).then((res) => {
+        if (!res.error) {
+          this.plans = this.plans.filter((plan) => plan.id !== planId);
+          this.selectedPlan = null;
+        }
+      });
+    },
+    async updateCurrentLocation(location) {
+      this.selectedPlan.members.forEach((member) => {
+        if (member.id === this.currentUser.id) {
+          member.Trips[0].startLocation = location;
+          planService
+            .updateTrip(
+              this.selectedPlan.id,
+              this.currentUser.id,
+              member.Trips[0].id,
+              {
+                startLocation: location,
+              }
+            )
+            .then((resTrip) => {});
+        }
+      });
     },
     clearCurrentLocation() {
-      this.currentUser.location = "";
+      this.selectedPlan.members.forEach((member) => {
+        if (member.id === this.currentUser.id) {
+          member.Trips[0].startLocation = "";
+          planService
+            .updateTrip(
+              this.selectedPlan.id,
+              this.currentUser.id,
+              member.Trips[0].id,
+              {
+                startLocation: "",
+              }
+            )
+            .then((resTrip) => {});
+        }
+      });
     },
   },
 };
@@ -477,6 +548,12 @@ export default {
     /*!!! change this? add an id? */
     padding-top: 15px;
   }
+}
+
+#menuContainer {
+  width: 280px;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .dropdown {

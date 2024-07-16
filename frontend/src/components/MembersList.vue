@@ -1,25 +1,30 @@
 <template>
   <div class="members-list">
     <h6>
-      Members <span>({{ members.length + 1 }} members)</span>
+      Members <span>({{ members.length }} members)</span>
     </h6>
     <ul class="members">
-      <li :key="you" :class="{ loading: !you.location }">
-        <img
-          class="rounded-circle"
-          src="https://avatars.githubusercontent.com/u/57234754?s=400&u=7928d03725e3a137f7c37cd146c6cf0177b4765a&v=4"
-          width="24px"
-          height="24px"
-        />
-        <span>{{ you.name }} (You)</span>
-      </li>
       <li
         v-for="member in members"
         :key="member"
-        :class="{ loading: !member.location }"
+        :class="{ loading: !member.Trips[0].startLocation }"
       >
-        <img src="@/assets/static/user.png" width="24px" height="24px" />
-        <span>{{ member }}</span>
+        <img
+          v-if="member.picture"
+          :src="member.picture"
+          class="rounded-circle"
+          width="24px"
+          height="24px"
+        />
+        <img
+          v-else
+          src="@/assets/static/user.png"
+          class="rounded-circle"
+          width="24px"
+          height="24px"
+        />
+        <span v-if="member.username === you.name">{{ you.name }} (You)</span>
+        <span v-else>{{ member.username }}</span>
       </li>
     </ul>
   </div>
