@@ -79,6 +79,11 @@ planRouter.get("/members/:memberId", async (req, res) => {
           model: User,
           as: "owner",
           attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
         },
         {
           model: User,
@@ -115,6 +120,7 @@ planRouter.get("/members/:memberId", async (req, res) => {
         }
       });
     });
+
     return res.json(plans);
   } catch (error) {
     return res.status(500).json({ error: "Failed to fetch plans", error });
@@ -207,6 +213,35 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
     return res.json(trip);
   } catch (e) {
     return res.status(422).json({ error: e });
+  }
+});
+
+planRouter.patch("/:id", async (req, res) => {
+  const name = req.body.name;
+  const category = req.body.category;
+  const address = req.body.address;
+  const date = req.body.date;
+
+  try {
+    const plan = await Plan.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!plan) {
+      return res.status(404).json({ error: "Plan not found" });
+    }
+
+    plan.name = name;
+    plan.category = category;
+    plan.address = address;
+    plan.date = date;
+
+    await plan.save();
+
+    return res.json(plan);
+  } catch {
+    return res.status(422).json({ error: "Failed to update plan" });
   }
 });
 

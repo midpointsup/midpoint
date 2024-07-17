@@ -152,8 +152,10 @@
                 (member) => member.id === currentUser.id
               ).Trips[0].startLocation
             "
+            :selectedPlan="selectedPlan"
             @add-location="updateCurrentLocation"
             @clear-location="clearCurrentLocation"
+            @generate-midpoint="updateMiddle"
           >
             <MembersList
               :members="selectedPlan.members"
@@ -451,6 +453,19 @@ export default {
           this.selectedPlan = null;
         }
       });
+    },
+    async updateMiddle(midpoint) {
+      planService
+        .updatePlan(this.selectedPlan.id, {
+          address: midpoint,
+          name: this.selectedPlan.name,
+          category: this.selectedPlan.category,
+          date: this.selectedPlan.date,
+        })
+        .then((res) => {});
+
+      //update the selected plan
+      this.selectedPlan.address = midpoint;
     },
     async updateCurrentLocation(location) {
       this.selectedPlan.members.forEach((member) => {

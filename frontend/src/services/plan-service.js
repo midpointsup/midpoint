@@ -60,6 +60,16 @@ const planService = (function () {
     });
   };
 
+  module.updatePlan = async function (id, plan) {
+    return fetch(`${baseUrl}/api/plans/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(plan),
+    }).then((res) => {
+      return res.json();
+    });
+  };
+
   module.createTrip = async function (planId, memberId, trip) {
     return fetch(`${baseUrl}/api/plans/${planId}/members/${memberId}/trip`, {
       method: "POST",

@@ -49,12 +49,13 @@ export default {
     return {
       showInput: !this.startLocation,
       startLoc: this.startLocation ?? "",
-      midpoint: {},
+      midpoint: this.selectedPlan?.address ?? "",
       travelMode: "DRIVE",
     };
   },
   props: {
     startLocation: String,
+    selectedPlan: Object,
   },
   mounted() {
     this.placePicker = document.getElementById("place-picker");
@@ -91,21 +92,25 @@ export default {
       this.$emit("clear-location");
     },
     async generateMiddle() {
-      const location = [
-        {
-          address: this.startLoc,
-          mode: this.travelMode,
-          radius: 1500,
-        },
-      ];
-      routeService.middle(location, "restaurant", "cruise").then((response) => {
-        if (response) {
-          this.displayPlaces(response.places).then(() => {});
-          this.midpoint = response.midpoint;
-        }
-      });
+      const locations = this.selectedPlan.members.map(
+        (member) => member.Trips[0]
+      );
+
+      routeService
+        .middle(locations, this.selectedPlan.category, "cruise")
+        .then((response) => {
+          if (response) {
+            this.displayPlaces(response.places).then(() => {});
+            this.midpoint = response.midpoint.address;
+            this.$emit("generate-midpoint", this.midpoint);
+          }
+        });
     },
     async displayPlaces(places) {
+      if (places.length === 0) {
+        window.alert("No places found");
+        return;
+      }
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 15,
         center: places[0].geometry.location,
@@ -148,7 +153,7 @@ export default {
 
       const request = {
         origin: this.startLoc,
-        destination: this.midpoint.address,
+        destination: this.midpoint,
         travelMode: travelModes[this.travelMode],
       };
       directionsService.route(request, (result, status) => {
