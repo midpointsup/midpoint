@@ -14,17 +14,17 @@ function getWeightedLocations(locations, radiuses) {
   }
 
   const modeMultipliers = {
-    walking: 3,
-    biking: 2,
-    bus: 2,
-    driving: 1,
+    WALK: 3,
+    BIKE: 2,
+    TRANSIT: 2,
+    DRIVE: 1,
   };
 
   let duplicatedLocations = [];
 
   locations.forEach((location, index) => {
     const modeMultiplier =
-      modeMultipliers[location.mode] || modeMultipliers.driving;
+      modeMultipliers[location.transportationMethod] || modeMultipliers.DRIVE;
     for (let i = 0; i < modeMultiplier; i++) {
       duplicatedLocations.push({
         latitude: location.latitude,
@@ -45,7 +45,7 @@ routesRouter.get("/middle", async (req, res) => {
   const geoLocations = await Promise.all(
     locations.map(async (location) => {
       geoResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${location.address}&key=${process.env.GOOGLE_MAPS_API}`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${location.startLocation}&key=${process.env.GOOGLE_MAPS_API}`
       );
       const data = await geoResponse.json();
       return {
@@ -61,16 +61,29 @@ routesRouter.get("/middle", async (req, res) => {
   });
   const weightedLocations = getWeightedLocations(geoLocations, radiuses);
 
-  const midpoint = getCenter(weightedLocations);
+  let midpoint = getCenter(weightedLocations);
+  const midpointAddressResponse = await fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${midpoint.latitude},${midpoint.longitude}&result_type=street_address&key=${process.env.GOOGLE_MAPS_API}`
+  );
+  const midpointAddress = await midpointAddressResponse.json();
+  if (!midpointAddress.results[0]) {
+    return res.status(400).json({ error: "No midpoint address" });
+  }
+  const formattedMidpointAddress = midpointAddress.results[0].formatted_address;
+
+  midpoint = { ...midpoint, address: formattedMidpointAddress };
 
   const radius = Math.min(...radiuses);
   const response = await fetch(
-    `https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=${keyword}&location=${midpoint.latitude}%2c${midpoint.longitude}&radius=${radius}&type=${category}&key=${process.env.GOOGLE_MAPS_API}`
+    `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${midpoint.latitude}%2c${midpoint.longitude}&radius=${radius}&type=${category}&key=${process.env.GOOGLE_MAPS_API}`
   );
   const data = await response.json();
-  const places = data.results;
+  let places = data.results;
+  places.unshift({
+    name: "Midpoint",
+    vicinity: formattedMidpointAddress,
+    geometry: { location: { lat: midpoint.latitude, lng: midpoint.longitude } },
+  });
 
   return res.json({ midpoint: midpoint, places: places });
 });
-
-routesRouter.get("/route", async (req, res) => {});

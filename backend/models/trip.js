@@ -6,28 +6,25 @@ import { Plan } from "./plan.js";
 export const Trip = sequelize.define("Trip", {
   startLocation: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   startTime: {
     type: DataTypes.TIME,
-    allowNull: false,
+    allowNull: true,
   },
   endLocation: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   transportationMethod: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   radius: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
 });
 
-Trip.belongsTo(Plan);
-Plan.hasMany(Trip);
-
 Trip.belongsTo(User);
-User.hasMany(Trip);
+User.hasMany(Trip, { foreignKey: "UserId" });
