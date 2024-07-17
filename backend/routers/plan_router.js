@@ -195,7 +195,7 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
     req.body.startTime ?? new Date().toTimeString().split(" ")[0];
   const endLocation = req.body.endLocation ?? "";
   const transportationMethod = req.body.transportationMethod ?? "";
-  const radius = req.body.radius ?? 0;
+  const radius = req.body.radius ?? 100;
 
   try {
     const trip = await Trip.create({
@@ -251,7 +251,7 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
     req.body.startTime ?? new Date().toTimeString().split(" ")[0];
   const endLocation = req.body.endLocation ?? "";
   const transportationMethod = req.body.transportationMethod ?? "";
-  const radius = req.body.radius ?? 0;
+  const radius = req.body.radius ?? 100;
 
   try {
     const trip = await Trip.findOne({

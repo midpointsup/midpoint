@@ -240,7 +240,11 @@
 
         <br />
         Where do you want to meet?
-        <gmpx-place-picker id="place-picker" for-map="map"></gmpx-place-picker>
+        <gmpx-place-picker
+          id="place-picker"
+          for-map="map"
+          placeholder="Enter A Location"
+        ></gmpx-place-picker>
         <div id="infowindow-content">
           <span id="place-name" class="title" style="font-weight: bold"></span
           ><br />

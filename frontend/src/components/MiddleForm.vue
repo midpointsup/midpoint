@@ -157,7 +157,8 @@ export default {
         const contentString =
           '<div id="content">' +
           `${place.name} <br>` +
-          `${place.vicinity} <br>`;
+          `${place.vicinity} <br>` +
+          `<button class="btn" id="updateMidpointBtn${place.name}">Meet here</button>`;
         ("</div>");
 
         const infowindow = new google.maps.InfoWindow({
@@ -166,7 +167,19 @@ export default {
         marker.addListener("click", () => {
           infowindow.open(map, marker);
         });
+
+        google.maps.event.addListener(infowindow, "domready", () => {
+          const buttonId = `updateMidpointBtn${place.name}`;
+          document.getElementById(buttonId).addEventListener("click", () => {
+            this.updateMidpoint(place.vicinity);
+          });
+        });
       });
+    },
+    updateMidpoint(location) {
+      this.midpoint = location;
+      this.$emit("generate-midpoint", location);
+      window.alert("Midpoint succesfully updated");
     },
     async getDirections() {
       const directionsService = new google.maps.DirectionsService();
