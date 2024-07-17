@@ -28,7 +28,7 @@ googleOAuthRouter.post("/", async (req, res) => {
         },
       }
     );
-
+    console.log("here1")
     let user = await findUser(userResponse.data.email, userResponse.data.name);
     if (!user) {
       user = await createUser(
@@ -48,11 +48,13 @@ googleOAuthRouter.post("/", async (req, res) => {
         console.log("Unable to update profile picture");
       }
     }
+    console.log("here2")
     const token = await storeGoogleToken(
       user,
       tokens.tokens.access_token,
       tokens.tokens.refresh_token
     );
+    console.log("here3")
     if (!token) {
       return res.status(500).json({ error: "Unable to store token" });
     }
@@ -60,7 +62,7 @@ googleOAuthRouter.post("/", async (req, res) => {
     if (!accessToken) {
       return res.status(500).json({ error: "Unable to generate access token" });
     }
-
+    console.log("here4")
     return res.status(200).json({
       username: userResponse.data.name,
       email: userResponse.data.email,

@@ -301,8 +301,13 @@ planRouter.get("/:id/members/trip", async (req, res) => {
       where: {
         PlanId: req.params.id,
       },
+      include: 
+      {
+        model: User,
+        attributes: ["username", "id", "picture", "email"],
+      },
     });
-    return res.json(trips);
+    return res.json({trips: trips});
   } catch {
     return res.status(500).json({ error: "Failed to fetch trips" });
   }

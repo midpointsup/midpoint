@@ -102,6 +102,15 @@ const planService = (function () {
     });
   };
 
+  module.getTrips = async function (planId) {
+    return fetch(`${baseUrl}/api/plans/${planId}/members/trip`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => {
+      return res.json();
+    });
+  };
+
   return module;
 })();
 

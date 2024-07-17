@@ -163,7 +163,7 @@
               :you="currentUser"
             ></MembersList>
           </MiddleForm>
-          <RouteDisplayTabs></RouteDisplayTabs>
+          <RouteDisplayTabs :planId="selectedPlan.id" :destination="selectedPlan.address"></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
           <button
             v-if="selectedPlan.ownerId === currentUser.id"
@@ -445,15 +445,6 @@ export default {
               this.newPlanName = "";
               this.showInput = false;
               this.success = true;
-
-              new Promise((resolve, reject) => {
-                res.members.forEach((member) => {
-                  userService.sendEmail(member).then((res) => {});
-                });
-                resolve();
-              }).then(() => {
-                console.log("Emails sent");
-              });
             });
           });
       }
