@@ -157,6 +157,7 @@
               :you="currentUser"
             ></MembersList>
           </MiddleForm>
+          <RouteDisplayTabs></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
         </div>
         <div v-else>
@@ -269,10 +270,12 @@ import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
 import userService from "../services/user-service.js";
+import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
 export default {
   components: {
     MiddleForm,
     MembersList,
+    RouteDisplayTabs
   },
   data() {
     return {
