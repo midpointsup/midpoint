@@ -9,7 +9,14 @@ let userService = (function () {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),
-    }).then((res) => res.json());
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.token) {
+          module.storeToken(res.token);
+        }
+        return res;
+      });
   };
 
   module.signin = function (username, password) {
@@ -17,7 +24,28 @@ let userService = (function () {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
-    }).then((res) => res.json());
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.token) {
+          module.storeToken(res.token);
+        }
+        return res;
+      });
+  };
+
+  module.saveGoogleToken = function (token) {
+    return fetch(`${baseUrl}/api/oauth`, {
+      method: "POST",
+      headers: { Authorization: token },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.token) {
+          module.storeToken(res.token);
+        }
+        return res;
+      });
   };
 
   module.storeToken = function (token) {
