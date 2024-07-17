@@ -248,9 +248,7 @@ planRouter.patch("/:id", async (req, res) => {
 planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
   const startLocation = req.body.startLocation ?? "";
   const startTime =
-    req.body.startTime ??
-    req.body.startTime ??
-    new Date().toTimeString().split(" ")[0];
+    req.body.startTime ?? new Date().toTimeString().split(" ")[0];
   const endLocation = req.body.endLocation ?? "";
   const transportationMethod = req.body.transportationMethod ?? "";
   const radius = req.body.radius ?? 0;

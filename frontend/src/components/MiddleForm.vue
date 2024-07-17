@@ -44,18 +44,27 @@
 
 <script>
 import routeService from "../services/route-service.js";
+import planService from "../services/plan-service.js";
 export default {
   data() {
     return {
       showInput: !this.startLocation,
       startLoc: this.startLocation ?? "",
       midpoint: this.selectedPlan?.address ?? "",
-      travelMode: "DRIVE",
+      travelMode:
+        this.selectedPlan?.members.find(
+          (member) => member.id === this.currentUser.id
+        ).Trips[0].transportationMethod === ""
+          ? "DRIVE"
+          : this.selectedPlan?.members.find(
+              (member) => member.id === this.currentUser.id
+            ).Trips[0].transportationMethod,
     };
   },
   props: {
     startLocation: String,
     selectedPlan: Object,
+    currentUser: Object,
   },
   mounted() {
     this.placePicker = document.getElementById("place-picker");
@@ -85,6 +94,25 @@ export default {
       if (this.startLoc?.trim()) {
         this.showInput = false;
         this.$emit("add-location", this.startLoc);
+
+        // get the trip id of the current user from the selectedPlan id
+        const tripId = this.selectedPlan.members.find(
+          (member) => member.id === this.currentUser.id
+        ).Trips[0].id;
+
+        planService
+          .updateTrip(this.selectedPlan.id, this.currentUser.id, tripId, {
+            transportationMethod: this.travelMode,
+            startLocation: this.selectedPlan.startLocation,
+            endLocation: this.selectedPlan.endLocation,
+            startTime: this.selectedPlan.startTime,
+            radius: this.selectedPlan.radius,
+          })
+          .then((response) => {
+            this.selectedPlan.members.find(
+              (member) => member.id === this.currentUser.id
+            ).Trips[0].transportationMethod = this.travelMode;
+          });
       }
     },
     editLocation() {
@@ -100,6 +128,10 @@ export default {
         .middle(locations, this.selectedPlan.category, "cruise")
         .then((response) => {
           if (response) {
+            if (!response.midpoint) {
+              window.alert("No midpoint found");
+              return;
+            }
             this.displayPlaces(response.places).then(() => {});
             this.midpoint = response.midpoint.address;
             this.$emit("generate-midpoint", this.midpoint);
