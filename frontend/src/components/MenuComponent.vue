@@ -153,6 +153,7 @@
               ).Trips[0].startLocation
             "
             :selectedPlan="selectedPlan"
+            :currentUser="currentUser"
             @add-location="updateCurrentLocation"
             @clear-location="clearCurrentLocation"
             @generate-midpoint="updateMiddle"
@@ -462,7 +463,9 @@ export default {
           category: this.selectedPlan.category,
           date: this.selectedPlan.date,
         })
-        .then((res) => {});
+        .then((res) => {
+          console.log("response planservice", res);
+        });
 
       //update the selected plan
       this.selectedPlan.address = midpoint;
