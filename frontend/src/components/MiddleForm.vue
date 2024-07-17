@@ -25,15 +25,31 @@
         <option value="BIKE">Bike</option>
         <option value="TRANSIT">Transit</option>
       </select>
+
+      <label for="radius">Radius:</label>
+      <input
+        v-model="radius"
+        type="number"
+        placeholder="ie: 100m"
+        class="form-control"
+        id="radius"
+      />
     </form>
   </div>
   <ul class="mb-auto middle-info">
     <li v-if="!showInput">
       <h6>Your starting location</h6>
       <div class="middle-form">
-        <span class="location">{{ startLoc }}</span>
+        <span class="display-info">{{ startLoc }}</span>
         <button @click="editLocation" class="btn">Edit</button>
       </div>
+      <div class="info-form">
+        <h6>Travel Mode</h6>
+        <span class="display-info">{{ this.travelMode }}</span>
+        <h6>Radius</h6>
+        <span class="display-info">{{ this.radius }}</span>
+      </div>
+      <br />
     </li>
   </ul>
   <slot></slot>
@@ -59,6 +75,9 @@ export default {
           : this.selectedPlan?.members.find(
               (member) => member.id === this.currentUser.id
             ).Trips[0].transportationMethod,
+      radius: this.selectedPlan?.members.find(
+        (member) => member.id === this.currentUser.id
+      ).Trips[0].radius,
     };
   },
   props: {
@@ -106,7 +125,7 @@ export default {
             startLocation: this.selectedPlan.startLocation,
             endLocation: this.selectedPlan.endLocation,
             startTime: this.selectedPlan.startTime,
-            radius: this.selectedPlan.radius,
+            radius: this.radius,
           })
           .then((response) => {
             this.selectedPlan.members.find(
@@ -236,9 +255,14 @@ export default {
   list-style: none;
 }
 
-.location {
+.display-info {
   width: 100%;
   padding: 5px;
   margin-bottom: 10px;
+}
+
+.info-form {
+  display: flex;
+  flex-direction: column;
 }
 </style>
