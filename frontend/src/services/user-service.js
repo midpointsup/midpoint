@@ -35,6 +35,14 @@ let userService = (function () {
     }).then((res) => res.json());
   };
 
+  module.sendEmail = async function (member) {
+    return fetch(`${baseUrl}/api/users/email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(member),
+    }).then((res) => res.json());
+  };
+
   return module;
 })();
 
