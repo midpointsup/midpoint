@@ -3,7 +3,6 @@ const routeService = (function () {
 
   const module = {};
   module.middle = async function (locations, category) {
-    console.log("locations in middle service: ", locations);
     return fetch(
       `/api/routes/middle&locations=${locations}&category=${category}`,
       {
@@ -11,7 +10,6 @@ const routeService = (function () {
         headers: { "Content-Type": "application/json" },
       }
     ).then((res) => {
-      console.log("res in middle service: ", res);
       return res.json;
     });
   };

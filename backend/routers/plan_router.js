@@ -1,26 +1,29 @@
 import { Router } from "express";
-import axios from "axios";
-import { OAuth2Client } from "google-auth-library";
-import { GoogleToken } from "../models/googleTokens.js";
-import { AccessToken } from "../models/accessTokens.js";
 import { User } from "../models/users.js";
+import { isAuthenticated } from "../middleware/auth.js";
 import crypto from "crypto";
+import { Op } from "sequelize";
 import { Plan } from "../models/plan.js";
 import { Trip } from "../models/trip.js";
 
 export const planRouter = Router();
 
 planRouter.post("/", async (req, res) => {
-  const { name, owner, members } = req.body;
+  const name = req.body.name;
+  const members = req.body.members;
+  const owner = req.body.ownerId;
+  const category = req.body.category;
+  const address = req.body.address;
+  const date = req.body.date;
 
-  if (!name || !owner || !members || members.length <= 0) {
+  if (!name || !owner || !members || members.length <= 0 || !date) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
     const ownerUser = await User.findOne({
       where: {
-        email: owner,
+        id: owner,
       },
     });
     if (!ownerUser) {
@@ -31,7 +34,7 @@ planRouter.post("/", async (req, res) => {
     for (const member of members) {
       const user = await User.findOne({
         where: {
-          email: member,
+          username: member,
         },
       });
       if (!user) {
@@ -44,18 +47,83 @@ planRouter.post("/", async (req, res) => {
       ownerId: ownerUser.id,
       memberCount: members.length,
       name: name,
+      category: category ? category : "",
+      address: address ? address : "",
+      date: date,
     });
 
-    membersList.forEach(async (member) => {
-      await plan.addUser(member);
+    await plan.addMembers(membersList);
+
+    let planWithMembers = await Plan.findByPk(plan.id, {
+      include: [
+        {
+          model: User,
+          as: "members",
+          attributes: ["username", "id", "picture"],
+        },
+      ],
     });
-    return res.json({
-      name: plan.name,
-      memberCount: plan.memberCount,
-      owner: ownerUser.email,
-    });
+
+    return res.json(planWithMembers);
   } catch {
     return res.status(422).json({ error: "Failed to create plan" });
+  }
+});
+
+//get all plans for the member
+planRouter.get("/members/:memberId", async (req, res) => {
+  try {
+    let plans = await Plan.findAll({
+      include: [
+        {
+          model: User,
+          as: "owner",
+          attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "members",
+          attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
+        },
+      ],
+      where: {
+        [Op.or]: [
+          { "$owner.id$": req.params.memberId },
+          { "$members.id$": req.params.memberId },
+        ],
+      },
+    });
+
+    plans = plans.map((plan) => plan.toJSON());
+    plans.forEach((plan) => {
+      if (!plan.members.some((member) => member.id === plan.owner.id)) {
+        plan.members.push(plan.owner);
+      }
+    });
+
+    plans.forEach((plan, index) => {
+      plan.members.forEach((member, memberIndex) => {
+        if (member.Trips) {
+          plans[index].members[memberIndex].Trips = member.Trips.filter(
+            (trip) => trip.PlanId === plan.id
+          );
+        }
+      });
+    });
+
+    return res.json(plans);
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to fetch plans", error });
   }
 });
 
@@ -96,33 +164,40 @@ planRouter.get("/:id", async (req, res) => {
   }
 });
 
-planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
-  const {
-    startLocation,
-    startTime,
-    endLocation,
-    transportationMethod,
-    radius,
-  } = req.body;
-  if (
-    !startLocation ||
-    !startTime ||
-    !endLocation ||
-    !transportationMethod ||
-    !radius
-  ) {
-    return res.status(400).json({ error: "Missing required fields" });
+planRouter.delete("/:id", async (req, res) => {
+  try {
+    const plan = await Plan.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!plan) {
+      return res.status(404).json({ error: "Plan not found" });
+    }
+
+    // TODO: Uncomment this code after implementing authentication
+    // if (plan.ownerId !== req.user.id) {
+    //   // User trying to delete the plan is not the owner
+    //   return res
+    //     .status(403)
+    //     .json({ error: "Not authorized to delete this plan" });
+    // }
+    await plan.destroy();
+    return res.json({ message: "Plan deleted" });
+  } catch {
+    return res.status(500).json({ error: "Failed to delete plan" });
   }
+});
+
+planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
+  const startLocation = req.body.startLocation ?? "";
+  const startTime =
+    req.body.startTime ?? new Date().toTimeString().split(" ")[0];
+  const endLocation = req.body.endLocation ?? "";
+  const transportationMethod = req.body.transportationMethod ?? "";
+  const radius = req.body.radius ?? 100;
 
   try {
-    console.log(
-      startLocation,
-      startTime,
-      endLocation,
-      transportationMethod,
-      radius,
-      req.params.id
-    );
     const trip = await Trip.create({
       startLocation: startLocation,
       startTime: startTime,
@@ -141,24 +216,42 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
   }
 });
 
-planRouter.patch("/:id//members/:memberId/trip/:tripId", async (req, res) => {
-  const {
-    startLocation,
-    startTime,
-    endLocation,
-    transportationMethod,
-    radius,
-  } = req.body;
+planRouter.patch("/:id", async (req, res) => {
+  const name = req.body.name;
+  const category = req.body.category;
+  const address = req.body.address;
+  const date = req.body.date;
 
-  if (
-    !startLocation ||
-    !startTime ||
-    !endLocation ||
-    !transportationMethod ||
-    !radius
-  ) {
-    return res.status(400).json({ error: "Missing required fields" });
+  try {
+    const plan = await Plan.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!plan) {
+      return res.status(404).json({ error: "Plan not found" });
+    }
+
+    plan.name = name;
+    plan.category = category;
+    plan.address = address;
+    plan.date = date;
+
+    await plan.save();
+
+    return res.json(plan);
+  } catch {
+    return res.status(422).json({ error: "Failed to update plan" });
   }
+});
+
+planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
+  const startLocation = req.body.startLocation ?? "";
+  const startTime =
+    req.body.startTime ?? new Date().toTimeString().split(" ")[0];
+  const endLocation = req.body.endLocation ?? "";
+  const transportationMethod = req.body.transportationMethod ?? "";
+  const radius = req.body.radius ?? 100;
 
   try {
     const trip = await Trip.findOne({
@@ -187,7 +280,22 @@ planRouter.patch("/:id//members/:memberId/trip/:tripId", async (req, res) => {
   }
 });
 
-planRouter.get("/:id/trip", async (req, res) => {
+planRouter.get("/:id/members/:memberId/trip/:tripId", async (req, res) => {
+  try {
+    const trip = await Trip.findOne({
+      where: {
+        id: req.params.tripId,
+        PlanId: req.params.id,
+        UserId: req.params.memberId,
+      },
+    });
+    return res.json(trip);
+  } catch {
+    return res.status(500).json({ error: "Failed to fetch trip" });
+  }
+});
+
+planRouter.get("/:id/members/trip", async (req, res) => {
   try {
     const trips = await Trip.findAll({
       where: {
@@ -197,19 +305,5 @@ planRouter.get("/:id/trip", async (req, res) => {
     return res.json(trips);
   } catch {
     return res.status(500).json({ error: "Failed to fetch trips" });
-  }
-});
-
-planRouter.get("/:id/trip/:tripId", async (req, res) => {
-  try {
-    const trip = await Trip.findOne({
-      where: {
-        id: req.params.tripId,
-        PlanId: req.params.id,
-      },
-    });
-    return res.json(trip);
-  } catch {
-    return res.status(500).json({ error: "Failed to fetch trip" });
   }
 });
