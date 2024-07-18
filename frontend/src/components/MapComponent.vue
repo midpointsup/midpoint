@@ -56,7 +56,6 @@ export default {
     initMap();
   },
   unmounted() {
-    this.map.remove();
     this.map = null;
   },
 };

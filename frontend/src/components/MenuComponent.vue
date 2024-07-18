@@ -1,131 +1,42 @@
 <template>
-  <div class="column-display">
-    <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
-      <li @click="toggleSidebar" v-if="!isSidebarOpen">
-        <a
-          href="#"
-          class="nav-link py-3"
-          aria-current="page"
-          title=""
-          data-bs-toggle="tooltip"
-          data-bs-placement="right"
-          data-bs-original-title="Home"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            class="bi bi-grid"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"
-            />
-          </svg>
-        </a>
-      </li>
-      <li v-else @click.prevent="toggleSidebar">
-        <a
-          href="#"
-          class="nav-link py-3"
-          title=""
-          data-bs-toggle="tooltip"
-          data-bs-placement="right"
-          data-bs-original-title="Dashboard"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            class="bi bi-x"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
-            />
-          </svg>
-        </a>
-      </li>
-      <li>
-        <a
-          @click="showPlans"
-          title="Plans"
-          href="#"
-          class="nav-link link-dark side-bar-icon"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            class="bi bi-backpack"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M4.04 7.43a4 4 0 0 1 7.92 0 .5.5 0 1 1-.99.14 3 3 0 0 0-5.94 0 .5.5 0 1 1-.99-.14M4 9.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm1 .5v3h6v-3h-1v.5a.5.5 0 0 1-1 0V10z"
-            />
-            <path
-              d="M6 2.341V2a2 2 0 1 1 4 0v.341c2.33.824 4 3.047 4 5.659v5.5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5V8a6 6 0 0 1 4-5.659M7 2v.083a6 6 0 0 1 2 0V2a1 1 0 0 0-2 0m1 1a5 5 0 0 0-5 5v5.5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5V8a5 5 0 0 0-5-5"
-            />
-          </svg>
-        </a>
-        Plans
-      </li>
-      <li>
-        <a
-          @click="showCreatePlan"
-          title="addPlan"
-          href="#"
-          class="nav-link link-dark side-bar-icon"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            class="bi bi-plus"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
-            />
-          </svg>
-        </a>
-        Add Plan
-      </li>
+  <div class="menu-wrapper-outer gap-3">
+    <ul class="menu-wrapper gap-3 ps-0 mb-0">
+      <h4 class="logo-header">idpoint</h4>
+      <hr />
+      <!-- <li class="nav-btn explore-btn" @click="showPlans" data-content="Explore"></li> -->
+      <li
+        class="nav-btn plans-btn"
+        @click="showPlans"
+        data-content="Your Plans"
+      ></li>
+      <li
+        class="nav-btn add-btn"
+        @click="showCreatePlan"
+        data-content="Add Plan"
+      ></li>
     </ul>
-
-    <div class="dropdown">
+    <div class="dropend">
       <a
         href="#"
         class="d-flex align-items-center link-dark text-decoration-none"
-        id="dropdownUser2"
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
         <img
-          :src="currentUser.profilePicture"
-          alt=""
-          width="32"
-          height="32"
-          class="rounded-circle"
+          v-if="currentUser.picture"
+          :src="currentUser.picture"
+          class="pfp"
         />
+        <img v-else src="@/assets/static/user.png" alt="" class="pfp" />
       </a>
-      <ul
-        class="dropdown-menu text-small shadow"
-        aria-labelledby="dropdownUser2"
-      >
+      <ul class="dropdown-menu text-small shadow">
         <li><a class="dropdown-item" href="#">Settings</a></li>
         <li><a class="dropdown-item" href="#">Profile</a></li>
         <li>
           <hr class="dropdown-divider" />
         </li>
         <li>
-          <a class="dropdown-item" href="#">
-            <RouterLink to="/login">Sign out</RouterLink>
-          </a>
+          <button class="dropdown-item" @click="signout">Sign out</button>
         </li>
       </ul>
     </div>
@@ -149,7 +60,7 @@
           <MiddleForm
             :startLocation="
               selectedPlan.members.find(
-                (member) => member.id === currentUser.id
+                (member) => member.id === currentUser.userId
               ).Trips[0].startLocation
             "
             :selectedPlan="selectedPlan"
@@ -166,7 +77,7 @@
           <RouteDisplayTabs :planId="selectedPlan.id" :destination="selectedPlan.address"></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
           <button
-            v-if="selectedPlan.ownerId === currentUser.id"
+            v-if="selectedPlan.ownerId === currentUser.userId"
             @click="confirmDelete(selectedPlan.id)"
             class="btn btn-danger mt-3"
           >
@@ -197,7 +108,6 @@
                 </svg>
                 {{ plan.name }}
                 <hr />
-                <!-- tags -->
                 <p>{{ plan.address ? plan.address : "TBD" }}</p>
                 <span class="badge">{{
                   plan.date && plan.date.slice(0, 10)
@@ -291,9 +201,11 @@ import "bootstrap";
 import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
-import userService from "../services/user-service.js";
 import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
-import planService from "../services/plan-service.js";
+import userService from "@/services/user-service.js";
+import planService from "@/services/plan-service.js";
+import { useUserStore } from "@/stores/userStore.js";
+
 export default {
   components: {
     MiddleForm,
@@ -325,11 +237,6 @@ export default {
       isSidebarOpen: false,
       plansPage: true,
       createPlan: false,
-      currentUser: {
-        name: "",
-        profilePicture: "",
-        id: "",
-      },
     };
   },
   mounted() {
@@ -338,11 +245,8 @@ export default {
     userService.getMe().then((res) => {
       if (!res.error) {
         console.log("Profile Picture:", res);
-        this.currentUser.profilePicture = res.picture;
-        this.currentUser.name = res.username;
-        this.currentUser.id = res.id;
 
-        planService.getPlansForMember(res.id).then((res) => {
+        planService.getPlansForMember(res.userId).then((res) => {
           if (!res.error) {
             this.plans = res;
             console.log("Plans:", this.plans);
@@ -422,8 +326,8 @@ export default {
         planService
           .createPlan(
             this.newPlanName.trim(),
-            this.currentUser.id,
-            [...this.membersList, this.currentUser.name],
+            this.currentUser.userId,
+            [...this.membersList, this.currentUser.username],
             this.selectedCategory,
             this.place.formattedAddress,
             this.date
@@ -436,11 +340,13 @@ export default {
               });
               resolve();
             }).then(() => {
-              planService.getPlansForMember(this.currentUser.id).then((res) => {
-                if (!res.error) {
-                  this.plans = res;
-                }
-              });
+              planService
+                .getPlansForMember(this.currentUser.userId)
+                .then((res) => {
+                  if (!res.error) {
+                    this.plans = res;
+                  }
+                });
               this.membersList = [];
               this.newPlanName = "";
               this.showInput = false;
@@ -479,12 +385,12 @@ export default {
     },
     async updateCurrentLocation(location) {
       this.selectedPlan.members.forEach((member) => {
-        if (member.id === this.currentUser.id) {
+        if (member.id === this.currentUser.userId) {
           member.Trips[0].startLocation = location;
           planService
             .updateTrip(
               this.selectedPlan.id,
-              this.currentUser.id,
+              this.currentUser.userId,
               member.Trips[0].id,
               {
                 startLocation: location,
@@ -496,12 +402,12 @@ export default {
     },
     clearCurrentLocation() {
       this.selectedPlan.members.forEach((member) => {
-        if (member.id === this.currentUser.id) {
+        if (member.id === this.currentUser.userId) {
           member.Trips[0].startLocation = "";
           planService
             .updateTrip(
               this.selectedPlan.id,
-              this.currentUser.id,
+              this.currentUser.userId,
               member.Trips[0].id,
               {
                 startLocation: "",
@@ -511,11 +417,138 @@ export default {
         }
       });
     },
+    signout() {
+      userService.storeToken(null);
+      useUserStore().setUser(null);
+      this.$router.push("/signup");
+    },
+  },
+  computed: {
+    currentUser() {
+      console.log(useUserStore().getUser());
+      return useUserStore().getUser();
+    },
   },
 };
 </script>
 
 <style>
+.menu-wrapper-outer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+
+  @media (min-width: 577px) {
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+  }
+}
+
+.menu-wrapper {
+  width: max-content;
+  list-style: none;
+  display: flex;
+
+  @media (min-width: 577px) {
+    flex-direction: column;
+  }
+}
+
+.nav-btn,
+.pfp {
+  height: 32px;
+  border-radius: var(--bs-border-radius);
+  background-color: var(--color-background);
+  display: flex;
+  align-items: center;
+
+  &:active {
+    transform: translateY(2px);
+  }
+
+  &:hover,
+  &:active,
+  .selected {
+    filter: brightness(0.9);
+  }
+
+  &.selected {
+    box-shadow: 0 0 0 0.2em rgba(0, 123, 255, 0.6);
+  }
+
+  &::after {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    content: "";
+  }
+}
+
+.nav-btn::before {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  content: "";
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 26px;
+}
+
+.pfp {
+  object-fit: contain;
+  height: 32px;
+  width: 32px;
+  object-position: center;
+  cursor: pointer;
+}
+
+.explore-btn::before {
+  background-image: url("@/assets/static/compass.svg");
+}
+
+.plans-btn::before {
+  background-image: url("@/assets/static/plan.svg");
+}
+
+.add-btn::before {
+  background-image: url("@/assets/static/plus.svg");
+}
+
+.logo-header {
+  display: none;
+  color: var(--primary);
+  line-height: 40px;
+
+  &::before {
+    content: "";
+    background-image: url("@/assets/static/logo.svg");
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: 80%;
+    width: 30px;
+    display: inline-block;
+    height: 30px;
+  }
+
+  + hr {
+    margin: 0;
+  }
+}
+
+@media (min-width: 577px) {
+  .nav-btn::after {
+    content: attr(data-content);
+  }
+  .nav-btn::before {
+    background-size: 20px;
+  }
+  .logo-header {
+    display: inline-block;
+  }
+}
+
 .side-bar-icon {
   margin-top: 18px;
   justify-content: center;

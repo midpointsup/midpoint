@@ -2,9 +2,8 @@ import { Router } from "express";
 import axios from "axios";
 import { OAuth2Client } from "google-auth-library";
 import { GoogleToken } from "../models/googleTokens.js";
-import { AccessToken } from "../models/accessTokens.js";
 import { User } from "../models/users.js";
-import crypto from "crypto";
+import { generateAccessToken } from "../helpers/auth.js";
 
 export const googleOAuthRouter = Router();
 
@@ -58,7 +57,7 @@ googleOAuthRouter.post("/", async (req, res) => {
     if (!token) {
       return res.status(500).json({ error: "Unable to store token" });
     }
-    const accessToken = await generateAccessToken(user);
+    const accessToken = await generateAccessToken(user.id);
     if (!accessToken) {
       return res.status(500).json({ error: "Unable to generate access token" });
     }
@@ -67,10 +66,11 @@ googleOAuthRouter.post("/", async (req, res) => {
       username: userResponse.data.name,
       email: userResponse.data.email,
       picture: userResponse.data.picture,
-      token: accessToken.access_token,
+      token: accessToken,
+      userId: userResponse.id,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to save code" });
+    return res.status(500).json({ message: error.message });
   }
 });
 
@@ -125,23 +125,5 @@ const storeGoogleToken = async (user, access_token, refresh_token) => {
     return token;
   } catch (error) {
     return { error: "Failed to store google token" };
-  }
-};
-
-const generateAccessToken = async (user) => {
-  const randomToken = crypto.randomBytes(16).toString("hex");
-  let today = new Date();
-  let tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  try {
-    let accessToken = await AccessToken.create({
-      access_token: randomToken,
-      UserId: user.id,
-      expires_in: tomorrow.toISOString(),
-    });
-    return accessToken;
-  } catch (error) {
-    console.log("Failed to generate access token");
-    return null;
   }
 };

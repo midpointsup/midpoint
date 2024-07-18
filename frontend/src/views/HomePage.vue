@@ -1,7 +1,9 @@
 <template>
-  <MenuComponent></MenuComponent>
-  <div id="layout">
-    <MapComponent></MapComponent>
+  <div class="app-wrapper">
+    <MenuComponent></MenuComponent>
+    <div id="layout">
+      <MapComponent></MapComponent>
+    </div>
   </div>
   <TripInfo></TripInfo>
 </template>
@@ -26,5 +28,14 @@ export default {
   flex: 1;
   display: flex;
   position: relative;
+}
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  @media (min-width: 577px) {
+    flex-direction: row;
+  }
 }
 </style>
