@@ -1,16 +1,14 @@
 import { User } from "../models/users.js";
 import { Router } from "express";
-import multer from "multer";
 import bcrypt from "bcrypt";
-import path from "path";
 import { AccessToken } from "../models/accessTokens.js";
 import "dotenv/config";
 import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
+import { generateAccessToken } from "../helpers/auth.js";
 
-const upload = multer({ dest: "uploads/" });
 export const userRouter = Router();
 
-userRouter.post("/signup", upload.single("picture"), async (req, res) => {
+userRouter.post("/signup", async (req, res) => {
   if (
     req.body.username === undefined ||
     req.body.email === undefined ||
@@ -30,9 +28,12 @@ userRouter.post("/signup", upload.single("picture"), async (req, res) => {
       email: req.body.email,
       password: password,
     });
+    const token = await generateAccessToken(user.id);
     return res.json({
       username: user.username,
       email: user.email,
+      token: token,
+      userId: user.id,
     });
   } catch {
     return res.status(422).json({ error: "Failed to create user" });
@@ -40,14 +41,8 @@ userRouter.post("/signup", upload.single("picture"), async (req, res) => {
 });
 
 userRouter.post("/signin", async (req, res) => {
-  if (
-    req.body.username === undefined ||
-    req.body.email === undefined ||
-    req.body.password === undefined
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Missing username, email or password" });
+  if (req.body.username === undefined || req.body.password === undefined) {
+    return res.status(400).json({ error: "Missing username or password" });
   }
   const user = await User.findOne({
     where: {
@@ -66,7 +61,13 @@ userRouter.post("/signin", async (req, res) => {
   if (!result) {
     return res.status(401).json({ error: "Incorrect username or password" });
   }
-  return res.status(200).json(user);
+  const token = await generateAccessToken(user.id);
+  return res.status(200).json({
+    username: user.username,
+    email: user.email,
+    token: token,
+    userId: user.id,
+  });
 });
 
 userRouter.get("/me", async (req, res) => {
@@ -95,13 +96,61 @@ userRouter.get("/me", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     return res.status(200).json({
-      id: user.id,
       username: user.username,
       email: user.email,
       picture: user.picture,
+      userId: user.id,
     });
-  } catch {
-    return res.status(500).json({ error: "Failed to get user" });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAIL_API_KEY,
+});
+
+userRouter.post("/email", async (req, res) => {
+  try {
+    const member = req.body;
+
+    const user = await User.findOne({
+      where: {
+        id: member.id,
+      },
+    });
+
+    const sentFrom = new Sender(
+      "MS_C3RpDC@trial-7dnvo4drdnrg5r86.mlsender.net",
+      "Midpoint"
+    );
+
+    const recipients = [new Recipient(user.email, user.username)];
+
+    const personalization = [
+      {
+        email: user.email,
+        data: {
+          name: user.username,
+        },
+      },
+    ];
+
+    const emailParams = new EmailParams()
+      .setFrom(sentFrom)
+      .setTo(recipients)
+      .setReplyTo(sentFrom)
+      .setSubject("MidPoint Plan Invite")
+      .setTemplateId("3z0vklorn9pl7qrx")
+      .setPersonalization(personalization);
+
+    await mailerSend.email.send(emailParams);
+
+    return res.status(200).json({ message: "Email sent" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Failed to send email", message: error });
   }
 });
 

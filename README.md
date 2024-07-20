@@ -83,16 +83,16 @@ Midpoint is a web application designed to help users find convenient meeting loc
 
 - Implement user authentication
 - Group creation feature
-- Overlay and filter routes
+- Draw routes and directions
 - Complete "Meet in the Middle" algorithm
+- Setup invite emails
+
+### Final Version
+
 - Complete real-time features:
   - Live changing routes
   - Live cursor tracking
 - Finalize user profile settings
-- Setup invite emails using SendGrid API
-
-### Final Version
-
 - Enhance and clean up existing features
 - Add extra features: multiple stops, calendar, pinned restaurants
 - Prepare presentation

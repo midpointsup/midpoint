@@ -69,14 +69,14 @@ export default {
       midpoint: this.selectedPlan?.address ?? "",
       travelMode:
         this.selectedPlan?.members.find(
-          (member) => member.id === this.currentUser.id
+          (member) => member.id === this.currentUser.userId
         ).Trips[0].transportationMethod === ""
           ? "DRIVE"
           : this.selectedPlan?.members.find(
-              (member) => member.id === this.currentUser.id
+              (member) => member.id === this.currentUser.userId
             ).Trips[0].transportationMethod,
       radius: this.selectedPlan?.members.find(
-        (member) => member.id === this.currentUser.id
+        (member) => member.id === this.currentUser.userId
       ).Trips[0].radius,
     };
   },
@@ -116,11 +116,11 @@ export default {
 
         // get the trip id of the current user from the selectedPlan id
         const tripId = this.selectedPlan.members.find(
-          (member) => member.id === this.currentUser.id
+          (member) => member.id === this.currentUser.userId
         ).Trips[0].id;
 
         planService
-          .updateTrip(this.selectedPlan.id, this.currentUser.id, tripId, {
+          .updateTrip(this.selectedPlan.id, this.currentUser.userId, tripId, {
             transportationMethod: this.travelMode,
             startLocation: this.selectedPlan.startLocation,
             endLocation: this.selectedPlan.endLocation,
@@ -129,7 +129,7 @@ export default {
           })
           .then((response) => {
             this.selectedPlan.members.find(
-              (member) => member.id === this.currentUser.id
+              (member) => member.id === this.currentUser.userId
             ).Trips[0].transportationMethod = this.travelMode;
           });
       }
