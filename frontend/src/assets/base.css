@@ -2,20 +2,20 @@
 :root {
   --white: #fffffa;
   --black: #001b2e;
-  --primary: #4dc48a;
-  --secondary: #a6e2c2;
-
   --red: #f05d5e;
   --coral: #ff847c;
+  --green: #4dc48a;
+  --light-green: #a6e2c2;
   --blue: #3777ff;
   --dark-blue: #1c4997;
   --dark-red: #a33225;
-
-  --bg-primary: #4dc48a;
 }
 
 /* semantic color variables for this project */
 :root {
+  --primary: var(--green);
+  --secondary: var(--light-green);
+
   --color-background: var(--white);
   --color-heading: var(--primary);
   --color-text: var(--black);

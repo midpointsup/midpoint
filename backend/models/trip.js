@@ -1,7 +1,6 @@
 import { sequelize } from "../datasource.js";
 import { DataTypes } from "sequelize";
 import { User } from "./users.js";
-import { Plan } from "./plan.js";
 
 export const Trip = sequelize.define("Trip", {
   startLocation: {

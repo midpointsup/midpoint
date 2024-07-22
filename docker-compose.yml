@@ -1,0 +1,42 @@
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - ./acme:/etc/acme.sh
+    environment:
+      - DEFAULT_EMAIL=rkwan.hy@gmail.com
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+  frontend:
+    image: ghcr.io/utsc-cscc09-programming-on-the-web/frontend-midpoint:spi-25-deploy
+    container_name: frontend-midpoint
+    restart: always
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=midpoint.live
+      - LETSENCRYPT_HOST=midpoint.live
+  backend:
+    image: ghcr.io/utsc-cscc09-programming-on-the-web/backend-midpoint:spi-25-deploy
+    container_name: backend-midpoint
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - VIRTUAL_HOST=api.midpoint.live
+      - LETSENCRYPT_HOST=api.midpoint.live
