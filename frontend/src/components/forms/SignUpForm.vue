@@ -34,7 +34,7 @@
       label="Password"
       :feedback="feedback.password"
       @focus="resetValidity"
-      />
+    />
     <TextInput
       id="reEnterPassword"
       name="reEnterPassword"
@@ -42,7 +42,7 @@
       label="Re-Enter Password"
       :feedback="feedback.reEnterPassword"
       @focus="resetValidity"
-      />
+    />
     <button type="submit" class="btn py-2">Create Account</button>
   </form>
 </template>
@@ -65,8 +65,8 @@ export default {
         email: "Email required",
         password: "Password required",
         reEnterPassword: "Password required",
-      }
-    }
+      },
+    };
   },
   methods: {
     signup() {
@@ -77,7 +77,7 @@ export default {
       const showError = (elem, msg) => {
         this.feedback[elem.name] = msg;
         elem.classList.add("is-invalid");
-      }
+      };
 
       this.resetFeedback();
       if (form.password.value.trim() !== form.reEnterPassword.value.trim()) {
@@ -86,9 +86,11 @@ export default {
         userService
           .signup(form.username.value, form.email.value, form.password.value)
           .then((res) => {
-            const field = ["username", "email"].find(f => res.error?.toLowerCase()?.includes(f));
+            const field = ["username", "email"].find((f) =>
+              res.error?.toLowerCase()?.includes(f)
+            );
             if (field) {
-              showError(form[field], res.error)
+              showError(form[field], res.error);
             } else if (res.error) {
               this.notifyError("Something went wrong. Please try again.");
             } else {
@@ -98,9 +100,9 @@ export default {
               router.push("/");
             }
           });
-        } else {
-          form.classList.add("was-validated");
-        }
+      } else {
+        form.classList.add("was-validated");
+      }
     },
     resetValidity(event) {
       event.target?.classList.remove("is-invalid");

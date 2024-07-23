@@ -23,20 +23,38 @@ export default {
             redirect_uri: import.meta.env.VITE_REDIRECT_URI,
             callback: (response) => {
               if (response.error) {
-                return this.notifyError("Something went wrong. Please try again.");
+                return this.notifyError(
+                  "Something went wrong. Please try again."
+                );
               }
               if (response.code) {
                 userService.saveGoogleToken(response.code).then((res) => {
                   if (res.error) {
-                    return this.notifyError("Something went wrong. Please try again.");
+                    return this.notifyError(
+                      "Something went wrong. Please try again."
+                    );
                   }
                   if (res.userId === null) {
                     if (this.isSignIn) {
-                      this.notifyWarning("Registration not completed. Please sign up.");
+                      this.notifyWarning(
+                        "Registration not completed. Please sign up."
+                      );
                     }
-                    return router.push({ path: "signup", query: { google: true, name: res.username, email: res.email, picture: res.picture } });
+                    return router.push({
+                      path: "signup",
+                      query: {
+                        google: true,
+                        name: res.username,
+                        email: res.email,
+                        picture: res.picture,
+                      },
+                    });
                   }
-                  this.notifySuccess(this.isSignIn ? "Signed in successfully." : "Signed in with existing account.");
+                  this.notifySuccess(
+                    this.isSignIn
+                      ? "Signed in successfully."
+                      : "Signed in with existing account."
+                  );
                   const userStore = useUserStore();
                   userStore.setUser(res);
                   router.push("/");
@@ -52,7 +70,7 @@ export default {
     isSignIn() {
       return this.$router.currentRoute.value.path === "/signin";
     },
-  }
+  },
 };
 </script>
 

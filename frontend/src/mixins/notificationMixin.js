@@ -1,4 +1,4 @@
-import { useNotificationStore } from '@/stores/notificationStore.js';
+import { useNotificationStore } from "@/stores/notificationStore.js";
 
 export const notificationMixin = {
   methods: {
@@ -10,6 +10,6 @@ export const notificationMixin = {
     },
     notifyWarning(message) {
       useNotificationStore().add(message, "alert-warning");
-    }
-  }
+    },
+  },
 };

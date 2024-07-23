@@ -8,7 +8,9 @@
       :placeholder="placeholder"
       required
     />
-    <label :for="id" class="d-inline-block text-truncate w-100">{{ label }}</label>
+    <label :for="id" class="d-inline-block text-truncate w-100">{{
+      label
+    }}</label>
     <div class="invalid-feedback">{{ feedback }}</div>
   </div>
 </template>

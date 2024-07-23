@@ -28,7 +28,10 @@ googleOAuthRouter.post("/", async (req, res) => {
       }
     );
 
-    const user = await findUser(userResponse.data.email, userResponse.data.name);
+    const user = await findUser(
+      userResponse.data.email,
+      userResponse.data.name
+    );
 
     // If user not found, want to ask user to sign up with a username
     if (!user) {

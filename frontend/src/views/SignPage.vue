@@ -1,6 +1,9 @@
 <template>
   <div class="sign-background">
-    <div v-if="$route.query.name && $route.query.email" class="sign-container shadow">
+    <div
+      v-if="$route.query.name && $route.query.email"
+      class="sign-container shadow"
+    >
       <UsernameForm
         name="$route.query.name"
         email="$route.query.email"

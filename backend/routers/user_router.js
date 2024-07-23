@@ -9,18 +9,15 @@ import { generateAccessToken } from "../helpers/auth.js";
 export const userRouter = Router();
 
 userRouter.post("/signup", async (req, res) => {
-  if (
-    req.body.username === undefined ||
-    req.body.email === undefined
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Missing username or email" });
+  if (req.body.username === undefined || req.body.email === undefined) {
+    return res.status(400).json({ error: "Missing username or email" });
   }
 
   const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds);
-  const password = req.body.password ? bcrypt.hashSync(req.body.password, salt) : null;
+  const password = req.body.password
+    ? bcrypt.hashSync(req.body.password, salt)
+    : null;
   try {
     const user = await User.create({
       username: req.body.username,
@@ -35,7 +32,7 @@ userRouter.post("/signup", async (req, res) => {
       token: token,
       userId: user.id,
     });
-  } catch(error) {
+  } catch (error) {
     return res.status(422).json({ error: error.errors[0].message });
   }
 });

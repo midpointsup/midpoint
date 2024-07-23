@@ -7,20 +7,22 @@
   >
     <h2 class="mt-5">Sign In</h2>
     <p class="mb-1">Welcome back to Midpoint!</p>
-    <span class="invalid-feedback" :class="isHidden">Incorrect username or password</span>
+    <span class="invalid-feedback" :class="isHidden"
+      >Incorrect username or password</span
+    >
     <TextInput
-    id="username"
-    name="username"
-    placeholder="Username"
-    label="Username"
-    :feedback="feedback.username"
+      id="username"
+      name="username"
+      placeholder="Username"
+      label="Username"
+      :feedback="feedback.username"
     />
     <TextInput
-    id="password"
-    name="password"
-    placeholder="Password"
-    label="Password"
-    :feedback="feedback.password"
+      id="password"
+      name="password"
+      placeholder="Password"
+      label="Password"
+      :feedback="feedback.password"
     />
     <button type="submit" class="btn py-2">Sign In</button>
   </form>
@@ -51,7 +53,8 @@ export default {
       const form = this.$refs.form;
       const router = this.$router;
       const userStore = useUserStore();
-      const onSuccess = () => this.notifySuccess("Account created successfully!");
+      const onSuccess = () =>
+        this.notifySuccess("Account created successfully!");
       const showError = () => {
         this.feedback.username = "";
         this.feedback.password = "";

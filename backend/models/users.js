@@ -18,7 +18,7 @@ export const User = sequelize.define("User", {
         args: /^[a-z0-9_-]+$/i,
         msg: "Username must only contain letters, numbers, underscores and hyphens",
       },
-    }
+    },
   },
   email: {
     type: DataTypes.STRING,
@@ -31,7 +31,7 @@ export const User = sequelize.define("User", {
       isEmail: {
         args: true,
         msg: "Email must be in a valid format (e.g. hi@example.com)",
-      }
+      },
     },
   },
   password: {
