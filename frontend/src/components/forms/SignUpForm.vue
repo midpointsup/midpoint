@@ -51,8 +51,10 @@
 import TextInput from "@/components/TextInput.vue";
 import userService from "@/services/user-service.js";
 import { useUserStore } from "@/stores/userStore.js";
+import { notificationMixin } from "@/mixins/notificationMixin.js";
 
 export default {
+  mixins: [notificationMixin],
   components: {
     TextInput,
   },
@@ -84,11 +86,13 @@ export default {
         userService
           .signup(form.username.value, form.email.value, form.password.value)
           .then((res) => {
-            if (res.error?.toLowerCase()?.includes("username")) {
-              showError(form.username, res.error);
-            } else if (res.error?.toLowerCase()?.includes("email")) {
-              showError(form.email, res.error);
+            const field = ["username", "email"].find(f => res.error?.toLowerCase()?.includes(f));
+            if (field) {
+              showError(form[field], res.error)
+            } else if (res.error) {
+              this.notifyError("Something went wrong. Please try again.");
             } else {
+              this.notifySuccess("Account created successfully!");
               form.classList.add("was-validated");
               userStore.setUser(res);
               router.push("/");

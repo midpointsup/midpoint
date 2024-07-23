@@ -30,7 +30,7 @@ export default {
     SignInForm,
     SignUpForm,
     GoogleLoginForm,
-    UsernameForm
+    UsernameForm,
   },
   props: {
     type: "up" | "in",
