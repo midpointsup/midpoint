@@ -1,11 +1,11 @@
 <template>
   <form
-    class="signup-form needs-validation"
+    class="needs-validation d-flex flex-column gap-3"
     @submit.prevent="signup"
     novalidate
     ref="form"
   >
-    <h2 class="mt-5 mb-4">Sign Up</h2>
+    <h2 class="mt-5">Sign Up</h2>
     <p>Get started with Midpoint!</p>
     <div class="row gap-2 mx-0">
       <TextInput
@@ -14,7 +14,8 @@
         name="username"
         placeholder="Username"
         label="Username"
-        feedback="Username required"
+        :feedback="feedback.username"
+        @focus="resetValidity"
       />
       <TextInput
         class="col p-0"
@@ -22,7 +23,8 @@
         name="email"
         placeholder="Email"
         label="Email"
-        feedback="Email required"
+        :feedback="feedback.email"
+        @focus="resetValidity"
       />
     </div>
     <TextInput
@@ -30,15 +32,17 @@
       name="password"
       placeholder="Password"
       label="Password"
-      feedback="Password required"
-    />
+      :feedback="feedback.password"
+      @focus="resetValidity"
+      />
     <TextInput
       id="reEnterPassword"
       name="reEnterPassword"
       placeholder="Re-Enter Password"
       label="Re-Enter Password"
-      feedback="Password required"
-    />
+      :feedback="feedback.reEnterPassword"
+      @focus="resetValidity"
+      />
     <button type="submit" class="btn py-2">Create Account</button>
   </form>
 </template>
@@ -52,38 +56,63 @@ export default {
   components: {
     TextInput,
   },
-  methods: {
-    signup(event) {
-      const form = this.$refs.form;
-      if (!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
+  data() {
+    return {
+      feedback: {
+        username: "Username required",
+        email: "Email required",
+        password: "Password required",
+        reEnterPassword: "Password required",
       }
-      form.reEnterPassword.setCustomValidity("");
-      if (form.password.value.trim() !== form.reEnterPassword.value.trim()) {
-        form.reEnterPassword.setCustomValidity("Passwords do not match.");
-        form.reEnterPassword.reportValidity();
-        event.preventDefault();
-        event.stopPropagation();
-      } else {
-        const router = this.$router;
-        userService
-          .signup(form.username.value, form.email.value, form.password.value)
-          .then(function (res) {
-            if (res.error) {
-              console.error("Handle already existing user and other errors");
-              return;
-            }
-            const userStore = useUserStore();
-            userStore.setUser(res);
-            router.push("/");
-          });
+    }
+  },
+  methods: {
+    signup() {
+      const form = this.$refs.form;
+      const router = this.$router;
+      const userStore = useUserStore();
+
+      const showError = (elem, msg) => {
+        this.feedback[elem.name] = msg;
+        elem.classList.add("is-invalid");
       }
 
-      form.classList.add("was-validated");
+      this.resetFeedback();
+      if (form.password.value.trim() !== form.reEnterPassword.value.trim()) {
+        showError(form.reEnterPassword, "Passwords do not match");
+      } else if (form.checkValidity()) {
+        userService
+          .signup(form.username.value, form.email.value, form.password.value)
+          .then((res) => {
+            if (res.error?.toLowerCase()?.includes("username")) {
+              showError(form.username, res.error);
+            } else if (res.error?.toLowerCase()?.includes("email")) {
+              showError(form.email, res.error);
+            } else {
+              form.classList.add("was-validated");
+              userStore.setUser(res);
+              router.push("/");
+            }
+          });
+        } else {
+          form.classList.add("was-validated");
+        }
+    },
+    resetValidity(event) {
+      event.target?.classList.remove("is-invalid");
+    },
+    resetFeedback() {
+      const form = this.$refs.form;
+      form.classList.remove("was-validated");
+      form.username.classList.remove("is-invalid");
+      form.email.classList.remove("is-invalid");
+      form.password.classList.remove("is-invalid");
+      form.reEnterPassword.classList.remove("is-invalid");
+      this.feedback.username = "Username required";
+      this.feedback.email = "Email required";
+      this.feedback.password = "Password required";
+      this.feedback.reEnterPassword = "Password required";
     },
   },
 };
 </script>
-
-<style></style>

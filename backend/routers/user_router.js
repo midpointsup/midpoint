@@ -11,22 +11,22 @@ export const userRouter = Router();
 userRouter.post("/signup", async (req, res) => {
   if (
     req.body.username === undefined ||
-    req.body.email === undefined ||
-    req.body.password === undefined
+    req.body.email === undefined
   ) {
     return res
       .status(400)
-      .json({ error: "Missing username, email or password" });
+      .json({ error: "Missing username or email" });
   }
+
   const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds);
-  const password = bcrypt.hashSync(req.body.password, salt);
-
+  const password = req.body.password ? bcrypt.hashSync(req.body.password, salt) : null;
   try {
     const user = await User.create({
       username: req.body.username,
       email: req.body.email,
       password: password,
+      picture: req.body.picture,
     });
     const token = await generateAccessToken(user.id);
     return res.json({
@@ -35,8 +35,8 @@ userRouter.post("/signup", async (req, res) => {
       token: token,
       userId: user.id,
     });
-  } catch {
-    return res.status(422).json({ error: "Failed to create user" });
+  } catch(error) {
+    return res.status(422).json({ error: error.errors[0].message });
   }
 });
 

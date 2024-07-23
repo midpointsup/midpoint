@@ -1,11 +1,11 @@
 <template>
   <form
-    class="signin-form needs-validation"
+    class="needs-validation d-flex flex-column gap-3"
     @submit.prevent="signin"
     novalidate
     ref="form"
   >
-    <h2 class="mt-5 mb-4">Sign In</h2>
+    <h2 class="mt-5">Sign In</h2>
     <p>Welcome back to Midpoint!</p>
     <TextInput
       id="username"
@@ -38,10 +38,7 @@ export default {
     signin(event) {
       const form = this.$refs.form;
       const router = this.$router;
-      if (!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-      } else {
+      if (form.checkValidity()) {
         userService
           .signin(form.username.value, form.password.value)
           .then(function (res) {
@@ -59,5 +56,3 @@ export default {
   },
 };
 </script>
-
-<style></style>

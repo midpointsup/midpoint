@@ -13,25 +13,35 @@ export default {
   methods: {
     login() {
       const router = this.$router;
+
+      const handleLogin = (response) => {
+        if (response.error) {
+          console.error("Error:", response.error);
+          return;
+        }
+        if (response.code) {
+          userService.saveGoogleToken(response.code).then((res) => {
+            if (res.error) {
+              console.error("Error:", res.error);
+              return;
+            }
+            if (res.userId === null) {
+              router.push({ path: "signup", query: { google: true, name: res.username, email: res.email, picture: res.picture } });
+              return;
+            }
+            const userStore = useUserStore();
+            userStore.setUser(res);
+            router.push("/");
+          });
+        }
+      }
       googleSdkLoaded((google) => {
         google.accounts.oauth2
           .initCodeClient({
             client_id: import.meta.env.VITE_CLIENT_ID,
             scope: "email profile openid",
             redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-            callback: (response) => {
-              if (response.error) {
-                console.error("Error:", response.error);
-                return;
-              }
-              if (response.code) {
-                userService.saveGoogleToken(response.code).then((res) => {
-                  const userStore = useUserStore();
-                  userStore.setUser(res);
-                  router.push("/");
-                });
-              }
-            },
+            callback: handleLogin,
           })
           .requestCode();
       });

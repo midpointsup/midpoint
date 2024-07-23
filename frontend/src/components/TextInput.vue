@@ -1,14 +1,14 @@
 <template>
-  <div class="form-floating mb-3">
+  <div class="form-floating">
     <input
       type="text"
-      class="form-control"
+      class="form-control text-overflow"
       :id="id"
       :name="name"
       :placeholder="placeholder"
       required
     />
-    <label :for="id">{{ label }}</label>
+    <label :for="id" class="d-inline-block text-truncate w-100">{{ label }}</label>
     <div class="invalid-feedback">{{ feedback }}</div>
   </div>
 </template>
