@@ -4,9 +4,9 @@
     <h2 class="mt-1">You're almost there!</h2>
     <p>Choose a unique username to finish setting up your account!</p>
     <div class="row align-items-center">
-      <img v-if="picture" :src="picture" class="col-2 pfp py-2" />
-      <img v-else src="@/assets/static/user.png" class="col-2 pfp py-2" />
-      <TextInput id="username" name="username" placeholder="Username" label="Username" :feedback="feedback"
+      <img v-if="picture" :src="picture" class="col-2 pfp-large rounded-circle py-2" />
+      <img v-else src="@/assets/static/user.png" class="col-2 limits rounded-circle py-2" />
+      <TextInput id="username" name="username" placeholder="Username" label="Username" :feedback="feedback" @focus="resetValidity"
         class="col-10 p-0" />
     </div>
     <button type="submit" class="btn py-2 mt-5 mb-2">Finish Setup</button>
@@ -54,19 +54,22 @@ export default {
             this.feedback = res.error;
             form.username.classList.add("is-invalid");
           } else {
-            console.log(res);
             form.classList.add("was-validated");
+            res.picture = this.picture;
             userStore.setUser(res);
             router.push("/");
           }
         });
+      } else {
+        this.feedback = "Username required";
+        form.username.classList.add("is-invalid");
       }
     },
   },
 };
 </script>
 
-<style scoped>
+<style>
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -85,8 +88,7 @@ export default {
   }
 }
 
-.pfp {
-  border-radius: 50%;
+.pfp-large {
   min-width: 60px;
   max-width: 90px;
 }

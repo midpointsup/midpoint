@@ -30,7 +30,7 @@ export const User = sequelize.define("User", {
     validate: {
       isEmail: {
         args: true,
-        msg: "Email must be in a valid format",
+        msg: "Email must be in a valid format (e.g. hi@example.com)",
       }
     },
   },

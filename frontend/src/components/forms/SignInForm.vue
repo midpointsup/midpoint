@@ -51,7 +51,7 @@ export default {
       const form = this.$refs.form;
       const router = this.$router;
       const userStore = useUserStore();
-
+      const onSuccess = () => this.notifySuccess("Account created successfully!");
       const showError = () => {
         this.feedback.username = "";
         this.feedback.password = "";
@@ -59,7 +59,6 @@ export default {
         form.password.classList.add("is-invalid");
         this.error = true;
       };
-
       this.resetFeedback();
       if (form.checkValidity()) {
         userService
@@ -68,7 +67,7 @@ export default {
             if (res.error) {
               showError(res.error);
             } else {
-              this.notifySuccess("Account created successfully!");
+              onSuccess();
               form.classList.add("was-validated");
               userStore.setUser(res);
               router.push("/");
