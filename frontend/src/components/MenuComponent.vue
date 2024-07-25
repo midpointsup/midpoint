@@ -74,7 +74,10 @@
               :you="currentUser"
             ></MembersList>
           </MiddleForm>
-          <RouteDisplayTabs :planId="selectedPlan.id" :destination="selectedPlan.address"></RouteDisplayTabs>
+          <RouteDisplayTabs
+            :planId="selectedPlan.id"
+            :destination="selectedPlan.address"
+          ></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
           <button
             v-if="selectedPlan.ownerId === currentUser.userId"
@@ -210,7 +213,7 @@ export default {
   components: {
     MiddleForm,
     MembersList,
-    RouteDisplayTabs
+    RouteDisplayTabs,
   },
   data() {
     return {

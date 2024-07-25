@@ -19,6 +19,16 @@ a,
   color: white;
 }
 
+.nav-pills .nav-link {
+  background-color: var(white);
+  color: var(--primary);
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--bs-card-title-color);
+  color: var(--primary);
+}
+
 .nav-link {
   color: var(--primary);
 }

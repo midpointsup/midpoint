@@ -252,6 +252,7 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
   const endLocation = req.body.endLocation ?? "";
   const transportationMethod = req.body.transportationMethod ?? "";
   const radius = req.body.radius ?? 100;
+  const waypoints = req.body.waypoints ?? [];
 
   try {
     const trip = await Trip.findOne({
@@ -259,6 +260,10 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
         id: req.params.tripId,
         PlanId: req.params.id,
         UserId: req.params.memberId,
+      },
+      include: {
+        model: User,
+        attributes: ["username", "id", "picture", "email"],
       },
     });
     if (!trip) {
@@ -270,26 +275,40 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
     trip.endLocation = endLocation;
     trip.transportationMethod = transportationMethod;
     trip.radius = radius;
+    trip.waypoints = waypoints;
 
     await trip.save();
 
-    req.io.emit("trip", trip);
-    return res.json(trip);
+    const roomId = req.params.id.toString();
+    console.log("Emitting trip to room", roomId);
+    //console.log("Emitting trip from socket", req.io.);
+
+    // req.io.on("connection", (socket) => {
+    //   console.log("a user connected");
+    //   console.log("socket id is:", socket.id);
+
+    //   socket.to(roomId).emit("trip", trip);
+    // })
+    req.io.in("room" + roomId).emit("trip", trip);
+    return res.json({trip: trip});
   } catch {
     return res.status(422).json({ error: "Failed to update trip" });
   }
 });
 
-planRouter.get("/:id/members/:memberId/trip/:tripId", async (req, res) => {
+planRouter.get("/:id/members/:memberId/trip", async (req, res) => {
   try {
     const trip = await Trip.findOne({
       where: {
-        id: req.params.tripId,
         PlanId: req.params.id,
         UserId: req.params.memberId,
       },
+      include: {
+        model: User,
+        attributes: ["username", "id", "picture", "email"],
+      },
     });
-    return res.json(trip);
+    return res.json({trip: trip});
   } catch {
     return res.status(500).json({ error: "Failed to fetch trip" });
   }
@@ -301,13 +320,12 @@ planRouter.get("/:id/members/trip", async (req, res) => {
       where: {
         PlanId: req.params.id,
       },
-      include: 
-      {
+      include: {
         model: User,
         attributes: ["username", "id", "picture", "email"],
       },
     });
-    return res.json({trips: trips});
+    return res.json({ trips: trips });
   } catch {
     return res.status(500).json({ error: "Failed to fetch trips" });
   }

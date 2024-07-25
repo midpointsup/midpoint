@@ -6,7 +6,7 @@
 import io from "socket.io-client";
 
 export default {
-  mounted() {
+  mounted() {/*
     const socket = io("http://localhost:3000");
 
     socket.on("connect", () => {
@@ -16,7 +16,7 @@ export default {
     socket.on("trip", (trip) => {
       console.log("trip");
       console.log(trip);
-    });
+    });*/
   },
 };
 </script>
