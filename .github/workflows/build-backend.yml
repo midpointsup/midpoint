@@ -5,6 +5,7 @@ on:
     # Only run this workflow if it is a commit to main.
     branches:
       - main
+      - SPI-25-deploy
     # Only run this workflow if the commit has modified files from backend
     paths:
       - backend/**
