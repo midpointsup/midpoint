@@ -17,7 +17,7 @@ const PORT = process.env.PORT;
 const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://midpoint.live",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -25,7 +25,7 @@ const io = new SocketIOServer(httpServer, {
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Only allow requests from this origin,
+    origin: "https://midpoint.live",
     credentials: true,
   })
 );

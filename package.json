@@ -16,13 +16,5 @@
     "prettier": "^2.8.8"
   },
   "author": "spiders",
-  "license": "ISC",
-  "dependencies": {
-    "axios": "^1.7.2",
-    "bootstrap": "^5.3.3",
-    "cors": "^2.8.5",
-    "mailersend": "^2.2.0",
-    "vue-google-oauth2": "^1.5.10",
-    "vue3-google-login": "^2.0.26"
-  }
+  "license": "ISC"
 }

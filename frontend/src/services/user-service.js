@@ -2,7 +2,7 @@ let userService = (function () {
   "use strict";
 
   const module = {};
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = "https://api.midpoint.live";
 
   module.signup = function (username, email, password) {
     return fetch(`${baseUrl}/api/users/signup`, {

@@ -7,7 +7,7 @@ import io from "socket.io-client";
 
 export default {
   created() {
-    const socket = io("http://localhost:3000");
+    const socket = io("https://api.midpoint.live");
 
     socket.on("connect", () => {
       console.log("connected");

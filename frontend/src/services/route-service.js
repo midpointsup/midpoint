@@ -2,7 +2,7 @@ const routeService = (function () {
   "use strict";
 
   const module = {};
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = "https://api.midpoint.live";
 
   module.middle = async function (locations, category, keyword) {
     const encodedLocations = encodeURIComponent(JSON.stringify(locations));

@@ -20,7 +20,7 @@ services:
       - ./html:/usr/share/nginx/html
       - ./acme:/etc/acme.sh
     environment:
-      - DEFAULT_EMAIL=rkwan.hy@gmail.com
+      - DEFAULT_EMAIL=madison.majarais@gmail.com
       - NGINX_PROXY_CONTAINER=nginx-proxy
   frontend:
     image: ghcr.io/utsc-cscc09-programming-on-the-web/frontend-midpoint:spi-25-deploy

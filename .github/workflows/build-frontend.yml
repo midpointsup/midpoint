@@ -31,7 +31,7 @@ jobs:
 
       - name: Log into GitHub Container Registry
         # TODO: Create a Personal Access Tokens (PAT) with `read:packages` and `write:packages` scopes and save it as an Actions secret `CR_PAT`
-        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u rkwan05 --password-stdin
+        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u MadisonMajarais --password-stdin
 
       - name: Push image to GitHub Container Registry
         run: |
@@ -52,9 +52,9 @@ jobs:
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 34.0.37.102
-          username: rkwan
-          key: ${{ secrets.KEY }}
+          host: 159.203.1.240
+          username: root
+          password: ${{ secrets.KEY }}
           script: |
             docker compose down
             docker compose pull && docker compose up -d
