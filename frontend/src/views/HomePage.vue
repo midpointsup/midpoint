@@ -1,21 +1,31 @@
 <template>
-  <div class="app-wrapper">
-    <MenuComponent></MenuComponent>
-    <div id="layout">
-      <MapComponent></MapComponent>
-    </div>
+  <MenuComponent></MenuComponent>
+  <div id="layout" ref=layout>
+    <MapComponent></MapComponent>
+    <PopupContainer></PopupContainer>
   </div>
 </template>
 
 <script>
 import MenuComponent from "@/components/MenuComponent.vue";
 import MapComponent from "@/components/MapComponent.vue";
+import PopupContainer from "@/components/PopupContainer.vue";
 import "@/../node_modules/mapbox-gl/dist/mapbox-gl.css";
+import { useBoundingStore } from "@/stores/offsetStore.js";
+// import { ref } from "vue";
 
 export default {
   components: {
     MapComponent,
     MenuComponent,
+    PopupContainer,
+  },
+  // setup() {
+  //   return { menuRef: ref(null) };
+  // },
+  mounted() {
+    const boundingStore = useBoundingStore();
+    boundingStore.setBounding("layout", this.$refs.layout);
   },
 };
 </script>
@@ -25,14 +35,5 @@ export default {
   flex: 1;
   display: flex;
   position: relative;
-}
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  @media (min-width: 577px) {
-    flex-direction: row;
-  }
 }
 </style>

@@ -4,13 +4,12 @@
   display: flex;
   height: 100vh;
   padding: 0;
-  flex: 1;
 }
 
 a,
 .green {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: var(--primary);
   transition: 0.4s;
 }
 
@@ -19,14 +18,10 @@ a,
   color: white;
 }
 
-.nav-pills .nav-link {
-  background-color: var(white);
-  color: var(--primary);
-}
-
-.nav-pills .nav-link.active {
-  background-color: var(--bs-card-title-color);
-  color: var(--primary);
+.badge-btn {
+  max-width: 4px;
+  max-height: 4px;
+  background-size: contain;
 }
 
 .nav-link {
@@ -35,6 +30,26 @@ a,
 
 .nav-link:hover {
   color: var(--secondary);
+}
+
+.input-simple {
+  border: 1px solid #80868b;
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+
+  &:focus {
+    outline: var(--dark-blue) auto;
+  }
+}
+
+.search {
+  background-image: url("@/assets/static/search.svg");
+  background-repeat: no-repeat;
+  background-position-y: center;
+  background-position-x: 10px;
+  background-size: 14px;
+  padding: 8px calc(0.875rem * 2.5);
 }
 
 @media (hover: hover) {

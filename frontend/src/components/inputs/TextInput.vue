@@ -36,7 +36,7 @@ export default {
     },
     feedback: {
       type: String,
-      required: true,
+      default: "",
     },
   },
 };

@@ -53,7 +53,7 @@ export default {
                   this.notifySuccess(
                     this.isSignIn
                       ? "Signed in successfully."
-                      : "Signed in with existing account."
+                      : "Signed in with an existing account."
                   );
                   const userStore = useUserStore();
                   userStore.setUser(res);

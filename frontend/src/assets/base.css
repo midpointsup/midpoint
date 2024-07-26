@@ -20,6 +20,8 @@
   --color-background-secondary: var(--dark-white);
   --color-heading: var(--primary);
   --color-text: var(--black);
+
+  --menu-height: 60px;
 }
 
 *,

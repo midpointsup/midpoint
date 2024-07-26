@@ -71,6 +71,13 @@ let userService = (function () {
     }).then((res) => res.json());
   };
 
+  module.findUsers = function (query) {
+    return fetch(`${baseUrl}/api/users?query=${query}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${module.getToken()}` },
+    }).then((res) => res.json());
+  };
+
   return module;
 })();
 
