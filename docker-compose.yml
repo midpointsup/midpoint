@@ -22,6 +22,7 @@ services:
     environment:
       - DEFAULT_EMAIL=madison.majarais@gmail.com
       - NGINX_PROXY_CONTAINER=nginx-proxy
+      - PORT=example
   frontend:
     image: ghcr.io/utsc-cscc09-programming-on-the-web/frontend-midpoint:spi-25-deploy
     container_name: frontend-midpoint
@@ -31,6 +32,10 @@ services:
     environment:
       - VIRTUAL_HOST=midpoint.live
       - LETSENCRYPT_HOST=midpoint.live
+      - VITE_GOOGLE_MAPS_API=example
+      - VITE_CLIENT_ID=example
+      - VITE_CLIENT_SECRET=example
+      - VITE_REDIRECT_URL=example
   backend:
     image: ghcr.io/utsc-cscc09-programming-on-the-web/backend-midpoint:spi-25-deploy
     container_name: backend-midpoint
@@ -40,3 +45,14 @@ services:
     environment:
       - VIRTUAL_HOST=api.midpoint.live
       - LETSENCRYPT_HOST=api.midpoint.live
+      - DB_NAME=example
+      - DB_HOST=example
+      - DB_USER=example
+      - DB_PASSWD=example
+      - DB_PORT=example
+      - GOOGLE_MAPS_API=example
+      - JWT_SECRET=example
+      - CLIENT_ID=example
+      - CLIENT_SECRET=example
+      - REDIRECT_URL=example
+      - MAIL_API_KEY=example

@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import { sequelize } from "./datasource.js";
 import { userRouter } from "./routers/user_router.js";
 import { googleOAuthRouter } from "./routers/google_oauth_router.js";
-import { Server } from "socket.io";
 import { Server as SocketIOServer } from "socket.io";
 import { registerIOListeners } from "./socket.js";
 import cors from "cors";
@@ -75,5 +74,5 @@ app.use(function (req, res, next) {
 
 app.listen(PORT, (err) => {
   if (err) console.log(err);
-  else console.log("HTTP server on http://localhost:%s", PORT);
+  else console.log("HTTPs server on http://localhost:%s", PORT);
 });

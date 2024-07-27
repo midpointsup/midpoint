@@ -56,5 +56,9 @@ jobs:
           username: root
           password: ${{ secrets.KEY }}
           script: |
+            docker stop backend-midpoint
+            docker stop frontend-midpoint
+            docker stop nginx-proxy
+            docker stop nginx-proxy-acme
             docker compose down
             docker compose pull && docker compose up -d
