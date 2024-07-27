@@ -132,7 +132,6 @@ userRouter.get("/", isAuthenticated, async (req, res) => {
     const users = await User.findAll({
       where: {
         username: {[Op.and]: { [Op.not]: req.user.username, [Op.iLike]: `${req.query.query}%` }}
-        // username:{ [Op.iLike]: `${req.query.query}%`, [Op.not]: req.user.username },
       },
     });
     return res.status(200).json(users);

@@ -5,7 +5,7 @@
 
     <div>
       <input type="text" id="userSearch" class="search input-simple" placeholder="Search username" v-model="searchUsername">
-      <div for="userSearch" class="form-text">Can't find who you're looking for? <a class="green">Send an Invite</a>
+      <div for="userSearch" class="form-text">Can't find who you're looking for? <a class="green" @click="showInvite">Send an Invite</a>
       </div>
       <button v-if="searchUsername.length >= 1" type="button" class="btn-clear" @click="searchUsername = ''"></button>
       <ul v-if="searchUsername.length >= 3" class="list-group member-dropdown">
@@ -33,6 +33,7 @@
 import TextInput from "@/components/inputs/TextInput.vue";
 import PlacePicker from "@/components/inputs/PlacePicker.vue";
 import userService from "@/services/user-service.js";
+import { usePopupStore } from "../../stores/popupStore";
 export default {
   components: {
     TextInput,
@@ -78,17 +79,18 @@ export default {
       if (this.cache[username]) {
         this.fetchedUsers = this.cache[username].filter((user) => !this.membersList.includes(user.username));
         this.isLoading = false;
-        console.log("cache hit", this.fetchedUsers)
         return;
       }
 
       userService.findUsers(username).then((response) => {
-        console.log(response);
         this.cache[username] = response.filter((user) => !this.membersList.includes(user.username));;
         this.fetchedUsers = this.cache[username];
         this.isLoading = false;
       });
     },
+    showInvite() {
+      usePopupStore().show(0)
+    }
   }
 }
 </script>

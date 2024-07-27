@@ -1,7 +1,7 @@
 <template>
   <div class="form-floating">
     <input
-      type="text"
+      :type="text"
       class="form-control text-overflow"
       :id="id"
       :name="name"
@@ -37,6 +37,10 @@ export default {
     feedback: {
       type: String,
       default: "",
+    },
+    type: {
+      type: String,
+      default: "text",
     },
   },
 };

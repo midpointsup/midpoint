@@ -2,38 +2,36 @@
   <UseDraggable
     v-for="(popup, index) in popups"
     :key="index"
-    class="popup"
-    :class="popup.show ? '' : 'hidden'"
-    @move.passive="(pos) => move(index, pos)"
+    :class="popup.show ? 'popup' : 'hidden'"
+    @move="(pos) => handleMove(index, pos)"
     :style="getPopupStyle(index, popup.pos)"
     ref="popupElement"
+    :initial-value="popup.pos"
   >
-    <button @click="hide(index)" class="btn-close small popup-close"></button>
+    <button @click="handleClose(index)" class="btn-close small popup-close"></button>
     <component :is="popup.component" class="mt-4"></component>
   </UseDraggable>
 </template>
 
 <script>
-import { popupMixin } from "@/mixins/popupMixin";
 import { UseDraggable } from "@vueuse/components";
-import { useBoundingStore } from "../stores/offsetStore.js";
+import { useBoundingStore } from "@/stores/offsetStore.js";
 import { useElementBounding } from "@vueuse/core";
+import { usePopupStore } from "@/stores/popupStore.js";
 
 export default {
-  mixins: [popupMixin],
   components: {
     UseDraggable,
   },
   data() {
     return {
+      popups: usePopupStore().getPopups(),
       popupBounds: [],
     };
   },
   computed: {
     offset() {
-      console.log("recalculated")
       const layoutBounds = useBoundingStore().getBounding("layout");
-      console.log(layoutBounds);
       return layoutBounds?.width ?? 0;
     },
   },
@@ -56,6 +54,12 @@ export default {
         left: `${left}px`,
         top: `${top}px`,
       };
+    },
+    handleMove(index, pos) {
+      usePopupStore().move(index, pos);
+    },
+    handleClose(index) {
+      usePopupStore().hide(index);
     },
   }
 };

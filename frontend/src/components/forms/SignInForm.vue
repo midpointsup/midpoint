@@ -23,6 +23,7 @@
       placeholder="Password"
       label="Password"
       :feedback="feedback.password"
+      type="password"
     />
     <button type="submit" class="btn py-2">Sign In</button>
   </form>

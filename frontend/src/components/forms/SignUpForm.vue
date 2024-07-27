@@ -34,6 +34,7 @@
       label="Password"
       :feedback="feedback.password"
       @focus="resetValidity"
+      type="password"
     />
     <TextInput
       id="reEnterPassword"
@@ -42,6 +43,7 @@
       label="Re-Enter Password"
       :feedback="feedback.reEnterPassword"
       @focus="resetValidity"
+      type="password"
     />
     <button type="submit" class="btn py-2">Create Account</button>
   </form>
