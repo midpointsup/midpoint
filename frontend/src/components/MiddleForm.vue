@@ -8,14 +8,16 @@
           id="place-picker"
           for-map="map"
           :value="startLoc"
-          @gmpx-placechange="handleLocationChange"
+          @gmpx-placechange="handleLocationChange($event, 'start')"
         ></gmpx-place-picker>
         <div id="infowindow-content">
           <span id="place-name" class="title" style="font-weight: bold"></span
           ><br />
           <span id="place-address"></span>
         </div>
-        <button @click="addLocation" class="btn">Done</button>
+        <button :disabled="!startLoc" @click="addLocation" class="btn">
+          Done
+        </button>
       </form>
 
       <label for="travelMode">Travel Mode:</label>
@@ -48,14 +50,40 @@
         <span class="display-info">{{ this.travelMode }}</span>
         <h6>Radius</h6>
         <span class="display-info">{{ this.radius }}</span>
+
+        <h6>Midpoint</h6>
+        <div class="middle-form">
+          <span v-if="!editMidpoint" class="display-info">{{ this.midpoint }}</span>
+          <gmpx-place-picker
+            v-if="editMidpoint"
+            id="place-picker-midpoint"
+            placeholder="Enter Midpoint"
+            @gmpx-placechange="handleLocationChange($event, 'midpoint')"
+          ></gmpx-place-picker>
+          <div v-if="!editMidpoint" id="infowindow-content">
+            <span id="place-name" class="title" style="font-weight: bold"></span
+            ><br />
+            <span id="place-address"></span>
+          </div>
+          
+          <button @click="editMidpointAddress" class="btn">
+            {{editMidpoint ? 'Done' : 'Edit'}}
+          </button>
+        </div>
+          
+          
       </div>
       <br />
     </li>
   </ul>
   <slot></slot>
-  <button class="btn" @click="generateMiddle">Meet in the middle!</button>
+  <button class="btn" :disabled="!allLocationsVerified" @click="generateMiddle">
+    Meet in the middle!
+  </button>
   <br />
-  <button class="btn" @click="getDirections">Get Directions</button>
+  <button class="btn" :disabled="midpoint == ''" @click="getDirections">
+    Get Directions
+  </button>
 </template>
 
 <script>
@@ -64,6 +92,8 @@ import planService from "../services/plan-service.js";
 export default {
   data() {
     return {
+      editMidpoint: false,
+      editedMidpoint: "",
       showInput: !this.startLocation,
       startLoc: this.startLocation ?? "",
       midpoint: this.selectedPlan?.address ?? "",
@@ -78,6 +108,10 @@ export default {
       radius: this.selectedPlan?.members.find(
         (member) => member.id === this.currentUser.userId
       ).Trips[0].radius,
+      allLocationsVerified: this.selectedPlan.members.every(
+        (member) => member.Trips[0].startLocation !== ""
+      ),
+      socket: null,
     };
   },
   props: {
@@ -86,11 +120,20 @@ export default {
     currentUser: Object,
   },
   mounted() {
-    this.placePicker = document.getElementById("place-picker");
-    if (this.placePicker) {
-      this.placePicker.addEventListener("gmpx-placechange", () => {
-        const place = this.placePicker.value;
-        this.startLoc = this.placePicker.value.formattedAddress;
+    this.initPlacePicker("place-picker");
+    this.initPlacePicker("place-picker-midpoint");   
+  },
+  methods: {
+    initPlacePicker(id) {
+      const placePickerEl = document.getElementById(id);
+    if (placePickerEl) {
+      placePickerEl.addEventListener("gmpx-placechange", () => {
+        if(id === "place-picker-midpoint") {
+          this.editedMidpoint = placePickerEl.value?.formattedAddress;
+        } else {
+          const place = placePickerEl.value;
+          this.startLoc = placePickerEl.value?.formattedAddress;
+        }
 
         if (!place.location) {
           window.alert("No details available for input: '" + place.name + "'");
@@ -104,10 +147,13 @@ export default {
           place.formattedAddress;
       });
     }
-  },
-  methods: {
-    handleLocationChange(newLocation) {
-      this.startLoc = newLocation.target.value.formattedAddress;
+    },
+    handleLocationChange(newLocation, locationType) {
+      if (locationType === "midpoint") {
+        this.editedMidpoint = newLocation.target.value.formattedAddress;
+      } else if(locationType === "start") {
+        this.startLoc = newLocation.target.value.formattedAddress;
+      }
     },
     addLocation() {
       if (this.startLoc?.trim()) {
@@ -131,12 +177,17 @@ export default {
             this.selectedPlan.members.find(
               (member) => member.id === this.currentUser.userId
             ).Trips[0].transportationMethod = this.travelMode;
+            this.allLocationsVerified = this.selectedPlan.members.every(
+              (member) => member.Trips[0].startLocation !== ""
+            );
           });
       }
     },
     editLocation() {
       this.showInput = true;
       this.$emit("clear-location");
+      this.allLocationsVerified = false;
+      this.startLoc = "";
     },
     async generateMiddle() {
       const locations = this.selectedPlan.members.map(
@@ -195,6 +246,12 @@ export default {
         });
       });
     },
+    editMidpointAddress() {
+      if(this.editMidpoint && this.editedMidpoint) {
+        this.updateMidpoint(this.editedMidpoint);
+      } 
+      this.editMidpoint = !this.editMidpoint;
+    },
     updateMidpoint(location) {
       this.midpoint = location;
       this.$emit("generate-midpoint", location);
@@ -223,7 +280,11 @@ export default {
       directionsService.route(request, (result, status) => {
         if (status == "OK") {
           directionsRenderer.setDirections(result);
-        }
+        } else if(status == "ZERO_RESULTS") {
+          window.alert("No route found. Please update your midpoint or starting point.");
+        } else {
+          window.alert("Directions request failed due to " + status);
+        } 
       });
     },
   },
