@@ -200,8 +200,8 @@ import "bootstrap";
 import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
-import userService from "@/services/user-service.js";
-import planService from "@/services/plan-service.js";
+import userService from "@/services/userService.js";
+import planService from "@/services/planService.js";
 import { useUserStore } from "@/stores/userStore.js";
 export default {
   components: {

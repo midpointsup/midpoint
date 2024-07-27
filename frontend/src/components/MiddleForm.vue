@@ -87,11 +87,16 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import routeService from "../services/route-service.js";
 import planService from "../services/plan-service.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import io from "socket.io-client";
 
+=======
+import routeService from "../services/routeService.js";
+import planService from "../services/planService.js";
+>>>>>>> 61403c6 (refactor: rename files)
 export default {
   mixins: [notificationMixin],
   data() {

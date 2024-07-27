@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import userService from "@/services/user-service.js";
+import userService from "@/services/userService.js";
 import TextInput from "@/components/inputs/TextInput.vue";
 import { useUserStore } from "@/stores/userStore.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";

@@ -6,7 +6,7 @@
 
 <script>
 import { googleSdkLoaded } from "vue3-google-login";
-import userService from "@/services/user-service.js";
+import userService from "@/services/userService.js";
 import { useUserStore } from "@/stores/userStore.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 

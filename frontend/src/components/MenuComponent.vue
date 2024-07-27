@@ -40,8 +40,8 @@
 
 <script>
 import { useUserStore } from "@/stores/userStore.js";
-import userService from "@/services/user-service.js";
-import planService from '@/services/plan-service.js';
+import userService from "@/services/userService.js";
+import planService from '@/services/planService.js';
 import SidebarComponent from "@/components/SidebarComponent.vue";
 import AddPlanForm from "@/components/forms/AddPlanForm.vue";
 

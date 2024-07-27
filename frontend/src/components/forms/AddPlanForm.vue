@@ -32,7 +32,7 @@
 <script>
 import TextInput from "@/components/inputs/TextInput.vue";
 import PlacePicker from "@/components/inputs/PlacePicker.vue";
-import userService from "@/services/user-service.js";
+import userService from "@/services/userService.js";
 import { usePopupStore } from "../../stores/popupStore";
 export default {
   components: {
