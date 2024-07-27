@@ -53,7 +53,9 @@
 
         <h6>Midpoint</h6>
         <div class="middle-form">
-          <span v-if="!editMidpoint" class="display-info">{{ this.midpoint }}</span>
+          <span v-if="!editMidpoint" class="display-info">{{
+            this.midpoint
+          }}</span>
           <gmpx-place-picker
             v-if="editMidpoint"
             id="place-picker-midpoint"
@@ -65,13 +67,11 @@
             ><br />
             <span id="place-address"></span>
           </div>
-          
+
           <button @click="editMidpointAddress" class="btn">
-            {{editMidpoint ? 'Done' : 'Edit'}}
+            {{ editMidpoint ? "Done" : "Edit" }}
           </button>
         </div>
-          
-          
       </div>
       <br />
     </li>
@@ -89,7 +89,9 @@
 <script>
 import routeService from "../services/route-service.js";
 import planService from "../services/plan-service.js";
+import { notificationMixin } from "@/mixins/notificationMixin.js";
 export default {
+  mixins: [notificationMixin],
   data() {
     return {
       editMidpoint: false,
@@ -121,37 +123,39 @@ export default {
   },
   mounted() {
     this.initPlacePicker("place-picker");
-    this.initPlacePicker("place-picker-midpoint");   
+    this.initPlacePicker("place-picker-midpoint");
   },
   methods: {
     initPlacePicker(id) {
       const placePickerEl = document.getElementById(id);
-    if (placePickerEl) {
-      placePickerEl.addEventListener("gmpx-placechange", () => {
-        if(id === "place-picker-midpoint") {
-          this.editedMidpoint = placePickerEl.value?.formattedAddress;
-        } else {
-          const place = placePickerEl.value;
-          this.startLoc = placePickerEl.value?.formattedAddress;
-        }
+      if (placePickerEl) {
+        placePickerEl.addEventListener("gmpx-placechange", () => {
+          if (id === "place-picker-midpoint") {
+            this.editedMidpoint = placePickerEl.value?.formattedAddress;
+          } else {
+            const place = placePickerEl.value;
+            this.startLoc = placePickerEl.value?.formattedAddress;
+          }
 
-        if (!place.location) {
-          window.alert("No details available for input: '" + place.name + "'");
-          this.infowindow.close();
-          return;
-        }
+          if (!place.location) {
+            this.notifyError(
+              "No details available for input: '" + place.name + "'"
+            );
+            this.infowindow.close();
+            return;
+          }
 
-        this.infowindowContent.children["place-name"].textContent =
-          place.displayName;
-        this.infowindowContent.children["place-address"].textContent =
-          place.formattedAddress;
-      });
-    }
+          this.infowindowContent.children["place-name"].textContent =
+            place.displayName;
+          this.infowindowContent.children["place-address"].textContent =
+            place.formattedAddress;
+        });
+      }
     },
     handleLocationChange(newLocation, locationType) {
       if (locationType === "midpoint") {
         this.editedMidpoint = newLocation.target.value.formattedAddress;
-      } else if(locationType === "start") {
+      } else if (locationType === "start") {
         this.startLoc = newLocation.target.value.formattedAddress;
       }
     },
@@ -180,6 +184,7 @@ export default {
             this.allLocationsVerified = this.selectedPlan.members.every(
               (member) => member.Trips[0].startLocation !== ""
             );
+            this.notifySuccess("Starting location added");
           });
       }
     },
@@ -199,7 +204,7 @@ export default {
         .then((response) => {
           if (response) {
             if (!response.midpoint) {
-              window.alert("No midpoint found");
+              this.notifyError("No midpoint found");
               return;
             }
             this.displayPlaces(response.places).then(() => {});
@@ -210,7 +215,7 @@ export default {
     },
     async displayPlaces(places) {
       if (places.length === 0) {
-        window.alert("No places found");
+        this.notifyError("No places found");
         return;
       }
       const map = new google.maps.Map(document.getElementById("map"), {
@@ -247,15 +252,15 @@ export default {
       });
     },
     editMidpointAddress() {
-      if(this.editMidpoint && this.editedMidpoint) {
+      if (this.editMidpoint && this.editedMidpoint) {
         this.updateMidpoint(this.editedMidpoint);
-      } 
+      }
       this.editMidpoint = !this.editMidpoint;
     },
     updateMidpoint(location) {
       this.midpoint = location;
       this.$emit("generate-midpoint", location);
-      window.alert("Midpoint succesfully updated");
+      this.notifySuccess("Midpoint updated");
     },
     async getDirections() {
       const directionsService = new google.maps.DirectionsService();
@@ -280,11 +285,13 @@ export default {
       directionsService.route(request, (result, status) => {
         if (status == "OK") {
           directionsRenderer.setDirections(result);
-        } else if(status == "ZERO_RESULTS") {
-          window.alert("No route found. Please update your midpoint or starting point.");
+        } else if (status == "ZERO_RESULTS") {
+          this.notifyWarning(
+            "No route found. Please update your midpoint or starting point."
+          );
         } else {
-          window.alert("Directions request failed due to " + status);
-        } 
+          this.notifyError("Directions request failed due to " + status);
+        }
       });
     },
   },
