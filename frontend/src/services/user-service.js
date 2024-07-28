@@ -4,11 +4,11 @@ let userService = (function () {
   const module = {};
   const baseUrl = "https://api.midpoint.live";
 
-  module.signup = function (username, email, password) {
+  module.signup = function (username, email, password, picture = null) {
     return fetch(`${baseUrl}/api/users/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, password, picture }),
     })
       .then((res) => res.json())
       .then((res) => {
