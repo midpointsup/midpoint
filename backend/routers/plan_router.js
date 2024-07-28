@@ -290,7 +290,7 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
     //   socket.to(roomId).emit("trip", trip);
     // })
     req.io.in("room" + roomId).emit("trip", trip);
-    return res.json({trip: trip});
+    return res.json({ trip: trip });
   } catch {
     return res.status(422).json({ error: "Failed to update trip" });
   }
@@ -308,7 +308,7 @@ planRouter.get("/:id/members/:memberId/trip", async (req, res) => {
         attributes: ["username", "id", "picture", "email"],
       },
     });
-    return res.json({trip: trip});
+    return res.json({ trip: trip });
   } catch {
     return res.status(500).json({ error: "Failed to fetch trip" });
   }

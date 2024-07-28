@@ -622,7 +622,6 @@ export default {
         zoom: 7,
       });
       this.routes.forEach((route, index) => {
-      
         this.directionsRenderers[index].setMap(map);
         this.directionsRenderers[index].setPanel(this.$refs.directionsPanel);
         if (route.UserId === useUserStore().getUser().userId) {
