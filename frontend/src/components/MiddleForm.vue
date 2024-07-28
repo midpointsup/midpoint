@@ -90,6 +90,7 @@
 import routeService from "../services/route-service.js";
 import planService from "../services/plan-service.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
+
 export default {
   mixins: [notificationMixin],
   data() {

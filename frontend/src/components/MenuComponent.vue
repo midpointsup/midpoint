@@ -335,9 +335,7 @@ export default {
                   userService.sendEmail(member).then((res) => {});
                 });
                 resolve();
-              }).then(() => {
-                console.log("Emails sent");
-              });
+              }).then(() => {});
             });
           });
       }
