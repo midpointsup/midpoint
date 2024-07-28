@@ -15,7 +15,7 @@
         data-content="Add Plan"
       ></li>
     </ul>
-    <div class="dropend">
+    <div class="dropdown">
       <a
         href="#"
         class="d-flex align-items-center link-dark text-decoration-none"
@@ -30,11 +30,6 @@
         <img v-else src="@/assets/static/user.png" alt="" class="pfp" />
       </a>
       <ul class="dropdown-menu text-small shadow">
-        <li><a class="dropdown-item" href="#">Settings</a></li>
-        <li><a class="dropdown-item" href="#">Profile</a></li>
-        <li>
-          <hr class="dropdown-divider" />
-        </li>
         <li>
           <button class="dropdown-item" @click="signout">Sign out</button>
         </li>
@@ -150,19 +145,6 @@
             {{ member }}
             <button @click="removeMember(index)" class="btn btn-sm">x</button>
           </span>
-        </div>
-
-        <br />
-        Where do you want to meet?
-        <gmpx-place-picker
-          id="place-picker"
-          for-map="map"
-          placeholder="Enter A Location"
-        ></gmpx-place-picker>
-        <div id="infowindow-content">
-          <span id="place-name" class="title" style="font-weight: bold"></span
-          ><br />
-          <span id="place-address"></span>
         </div>
 
         <br />

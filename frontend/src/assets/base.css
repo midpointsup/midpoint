@@ -1,6 +1,7 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --white: #fffffa;
+  --dark-white: #f7f4f4;
   --black: #001b2e;
   --primary: #4dc48a;
   --secondary: #a6e2c2;
@@ -10,13 +11,13 @@
   --blue: #3777ff;
   --dark-blue: #1c4997;
   --dark-red: #a33225;
-
-  --bg-primary: #4dc48a;
+  --dark-green: #2e7d32;
 }
 
 /* semantic color variables for this project */
 :root {
   --color-background: var(--white);
+  --color-background-secondary: var(--dark-white);
   --color-heading: var(--primary);
   --color-text: var(--black);
 }

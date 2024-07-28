@@ -27,50 +27,42 @@ googleOAuthRouter.post("/", async (req, res) => {
         },
       }
     );
-    console.log("here1")
-    let user = await findUser(userResponse.data.email, userResponse.data.name);
-    if (!user) {
-      user = await createUser(
-        userResponse.data.email,
-        userResponse.data.name,
-        userResponse.data.picture
-      );
-      if (!user) {
-        return res.status(422).json({ error: user.error });
-      }
-    } else {
-      user = await updateUserProfilePic(
-        userResponse.data.email,
-        userResponse.data.picture
-      );
-      if (!user) {
-        console.log("Unable to update profile picture");
-      }
-    }
-    console.log("here2")
-    const token = await storeGoogleToken(
-      user,
-      tokens.tokens.access_token,
-      tokens.tokens.refresh_token
+
+    const user = await findUser(
+      userResponse.data.email,
+      userResponse.data.name
     );
-    console.log("here3")
-    if (!token) {
-      return res.status(500).json({ error: "Unable to store token" });
+
+    // If user not found, want to ask user to sign up with a username
+    if (!user) {
+      return res.status(200).json({
+        username: userResponse.data.name,
+        email: userResponse.data.email,
+        picture: userResponse.data.picture,
+        token: null,
+        userId: null,
+      });
     }
+
+    await updateUserProfilePic(
+      userResponse.data.email,
+      userResponse.data.picture
+    );
+    await GoogleToken.create({
+      access_token: tokens.tokens.access_token,
+      refresh_token: tokens.tokens.refresh_token,
+      UserId: user.id,
+    });
     const accessToken = await generateAccessToken(user.id);
-    if (!accessToken) {
-      return res.status(500).json({ error: "Unable to generate access token" });
-    }
-    console.log("here4")
     return res.status(200).json({
       username: userResponse.data.name,
       email: userResponse.data.email,
       picture: userResponse.data.picture,
       token: accessToken,
-      userId: userResponse.id,
+      userId: user.id,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error });
   }
 });
 
@@ -111,19 +103,5 @@ const createUser = async (email, name, picture) => {
     return user;
   } catch (error) {
     return null;
-  }
-};
-
-const storeGoogleToken = async (user, access_token, refresh_token) => {
-  //GET USER ID and store token in database
-  try {
-    const token = await GoogleToken.create({
-      access_token: access_token,
-      refresh_token: refresh_token,
-      UserId: user.id,
-    });
-    return token;
-  } catch (error) {
-    return { error: "Failed to store google token" };
   }
 };
