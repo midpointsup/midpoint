@@ -10,6 +10,7 @@
         role="tab"
         aria-controls="home"
         aria-selected="true"
+        @click="displayMyRoutesTab"
       >
         My Route
       </button>
@@ -24,6 +25,7 @@
         role="tab"
         aria-controls="home"
         aria-selected="true"
+        @click="displayGroupRoutesTab"
       >
         Group Routes
       </button>
@@ -37,10 +39,67 @@
       aria-labelledby="my-route-tab"
     >
       This is my route
-      <MyRouteTab
-        :planId="planId"
-        :destination="destination">
-      </MyRouteTab>
+      <div>
+        My Current Route
+        <ul class="list-group">
+          <li class="list-group-item list-item" v-if="myCurrRoute">
+            <RouteCard
+              :route="myCurrRoute"
+              :destination="destination"
+              :mode="currTrip.transportationMethod"
+              @click="displayCurrRouteOnMap"
+            ></RouteCard>
+          </li>
+        </ul>
+      </div>
+      <div>
+        Suggested Routes
+        <div>
+          <ul class="list-group">
+            <div
+              v-for="(route, index) in myRoutes"
+              :key="route.summary"
+              class="list-group-item list-item"
+            >
+              <div>
+                <RouteCard
+                  :route="route"
+                  :destination="destination"
+                  :mode="currTrip.transportationMethod"
+                ></RouteCard>
+                <div class="row">
+                  <button
+                    class="btn btn-outline-primary"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    :data-bs-target="`#collapse${index}`"
+                    aria-expanded="false"
+                    :aria-controls="`collapse${index}`"
+                    @click="toggleExpandedButton(index)"
+                  >
+                    Preview
+                  </button>
+                  <button
+                    class="btn btn-outline-primary"
+                    type="button"
+                    @click="selectRoute(index)"
+                  >
+                    Select Route
+                  </button>
+                </div>
+              </div>
+              <div class="row" v-if="expandedButton === index">
+                <div class="collapse show" :id="`collapse${index}`">
+                  <div class="card card-body" :id="`directionsDisplay${index}`">
+                    direction display
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ul>
+        </div>
+      </div>
+      <div id="directions"></div>
     </div>
     <div
       class="tab-pane fade"
@@ -78,7 +137,7 @@ import groupRouteCard from "@/components/groupRouteCard.vue";
 import planService from "../services/plan-service.js";
 import io from "socket.io-client";
 import { useUserStore } from "../stores/userStore.js";
-import MyRouteTab from "./MyRouteTab.vue";
+import RouteCard from "./routeCard.vue";
 
 export default {
   props: {
@@ -87,8 +146,16 @@ export default {
   },
   data() {
     return {
+      socket: null,
       routes: [],
+      myRoutes: [],
+      currTrip: null,
+      myCurrRoute: null,
+      directionsRenderer: new google.maps.DirectionsRenderer(),
+      previewDirectionsRenderer: new google.maps.DirectionsRenderer(),
+      currRouteRenderer: new google.maps.DirectionsRenderer(),
       directionsRenderers: [],
+      expandedButton: null,
       directionsService: new google.maps.DirectionsService(),
       directionsArray: [],
       colours: [
@@ -107,28 +174,27 @@ export default {
   },
   components: {
     groupRouteCard,
-    MyRouteTab,
+    RouteCard,
   },
   mounted() {
     //const directionsService = new google.maps.DirectionsService();
-    const socket = io("http://localhost:3000");
+    this.socket = io("http://localhost:3000");
 
-    socket.on("connect", () => {
+    this.socket.on("connect", () => {
       console.log("connected");
-      socket.emit("join-room", "room" + this.planId);
-      console.log("socket id is", socket.id);
+      this.socket.emit("join-room", "room" + this.planId);
+      console.log("socket id is", this.socket.id);
     });
 
     // Listen for the 'joinedRoom' event to confirm joining
-socket.on("joined-room", (roomId) => {
-  console.log(`Successfully joined room ${roomId}`);
-  // Additional logic upon successfully joining the room can be added here
-});
-
+    this.socket.on("joined-room", (roomId) => {
+      console.log(`Successfully joined room ${roomId}`);
+      // Additional logic upon successfully joining the room can be added here
+    });
 
     //this.setDirectionRenderers();
 
-    socket.on("trip", (trip) => {
+    this.socket.on("trip", (trip) => {
       console.log("trip event");
       console.log(trip);
       //this.getGroupTrips();
@@ -143,94 +209,138 @@ socket.on("joined-room", (roomId) => {
             this.routes[index] = trip;
             this.drawRoute(trip, index, oldRoute);
           }
-          console.log("inside here");
         });
       }
     });
-    this.$nextTick(() => {
+
+    this.$nextTick(async () => {
       this.getGroupTrips();
+      await this.getCurrentRoute();
+      this.getSuggestedRoutes();
+      this.setCurrentRouteRenderer();
     });
-    console.log(this.routes);
-
-    // directionsRenderer.addListener("directions_changed", () => {
-    //   console.log("directions changed");
-    // });
   },
+  beforeUnmount() {
+    this.disconnectSocket();
+  },
+
+  unmounted() {
+    this.directionsRenderer.setMap(null);
+    this.currRouteRenderer.setMap(null);
+    this.directionsRenderers.forEach((directionsRenderer) => {
+      directionsRenderer.setMap(null);
+    });
+  },
+
   methods: {
-    getGroupTrips() {
-      planService.getTrips(this.planId).then(async (response) => {
-        if (response.error) {
-          this.routes = response.data;
-          console.log(response);
-        } else {
-          this.routes = response.trips;
-          this.setDirectionRenderers();
-          console.log(this.routes);
-          await this.getDirections();
-          console.log(response);
-        }
-      });
+    disconnectSocket() {
+      if (this.socket) {
+        this.socket.disconnect();
+      }
     },
 
-    setDirectionRenderers() {
-      this.routes.forEach((route, index) => {
-        //let editable = route.User.id === this.$store.state.user.id;
-        var directionsRenderer = new google.maps.DirectionsRenderer();
-        if (route.UserId === useUserStore().getUser().userId) {
-          directionsRenderer.setOptions({ draggable: true });
-        }
-        directionsRenderer.setOptions({
-          polylineOptions: { strokeColor: this.colours[index] },
-          suppressMarkers: true
+    toggleExpandedButton(index) {
+      if (this.expandedButton === index) {
+        this.expandedButton = null;
+      } else {
+        this.expandedButton = index;
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 7,
         });
-        this.directionsRenderers.push(directionsRenderer);
+        this.directionsRenderer.setMap(map);
+        this.setRouteIndex(index);
+        this.$nextTick(() => {
+          this.directionsRenderer.setPanel(
+            document.getElementById(`directionsDisplay${index}`)
+          );
+          this.previewDirectionsRenderer.setMap(null);
+          this.previewDirectionsRenderer.setPanel(
+            document.getElementById(`directionsDisplay${index}`)
+          );
+        });
+      }
+    },
+
+    async getCurrentRoute() {
+      await planService
+        .getTrip(this.planId, useUserStore().getUser().userId)
+        .then((response) => {
+          if (response.trip) {
+            this.currTrip = response.trip;
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch trip:", error);
+        });
+    },
+
+    setCurrentRouteRenderer() {
+      const travelModes = {
+        DRIVE: google.maps.TravelMode.DRIVING,
+        WALK: google.maps.TravelMode.WALKING,
+        BIKE: google.maps.TravelMode.BICYCLING,
+        TRANSIT: google.maps.TravelMode.TRANSIT,
+      };
+
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 7,
+      });
+      this.currRouteRenderer.setMap(map);
+      this.currRouteRenderer.setOptions({
+        polylineOptions: { strokeColor: "#3CB371" },
+        draggable: true,
+      });
+      const request = {
+        origin: this.currTrip.startLocation,
+        destination: this.destination,
+        travelMode: travelModes[this.currTrip.transportationMethod],
+        waypoints: this.currTrip.waypoints.map((waypoint) => {
+          return {
+            location: { placeId: waypoint },
+            stopover: false,
+          };
+        }),
+      };
+
+      this.directionsService.route(request, (result, status) => {
+        if (status == "OK") {
+          this.currRouteRenderer.setDirections(result);
+          this.myCurrRoute = result.routes[0];
+          this.currRouteRenderer.setPanel(
+            document.getElementById(`directionsDisplay0`)
+          );
+
+          this.currRouteRenderer.addListener("directions_changed", () => {
+            const directions = this.currRouteRenderer.getDirections();
+            let waypoints = [];
+            directions.geocoded_waypoints.forEach((waypoint) => {
+              waypoints.push(waypoint.place_id);
+            });
+            let newRoute = JSON.parse(JSON.stringify(this.currTrip));
+            let diffWaypoints =
+              JSON.stringify(this.currTrip.waypoints) !==
+              JSON.stringify(waypoints);
+            newRoute.waypoints = [...new Set(waypoints)];
+            if (diffWaypoints) {
+              planService
+                .updateTrip(this.planId, newRoute.UserId, newRoute.id, newRoute)
+                .then((response) => {
+                  if (!response.error) {
+                    if (response.trip) {
+                      this.currTrip = response.trip;
+                    }
+                  }
+                });
+            }
+          });
+        }
       });
     },
 
-    checkSameRoute(route, index, oldRoute) {
-      console.log("new route", route);
-      console.log("old route", oldRoute);
-      if (!route || !oldRoute) {
-        console.log("route is null");
-        return false;
-      }
-      if (route.startLocation === oldRoute.startLocation &&
-        route.destination === oldRoute.destination &&
-        route.transportationMethod === oldRoute.transportationMethod
-      ) {
-        if(route.waypoints && oldRoute.waypoints) {
-          if(route.waypoints.length === oldRoute.waypoints.length) {
-            for(let i = 0; i < route.waypoints.length; i++) {
-              if(route.waypoints[i] !== oldRoute.waypoints[i]) {
-                console.log("different waypoints");
-                return false;
-              }
-            }
-            console.log("same waypoints");
-            return true;
-          } else {
-            console.log("different waypoints length");
-            return false;
-          }
-        } else if (!route.waypoints && !oldRoute.waypoints) {
-          console.log("no waypoints");
-          return true;
-        } else {
-          console.log("different waypoints");
-          return false;
-        }
-      }
-      return false;
-    },
-
-    drawRoute(route, index, oldRoute) {
-      if (this.checkSameRoute(route, index, oldRoute)) {
-        console.log("same route");
+    drawMyCurrentRoute(route, oldRoute) {
+      if (this.checkSameRoute(route, oldRoute)) {
         return;
       }
-      console.log("all routes", this.routes);
-      console.log(route);
-      console.log(index);
       const travelModes = {
         DRIVE: google.maps.TravelMode.DRIVING,
         WALK: google.maps.TravelMode.WALKING,
@@ -250,18 +360,231 @@ socket.on("joined-room", (roomId) => {
           }),
           travelMode: travelModes[route.transportationMethod],
         };
-        //if (useUserStore().getUser().userId === route.UserId) {
-        //return;
-        //}
+        this.directionsService.route(request, (result, status) => {
+          if (status == "OK") {
+            this.currRouteRenderer.setDirections(result);
+          } else if (status == "MAX_WAYPOINTS_EXCEEDED") {
+            let newRoute = JSON.parse(JSON.stringify(this.currTrip));
+            newRoute.waypoints = [];
+            planService.updateTrip(
+              this.planId,
+              newRoute.UserId,
+              newRoute.id,
+              newRoute
+            );
+          }
+          //handle zero results case
+        });
+      } else {
+        const request = {
+          origin: route.startLocation,
+          destination: this.destination,
+          travelMode: travelModes[route.transportationMethod],
+        };
+        this.directionsService.route(request, (result, status) => {
+          if (status == "OK") {
+            this.currRouteRenderer.setDirections(result);
+          } else if (status == "MAX_WAYPOINTS_EXCEEDED") {
+            //add route too complex error
+            let newRoute = JSON.parse(JSON.stringify(this.currTrip));
+            newRoute.waypoints = [];
+            planService.updateTrip(
+              this.planId,
+              newRoute.UserId,
+              newRoute.id,
+              newRoute
+            );
+          }
+        });
+      }
+    },
+
+    getSuggestedRoutes() {
+      const travelModes = {
+        DRIVE: google.maps.TravelMode.DRIVING,
+        WALK: google.maps.TravelMode.WALKING,
+        BIKE: google.maps.TravelMode.BICYCLING,
+        TRANSIT: google.maps.TravelMode.TRANSIT,
+      };
+
+      this.expandedButton = null;
+
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 7,
+      });
+
+      this.directionsRenderer.setMap(map);
+      this.directionsRenderer.setOptions({
+        polylineOptions: { strokeColor: "#3CB371" },
+      });
+      const request = {
+        origin: this.currTrip.startLocation,
+        destination: this.destination,
+        travelMode: travelModes[this.currTrip.transportationMethod],
+        provideRouteAlternatives: true,
+      };
+      this.directionsService.route(request, (result, status) => {
+        if (status == "OK") {
+          this.directionsRenderer.setDirections(result);
+          this.directionsRenderer.setRouteIndex(0);
+          this.myRoutes = result.routes;
+          this.directionsRenderer.setPanel(
+            document.getElementById(`directionsDisplay0`)
+          );
+        }
+      });
+    },
+
+    setRouteIndex(index) {
+      try {
+        this.directionsRenderer.setRouteIndex(index);
+      } catch (error) {
+        console.error("Failed to set route index", error);
+      }
+    },
+
+    selectRoute(index) {
+      this.directionsRenderer.setRouteIndex(index);
+      const directions = this.directionsRenderer.getDirections();
+      let waypoints = [];
+      directions.geocoded_waypoints.forEach((waypoint) => {
+        waypoints.push(waypoint.place_id);
+      });
+      let newRoute = JSON.parse(JSON.stringify(this.currTrip));
+      newRoute.waypoints = [...new Set(waypoints)];
+
+      planService
+        .updateTrip(
+          this.planId,
+          this.currTrip.UserId,
+          this.currTrip.id,
+          newRoute
+        )
+        .then((response) => {
+          if (!response.error) {
+            if (response.trip) {
+              this.currTrip = response.trip;
+            }
+            this.displayCurrRouteOnMap();
+          }
+        });
+    },
+
+    displayCurrRouteOnMap() {
+      // get current route
+      // display current route
+      this.directionsRenderer.setMap(null);
+      this.setCurrentRouteRenderer();
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 7,
+      });
+      this.currRouteRenderer.setMap(map);
+
+      // Close all expanded buttons
+      this.expandedButton = null;
+    },
+
+    async displayMyRoutesTab() {
+      // get all my routes
+      this.directionsRenderers.forEach((directionsRenderer) => {
+        directionsRenderer.setMap(null);
+      });
+      await this.getCurrentRoute();
+      this.getSuggestedRoutes();
+      this.setCurrentRouteRenderer();
+    },
+
+    async displayGroupRoutesTab() {
+      // get all group routes
+      this.directionsRenderer.setMap(null);
+      this.currRouteRenderer.setMap(null);
+      await this.getGroupTrips();
+    },
+
+    getGroupTrips() {
+      planService.getTrips(this.planId).then(async (response) => {
+        if (response.error) {
+          this.routes = response.data;
+        } else {
+          this.routes = response.trips;
+          this.setDirectionRenderers();
+          await this.getDirections();
+        }
+      });
+    },
+
+    setDirectionRenderers() {
+      this.routes.forEach((route, index) => {
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+        if (route.UserId === useUserStore().getUser().userId) {
+          directionsRenderer.setOptions({ draggable: true });
+        }
+        directionsRenderer.setOptions({
+          polylineOptions: { strokeColor: this.colours[index] },
+          suppressMarkers: true,
+        });
+        this.directionsRenderers.push(directionsRenderer);
+      });
+    },
+
+    checkSameRoute(route, oldRoute) {
+      if (!route || !oldRoute) {
+        return false;
+      }
+      if (
+        route.startLocation === oldRoute.startLocation &&
+        route.destination === oldRoute.destination &&
+        route.transportationMethod === oldRoute.transportationMethod
+      ) {
+        if (route.waypoints && oldRoute.waypoints) {
+          if (route.waypoints.length === oldRoute.waypoints.length) {
+            for (let i = 0; i < route.waypoints.length; i++) {
+              if (route.waypoints[i] !== oldRoute.waypoints[i]) {
+                return false;
+              }
+            }
+            return true;
+          } else {
+            return false;
+          }
+        } else if (!route.waypoints && !oldRoute.waypoints) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      return false;
+    },
+
+    drawRoute(route, index, oldRoute) {
+      if (this.checkSameRoute(route, oldRoute)) {
+        return;
+      }
+      const travelModes = {
+        DRIVE: google.maps.TravelMode.DRIVING,
+        WALK: google.maps.TravelMode.WALKING,
+        BIKE: google.maps.TravelMode.BICYCLING,
+        TRANSIT: google.maps.TravelMode.TRANSIT,
+      };
+
+      if (route.waypoints && route.waypoints.length > 0) {
+        const request = {
+          origin: route.startLocation,
+          destination: this.destination,
+          waypoints: route.waypoints.map((waypoint) => {
+            return {
+              location: { placeId: waypoint },
+              stopover: false,
+            };
+          }),
+          travelMode: travelModes[route.transportationMethod],
+        };
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
-
           } else if (status == "MAX_WAYPOINTS_EXCEEDED") {
-            console.log("Too many waypoints");
             let newRoute = JSON.parse(JSON.stringify(this.routes[index]));
             newRoute.waypoints = [];
-            console.log("new route before updating", newRoute);
             planService.updateTrip(
               this.planId,
               newRoute.UserId,
@@ -281,75 +604,42 @@ socket.on("joined-room", (roomId) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
           } else if (status == "MAX_WAYPOINTS_EXCEEDED") {
-            console.log("Too many waypoints");
             //add route too complex error
             let newRoute = JSON.parse(JSON.stringify(this.routes[index]));
             newRoute.waypoints = [];
-            console.log("new route before updating", newRoute);
             planService.updateTrip(
               this.planId,
               newRoute.UserId,
               newRoute.id,
               newRoute
             );
-            //this.drawRoute(this.routes[index], index);
           }
         });
       }
     },
     async getDirections() {
-      //const directionsService = new google.maps.DirectionsService();
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
       });
-      console.log("rendering2");
-      this.routes.forEach((route) => {
-        console.log(route);
-      });
-      console.log(this.routes);
       this.routes.forEach((route, index) => {
-        console.log("rendering");
-        /*
-        var directionsRenderer = new google.maps.DirectionsRenderer();
-
-        directionsRenderer.setOptions({
-          polylineOptions: { strokeColor: this.colours[index] },
-          suppressMarkers: true,
-          draggable: true,
-        });*/
+      
         this.directionsRenderers[index].setMap(map);
-        console.log(this.$refs.directionsPanel);
         this.directionsRenderers[index].setPanel(this.$refs.directionsPanel);
-        console.log("user store", useUserStore().getUser());
         if (route.UserId === useUserStore().getUser().userId) {
-          //this.directionsRenderers[index].setOptions({ draggable: true });
           this.directionsRenderers[index].addListener(
             "directions_changed",
             () => {
-              console.log("directions changed");
               const directions =
                 this.directionsRenderers[index].getDirections();
-              console.log(directions);
-              console.log(directions.geocoded_waypoints);
               let waypoints = [];
               directions.geocoded_waypoints.forEach((waypoint) => {
-                console.log(waypoint);
                 waypoints.push(waypoint.place_id);
               });
               let newRoute = JSON.parse(JSON.stringify(this.routes[index]));
-              console.log("newRoute");
-              console.log(newRoute);
-              console.log(this.routes[index]);
-              //check if waypoints are different
-              // this.routes[index].waypoints.forEach((waypoint, index) => {
-              //   if (waypoint !== waypoints[index]) {
-              //     console.log("waypoints are different");
-              //   }
-              // });
-              let diffWaypoints = JSON.stringify(this.routes[index].waypoints) !== JSON.stringify(waypoints);
-              //let diffWaypoints = this.routes[index].waypoints !== waypoints;
+              let diffWaypoints =
+                JSON.stringify(this.routes[index].waypoints) !==
+                JSON.stringify(waypoints);
               newRoute.waypoints = [...new Set(waypoints)];
-              console.log("with waypoints", newRoute);
               if (diffWaypoints) {
                 planService
                   .updateTrip(
@@ -359,53 +649,23 @@ socket.on("joined-room", (roomId) => {
                     newRoute
                   )
                   .then((response) => {
-                    console.log(response);
                     if (!response.error) {
-                      const oldRoute = JSON.parse(JSON.stringify(this.routes[index]));
+                      const oldRoute = JSON.parse(
+                        JSON.stringify(this.routes[index])
+                      );
                       if (response.trip) {
                         this.routes[index] = response.trip;
-                        console.log("drawing route after update");
                         this.drawRoute(this.routes[index], index, oldRoute);
                       }
                     }
-                    if (diffWaypoints && response.trip) {
-                      // this.drawRoute(response.trip, index);
-                    }
                   });
               }
-              // planService.updateTrip(
-              //   this.planId,
-              //   newRoute.UserId,
-              //   newRoute.id,
-              //   newRoute
-              // ).then(
-              //   (response) => {
-              //     console.log(response);
-              //     if (!response.error) {
-              //       this.routes[index] = response.trip;
-              //       if (diffWaypoints && response.trip) {
-              //         //this.drawRoute(this.routes[index], index);
-              //       }
-              //     }
-              //     if (diffWaypoints && response.trip) {
-              //  // this.drawRoute(response.trip, index);
-              // }
-              //   });
             }
           );
         }
         this.drawRoute(route, index, null);
       });
     },
-    /*
-  displayGroupRoutes() {
-    // get all group routes
-    routes = getGroupRoutes();//fill this
-    routes.forEach(route => {
-      //display each route
-    });
-  }
-    */
   },
 };
 </script>
