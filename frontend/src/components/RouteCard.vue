@@ -27,28 +27,12 @@
 
 <script>
 export default {
-  /*data() {
-          return {
-              name: this.route.name,
-              startTime: this.route.startTime,
-              endTime: this.route.endTime,
-              startLocation: this.route.startLocation,
-              mode: this.route.mode,
-              duration: this.route.duration,
-              distance: this.route.distance
-          };
-      },*/
   props: {
     route: Object,
     destination: String,
     mode: String,
   },
   methods: {},
-  mounted() {
-    // this.getDirections().then (() => {
-    //  console.log("Directions rendered");
-    //})
-  },
 };
 </script>
 
