@@ -8,12 +8,10 @@ webhookRouter.post("/", async (req, res) => {
 
   switch (event) {
     case "activity.sent":
-      console.log(`Email sent: ${data.email.subject}`);
-      req.io.emit("emailSent", { subject: data.email.subject });
+      req.io.emit("emailSent", data.email.recipient.email);
       break;
     case "activity.opened":
-      console.log(`Email opened: ${data.email.subject}`);
-      req.io.emit("emailOpened", { subject: data.email.subject });
+      req.io.emit("emailOpened", data.email.recipient.email);
       break;
     default:
       console.log(`Unknown event: ${event}`);

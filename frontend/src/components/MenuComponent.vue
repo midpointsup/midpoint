@@ -363,6 +363,14 @@ export default {
                 res.members.forEach((member) => {
                   if (member.id !== this.currentUser.userId) {
                     userService.sendEmail(member).then((res) => {});
+                  } else {
+                    this.socket.on("emailSent", (data) => {
+                      this.notifySuccess("Email sent to " + data);
+                    });
+
+                    this.socket.on("emailOpened", (data) => {
+                      this.notifySuccess(data + " opened the email!");
+                    });
                   }
                 });
                 resolve();
