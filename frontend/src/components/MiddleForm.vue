@@ -28,7 +28,7 @@
         <option value="TRANSIT">Transit</option>
       </select>
 
-      <label for="radius">Radius:</label>
+      <label for="radius">Radius of Midpoint:</label>
       <input
         v-model="radius"
         type="number"
@@ -90,6 +90,8 @@
 import routeService from "../services/route-service.js";
 import planService from "../services/plan-service.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
+import io from "socket.io-client";
+
 export default {
   mixins: [notificationMixin],
   data() {
@@ -113,6 +115,7 @@ export default {
       allLocationsVerified: this.selectedPlan.members.every(
         (member) => member.Trips[0].startLocation !== ""
       ),
+      currentInfoWindow: null,
       socket: null,
     };
   },
@@ -124,8 +127,39 @@ export default {
   mounted() {
     this.initPlacePicker("place-picker");
     this.initPlacePicker("place-picker-midpoint");
+
+    this.socket = io("http://localhost:3000");
+
+    this.socket.on("connect", () => {
+      this.socket.emit("join-room", "room" + this.selectedPlan.id);
+    });
+
+    this.socket.on("planUpdate", (data) => {
+      this.notifySuccess("Midpoint updated", data);
+      this.midpoint = data.address;
+    });
+
+    this.socket.on("trip", (data) => {
+      this.selectedPlan.members = this.selectedPlan.members.map((member) => {
+        if (member.id === data.UserId) {
+          member.Trips[0] = data;
+        }
+        return member;
+      });
+      this.allLocationsVerified = this.selectedPlan.members.every(
+        (member) => member.Trips[0].startLocation !== ""
+      );
+    });
+  },
+  beforeUnmount() {
+    this.disconnectSocket();
   },
   methods: {
+    disconnectSocket() {
+      if (this.socket) {
+        this.socket.disconnect();
+      }
+    },
     initPlacePicker(id) {
       const placePickerEl = document.getElementById(id);
       if (placePickerEl) {
@@ -135,20 +169,15 @@ export default {
           } else {
             const place = placePickerEl.value;
             this.startLoc = placePickerEl.value?.formattedAddress;
-          }
 
-          if (!place.location) {
-            this.notifyError(
-              "No details available for input: '" + place.name + "'"
-            );
-            this.infowindow.close();
-            return;
+            if (!place || !place.location) {
+              this.notifyError(
+                "No details available for input. Please try again.'"
+              );
+              this.infowindow.close();
+              return;
+            }
           }
-
-          this.infowindowContent.children["place-name"].textContent =
-            place.displayName;
-          this.infowindowContent.children["place-address"].textContent =
-            place.formattedAddress;
         });
       }
     },
@@ -162,7 +191,6 @@ export default {
     addLocation() {
       if (this.startLoc?.trim()) {
         this.showInput = false;
-        this.$emit("add-location", this.startLoc);
 
         // get the trip id of the current user from the selectedPlan id
         const tripId = this.selectedPlan.members.find(
@@ -172,7 +200,7 @@ export default {
         planService
           .updateTrip(this.selectedPlan.id, this.currentUser.userId, tripId, {
             transportationMethod: this.travelMode,
-            startLocation: this.selectedPlan.startLocation,
+            startLocation: this.startLoc,
             endLocation: this.selectedPlan.endLocation,
             startTime: this.selectedPlan.startTime,
             radius: this.radius,
@@ -190,7 +218,7 @@ export default {
     },
     editLocation() {
       this.showInput = true;
-      this.$emit("clear-location");
+      this.$emit("add-location", "");
       this.allLocationsVerified = false;
       this.startLoc = "";
     },
@@ -240,7 +268,11 @@ export default {
           content: contentString,
         });
         marker.addListener("click", () => {
+          if (this.currentInfoWindow) {
+            this.currentInfoWindow.close();
+          }
           infowindow.open(map, marker);
+          this.currentInfoWindow = infowindow;
         });
 
         google.maps.event.addListener(infowindow, "domready", () => {
@@ -260,7 +292,6 @@ export default {
     updateMidpoint(location) {
       this.midpoint = location;
       this.$emit("generate-midpoint", location);
-      this.notifySuccess("Midpoint updated");
     },
     async getDirections() {
       const directionsService = new google.maps.DirectionsService();
@@ -286,7 +317,7 @@ export default {
         if (status == "OK") {
           directionsRenderer.setDirections(result);
         } else if (status == "ZERO_RESULTS") {
-          this.notifyWarning(
+          this.notifyError(
             "No route found. Please update your midpoint or starting point."
           );
         } else {

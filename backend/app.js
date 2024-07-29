@@ -1,14 +1,15 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { sequelize } from "./datasource.js";
-import { userRouter } from "./routers/user_router.js";
-import { googleOAuthRouter } from "./routers/google_oauth_router.js";
-import { Server } from "socket.io";
 import { registerIOListeners } from "./socket.js";
 import cors from "cors";
-import { planRouter } from "./routers/plan_router.js";
 import http from "http";
+import { Server } from "socket.io";
+import { planRouter } from "./routers/plan_router.js";
 import { routesRouter } from "./routers/routes_router.js";
+import { googleOAuthRouter } from "./routers/google_oauth_router.js";
+import { userRouter } from "./routers/user_router.js";
+import { webhookRouter } from "./routers/webhookRouter.js";
 
 export const app = express();
 const PORT = process.env.PORT;
@@ -57,6 +58,7 @@ app.use("/api/users", userRouter);
 app.use("/api/oauth", googleOAuthRouter);
 app.use("/api/plans", planRouter);
 app.use("/api/routes", routesRouter);
+app.use("/ms/webhook", webhookRouter);
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body);

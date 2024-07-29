@@ -4,10 +4,13 @@ export function registerIOListeners(io) {
     console.log("a user connected");
 
     socket.on("join-room", function (roomId) {
-      console.log("joining room", roomId);
       socket.join(roomId);
       socket.emit("joined-room", roomId);
-      console.log("socket id is:", socket.id);
+    });
+
+    socket.on("join-user", function (userId) {
+      socket.join(userId);
+      socket.emit("joined-user", userId);
     });
 
     socket.on("disconnect", () => {

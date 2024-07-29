@@ -61,11 +61,11 @@
             :selectedPlan="selectedPlan"
             :currentUser="currentUser"
             @add-location="updateCurrentLocation"
-            @clear-location="clearCurrentLocation"
             @generate-midpoint="updateMiddle"
           >
             <MembersList
               :members="selectedPlan.members"
+              :selectedPlan="selectedPlan"
               :you="currentUser"
             ></MembersList>
           </MiddleForm>
@@ -190,8 +190,10 @@ import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
 import userService from "@/services/user-service.js";
 import planService from "@/services/plan-service.js";
 import { useUserStore } from "@/stores/userStore.js";
-
+import { notificationMixin } from "@/mixins/notificationMixin.js";
+import io from "socket.io-client";
 export default {
+  mixins: [notificationMixin],
   components: {
     MiddleForm,
     MembersList,
@@ -222,26 +224,46 @@ export default {
       isSidebarOpen: false,
       plansPage: true,
       createPlan: false,
+      socket: null,
     };
   },
   mounted() {
-    this.loadGoogleMapsScript();
+    this.socket = io("http://localhost:3000");
+
+    this.socket.on("connect", () => {
+      this.socket.emit("join-user", "user" + this.currentUser.userId);
+    });
+
+    this.socket.on("planCreate", (plans) => {
+      this.getPlans(this.currentUser.userId);
+      this.notifySuccess("You have been added to a new plan!");
+    });
 
     userService.getMe().then((res) => {
       if (!res.error) {
         console.log("Profile Picture:", res);
 
-        planService.getPlansForMember(res.userId).then((res) => {
-          if (!res.error) {
-            this.plans = res;
-            console.log("Plans:", this.plans);
-          }
-        });
+        this.getPlans(res.userId);
       }
     });
   },
+  beforeUnmount() {
+    this.disconnectSocket();
+  },
   methods: {
-    loadGoogleMapsScript() {},
+    disconnectSocket() {
+      if (this.socket) {
+        this.socket.disconnect();
+      }
+    },
+    getPlans(userId) {
+      planService.getPlansForMember(userId).then((res) => {
+        if (!res.error) {
+          console.log("Plans:", res);
+          this.plans = res;
+        }
+      });
+    },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
@@ -339,12 +361,12 @@ export default {
 
               new Promise((resolve, reject) => {
                 res.members.forEach((member) => {
-                  userService.sendEmail(member).then((res) => {});
+                  if (member.id !== this.currentUser.userId) {
+                    userService.sendEmail(member).then((res) => {});
+                  }
                 });
                 resolve();
-              }).then(() => {
-                console.log("Emails sent");
-              });
+              }).then(() => {});
             });
           });
       }
@@ -370,9 +392,7 @@ export default {
           category: this.selectedPlan.category,
           date: this.selectedPlan.date,
         })
-        .then((res) => {
-          console.log("response planservice", res);
-        });
+        .then((res) => {});
 
       //update the selected plan
       this.selectedPlan.address = midpoint;
@@ -388,23 +408,6 @@ export default {
               member.Trips[0].id,
               {
                 startLocation: location,
-              }
-            )
-            .then((resTrip) => {});
-        }
-      });
-    },
-    clearCurrentLocation() {
-      this.selectedPlan.members.forEach((member) => {
-        if (member.id === this.currentUser.userId) {
-          member.Trips[0].startLocation = "";
-          planService
-            .updateTrip(
-              this.selectedPlan.id,
-              this.currentUser.userId,
-              member.Trips[0].id,
-              {
-                startLocation: "",
               }
             )
             .then((resTrip) => {});
