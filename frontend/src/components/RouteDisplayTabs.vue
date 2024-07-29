@@ -210,9 +210,6 @@ export default {
     this.socket.on("joined-room", (roomId) => {});
 
     this.socket.on("planUpdate", (plan) => {
-      console.log("destination changed in plan", this.destination);
-      console.log("this is the plan", plan);
-      console.log("destinaiton is ", this.destination);
       if (plan.address !== this.destination) {
         this.updateProp(plan.address);
         if (this.onMyRouteTab) {
@@ -228,7 +225,6 @@ export default {
       if (!trip.error) {
         //update route in data local
         this.routes.forEach((route, index) => {
-          console.log("currrent route is", route);
          if (
             route.id === trip.id &&
             useUserStore().getUser().userId !== route.UserId
@@ -248,9 +244,6 @@ export default {
            if (route.id === trip.id &&
            useUserStore().getUser().userId === route.UserId) {
             if ((route.startLocation !== trip.startLocation && trip.startLocation !== "") || (route.transportationMethod !== trip.transportationMethod && trip.transportationMethod !== "")) {
-              console.log(
-                "different start location"
-              )
               this.routes[index] = trip;
               if (this.onMyRouteTab) {
                 this.displayMyRoutesTab();
@@ -362,7 +355,6 @@ export default {
         this.currRouteRenderer.setMap(null);
         return;
       }
-      console.log("setting current route renderer", this.currTrip);
       const travelModes = {
         DRIVE: google.maps.TravelMode.DRIVING,
         WALK: google.maps.TravelMode.WALKING,
@@ -402,7 +394,6 @@ export default {
         if (status == "OK") {
           this.currRouteRenderer.setDirections(result);
           this.myCurrRoute = result.routes[0];
-          console.log("myCurrRoute", this.myCurrRoute);
           this.currRouteRenderer.setPanel(
             document.getElementById(`directionsDisplayCurrent`)
           );
@@ -495,7 +486,7 @@ export default {
             );
           } else if (status == "ZERO_RESULTS") {
           this.notifyError(
-            "No route found. Please update your midpoint or starting point."
+            "No route found. Please update your midpoint, transportation mode or starting point"
           );
         }
           //handle zero results case
@@ -521,7 +512,7 @@ export default {
             );
           } else if (status == "ZERO_RESULTS") {
           this.notifyError(
-            "No route found. Please update your midpoint or starting point."
+            "No route found. Please update your midpoint, transportation mode or starting point"
           );
         }
         });
@@ -571,7 +562,7 @@ export default {
           );
         } else if (status == "ZERO_RESULTS") {
           this.notifyError(
-            "No route found. Please update your midpoint or starting point."
+            "No route found. Please update your midpoint, transportation mode or starting point"
           );
         }
       });
@@ -587,7 +578,6 @@ export default {
 
     selectRoute() {
       const directions = this.directionsRenderer.getDirections();
-      console.log("directions are ", directions);
       let waypoints = [];
       directions.geocoded_waypoints.forEach((waypoint) => {
         waypoints.push(waypoint.place_id);
@@ -649,10 +639,8 @@ export default {
       planService.getTrips(this.planId).then(async (response) => {
         if (response.error) {
           this.routes = response.data;
-          console.log("error getting group trips", response.error);
         } else {
           this.routes = response.trips;
-          console.log("routes", this.routes);
           this.setDirectionRenderers();
           await this.getDirections();
         }
@@ -660,7 +648,6 @@ export default {
     },
 
     setDirectionRenderers() {
-      console.log("this is the routes", this.routes);
       this.directionsRenderers = [];
       this.routes.forEach((route, index) => {
         let directionsRenderer = new google.maps.DirectionsRenderer();
@@ -730,7 +717,6 @@ export default {
         BIKE: google.maps.TravelMode.BICYCLING,
         TRANSIT: google.maps.TravelMode.TRANSIT,
       };
-      console.log("inside of drawing route", route);
       if (route.waypoints && route.waypoints.length > 0) {
         const request = {
           origin: route.startLocation,
@@ -746,9 +732,6 @@ export default {
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
-            console.log("drew route", result);
-            console.log("map", map);
-            console.log("result after drawing, ", result);
             // this.directionsRenderers[index].setMap(map);
           } else if (status == "MAX_WAYPOINTS_EXCEEDED"  || status == "INVALID_REQUEST") {
             let newRoute = JSON.parse(JSON.stringify(this.routes[index]));
@@ -762,7 +745,7 @@ export default {
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
           this.notifyError(
-            "No route found. Please update your midpoint or starting point."
+            "No route found. Please update your midpoint, transportation mode or starting point."
           );
         }
           //handle zero results case
@@ -788,14 +771,13 @@ export default {
             );
           } else if (status == "ZERO_RESULTS") {
           this.notifyError(
-            "No route found. Please update your midpoint or starting point."
+            "No route found. Please update your midpoint, transportation mode or starting point"
           );
         }
         });
       }
     },
     async getDirections() {
-      console.log("map element", document.getElementById("map"));
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
       });
@@ -811,17 +793,10 @@ export default {
         ) {
           if (this.directionsRenderers[index]) {
             this.directionsRenderers[index].setMap(null);
-            console.log("inside invalide route");
           }
-          console.log("invalid route", route);
           return;
         } else {
-          // map = new google.maps.Map(document.getElementById("map"), {
-          // zoom: 7,
-          // });
-          console.log("map hi", map);
           this.directionsRenderers[index].setMap(map);
-          console.log("valid route", route);
         }
 
         if (route.UserId === useUserStore().getUser().userId) {
@@ -862,10 +837,8 @@ export default {
             }
           );
         }
-        console.log("drawing route", route);
         this.drawRoute(route, index, null);
       });
-      console.log("on the outside of the loop");
     },
   },
 };
