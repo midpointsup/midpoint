@@ -36,7 +36,7 @@
     class="nav nav-pills flex-column mb-auto"
     :currentPage="selectedPlan.name"
     :canGoBack="true"
-    @goBack="selectedPlan = null"
+    @goBack="goBack"
   >
     <MiddleForm
       :startLocation="
@@ -54,23 +54,25 @@
         :you="currentUser"
       ></MembersList>
     </MiddleForm>
-    <RouteDisplayTabs
-      v-if="selectedPlan.address"
-      :planId="selectedPlan.id"
-      :destination="selectedPlan.address"
-      @update:destination="updateTabProp"
-    ></RouteDisplayTabs>
+    <a
+      v-if="selectedPlan?.address"
+      @click="togglePopup"
+      class="btn btn-primary w-100 mt-3"
+      >Toggle Routes</a
+    >
     <button
       v-if="selectedPlan.ownerId === currentUser.userId"
       @click="confirmDelete(selectedPlan.id)"
-      class="btn btn-danger mt-3"
+      class="btn btn-danger mt-3 w-100"
     >
       Delete Plan
     </button>
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
+    <ExploreList v-if="currentPage === 'Explore'" />
+    <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
     <ul
-      v-if="currentPage === 'My Plans'"
+      v-else-if="currentPage === 'My Plans'"
       class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
     >
       <li
@@ -115,10 +117,6 @@
         <p class="form-text">No plans yet. Add a plan to get started!</p>
       </li>
     </ul>
-    <AddPlanForm
-      v-else-if="currentPage === 'Add Plan'"
-      :currentUser="currentUser"
-    />
   </SidebarComponent>
 </template>
 
@@ -133,6 +131,9 @@ import io from "socket.io-client";
 import MiddleForm from "@/components/forms/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
 import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
+import ExploreList from "@/components/ExploreList.vue";
+import { usePlanStore } from "@/stores/planStore.js";
+import { usePopupStore } from "@/stores/popupStore";
 
 export default {
   mixins: [notificationMixin],
@@ -142,16 +143,16 @@ export default {
     MiddleForm,
     MembersList,
     RouteDisplayTabs,
+    ExploreList,
   },
   data() {
     return {
       isSidebarOpen: false,
-      pages: ["My Plans", "Add Plan"],
+      pages: ["Explore", "My Plans", "Add Plan"],
       currentPage: "",
       myPlans: [],
       presetPlans: [],
       currentPlan: null,
-      selectedPlan: null,
       socket: null,
     };
   },
@@ -167,6 +168,9 @@ export default {
       }
       if (content === "My Plans") {
         this.getMyPlans();
+      }
+      if (!this.openSidebar) {
+        usePlanStore().setPlan(null);
       }
     },
     getPageClasses(name) {
@@ -194,7 +198,7 @@ export default {
       }
       planService.getPlan(+plan.id).then((res) => {
         if (!res.error) {
-          this.selectedPlan = res;
+          usePlanStore().setPlan(res);
         }
       });
       this.currentPlan = plan;
@@ -221,6 +225,7 @@ export default {
         .then((res) => {});
 
       this.selectedPlan.address = midpoint;
+      usePopupStore().show(1);
     },
     updateCurrentLocation(location) {
       this.selectedPlan.members.forEach((member) => {
@@ -244,20 +249,26 @@ export default {
         planService.deletePlan(planId).then((res) => {
           if (!res.error) {
             this.myPlans = this.myPlans.filter((plan) => plan.id !== planId);
-            this.selectedPlan = null;
+            usePlanStore().setPlan(null);
             this.currentPlan = null;
             this.notifySuccess("Plan deleted successfully.");
           }
         });
       }
     },
-    updateTabProp(newVal) {
-      this.selectedPlan.address = newVal;
+    goBack() {
+      usePlanStore().setPlan(null);
+    },
+    togglePopup() {
+      usePopupStore().toggle(1);
     },
   },
   computed: {
     currentUser() {
       return useUserStore().getUser();
+    },
+    selectedPlan() {
+      return usePlanStore().getPlan();
     },
   },
   mounted() {
@@ -276,7 +287,7 @@ export default {
       this.notifyWarning("A plan you were part of has been deleted.");
       if (this.currentPlan && this.currentPlan.id === planId) {
         this.currentPlan = null;
-        this.selectedPlan = null;
+        usePlanStore().setPlan(null);
       }
       this.getMyPlans();
     });

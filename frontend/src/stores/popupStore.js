@@ -1,6 +1,7 @@
 import { markRaw } from "vue";
-import InviteForm from "../components/forms/InviteForm.vue";
+import InviteForm from "@/components/forms/InviteForm.vue";
 import { defineStore } from "pinia";
+import RouteView from "@/components/RouteView.vue";
 
 export const usePopupStore = defineStore("popup", {
   state: () => ({
@@ -16,13 +17,13 @@ export const usePopupStore = defineStore("popup", {
         bounding: null,
       },
       {
-        component: markRaw(InviteForm),
+        component: markRaw(RouteView),
         show: false,
         pos: {
-          x: 200,
-          y: 400,
+          x: 0,
+          y: 160,
         },
-        key: "aaaaaaa",
+        key: "routeview",
         bounding: null,
       },
     ],
@@ -33,6 +34,9 @@ export const usePopupStore = defineStore("popup", {
     },
     hide(id) {
       this.popups[id].show = false;
+    },
+    toggle(id) {
+      this.popups[id].show = !this.popups[id].show;
     },
     move(id, { x, y }) {
       this.popups[id].pos.x = x;
