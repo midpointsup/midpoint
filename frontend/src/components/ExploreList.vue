@@ -6,19 +6,27 @@
       <p class="preset-description">{{ preset.description }}</p>
       <ul class="activities-list">
         <li v-for="activity in preset.activities" :key="activity.name">
-          {{ activity.name }} <span class="form-text">{{ activity.duration }} mins</span>
+          {{ activity.name }}
+          <span class="form-text">{{ activity.duration }} mins</span>
         </li>
       </ul>
-      <button @click="selectPreset(preset)" class="preset-btn">Go on this plan!</button>
+      <button @click="selectPreset(preset)" class="preset-btn">
+        Go on this plan!
+      </button>
     </div>
   </div>
   <div v-else>
-    <a @click="selectedPreset=null" class="back-btn mt-3">Back</a>
-    <AddPlanForm :template="true" :templateName="selectedPreset.name" @createPlan="createPlanFromTemplate">
+    <a @click="selectedPreset = null" class="back-btn mt-3">Back</a>
+    <AddPlanForm
+      :template="true"
+      :templateName="selectedPreset.name"
+      @createPlan="createPlanFromTemplate"
+    >
       <p class="preset-description">{{ selectedPreset.description }}</p>
       <ul class="activities-list">
         <li v-for="activity in selectedPreset.activities" :key="activity.name">
-          {{ activity.name }} <span class="form-text">{{ activity.duration }} mins</span>
+          {{ activity.name }}
+          <span class="form-text">{{ activity.duration }} mins</span>
         </li>
       </ul>
     </AddPlanForm>
@@ -26,8 +34,8 @@
 </template>
 
 <script>
-import AddPlanForm from '@/components/forms/AddPlanForm.vue';
-import planService from '@/services/planService.js';
+import AddPlanForm from "@/components/forms/AddPlanForm.vue";
+import planService from "@/services/planService.js";
 
 export default {
   components: {
@@ -39,39 +47,41 @@ export default {
       presets: [
         {
           id: 1,
-          name: 'Movie Date',
-          description: 'Enjoy a relaxing movie date with dinner.',
+          name: "Movie Date",
+          description: "Enjoy a relaxing movie date with dinner.",
           activities: [
-            { name: 'Watch Movie', duration: 120, category: 'Cinemas' },
-            { name: 'Dinner', duration: 60, category: 'Restaurants' },
+            { name: "Watch Movie", duration: 120, category: "Cinemas" },
+            { name: "Dinner", duration: 60, category: "Restaurants" },
           ],
         },
         {
           id: 2,
-          name: 'City Tour',
-          description: 'Explore the city with a museum visit, lunch, and a city walk.',
+          name: "City Tour",
+          description:
+            "Explore the city with a museum visit, lunch, and a city walk.",
           activities: [
-            { name: 'Visit Museum', duration: 90, category: 'Museums' },
-            { name: 'Lunch', duration: 60, category: 'Restaurants' },
-            { name: 'City Walk', duration: 120, category: 'Parks' },
+            { name: "Visit Museum", duration: 90, category: "Museums" },
+            { name: "Lunch", duration: 60, category: "Restaurants" },
+            { name: "City Walk", duration: 120, category: "Parks" },
           ],
         },
         {
           id: 3,
-          name: 'Beach Day',
-          description: 'Spend a day at the beach with swimming, sunbathing, and beach volleyball.',
+          name: "Beach Day",
+          description:
+            "Spend a day at the beach with swimming, sunbathing, and beach volleyball.",
           activities: [
-            { name: 'Swimming', duration: 60, category: 'Beaches' },
-            { name: 'Beach Volleyball', duration: 90, category: 'Sports' },
+            { name: "Swimming", duration: 60, category: "Beaches" },
+            { name: "Beach Volleyball", duration: 90, category: "Sports" },
           ],
         },
         {
           id: 4,
-          name: 'Mountain Hike',
-          description: 'Enjoy a day of hiking and a picnic in the mountains.',
+          name: "Mountain Hike",
+          description: "Enjoy a day of hiking and a picnic in the mountains.",
           activities: [
-            { name: 'Hiking', duration: 180, category: 'Hiking' },
-            { name: 'Picnic', duration: 60, category: 'Parks' },
+            { name: "Hiking", duration: 180, category: "Hiking" },
+            { name: "Picnic", duration: 60, category: "Parks" },
           ],
         },
       ],
@@ -79,7 +89,7 @@ export default {
   },
   methods: {
     selectPreset(preset) {
-      console.log('Selected Preset:', preset);
+      console.log("Selected Preset:", preset);
       this.selectedPreset = preset;
     },
     createPlanFromTemplate(preset) {
@@ -88,14 +98,13 @@ export default {
         preset.membersList,
         this.selectedPreset.activities[0].category,
         preset.date,
-        preset.planColour,
-      )
+        preset.planColour
+      );
       preset.onSuccess();
-    }
-  }
-}
+    },
+  },
+};
 </script>
-
 
 <style scoped>
 .explore-list {

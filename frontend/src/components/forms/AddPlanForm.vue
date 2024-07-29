@@ -229,7 +229,7 @@ export default {
         this.planCategory = null;
         this.date = new Date();
         this.planColour = "#4dc48a";
-      }
+      };
       if (
         this.membersList.length > 0 &&
         this.planName.trim().length > 0 &&
