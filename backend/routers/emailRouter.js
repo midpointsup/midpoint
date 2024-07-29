@@ -8,13 +8,13 @@ const mailerSend = new MailerSend({
   apiKey: process.env.MAIL_API_KEY,
 });
 
-userRouter.post("/", async (req, res) => {
+emailRouter.post("/", isAuthenticated, async (req, res) => {
   try {
-    const member = req.body;
+    const userId = req.body.userId;
 
     const user = await User.findOne({
       where: {
-        id: member.id,
+        id: userId,
       },
     });
 

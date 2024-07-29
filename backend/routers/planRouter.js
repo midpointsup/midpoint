@@ -8,70 +8,34 @@ import { Trip } from "../models/trip.js";
 
 export const planRouter = Router();
 
-planRouter.post("/", async (req, res) => {
+planRouter.post("/", isAuthenticated, async (req, res) => {
   const name = req.body.name;
   const members = req.body.members;
-  const owner = req.body.ownerId;
   const category = req.body.category;
-  const address = req.body.address;
   const date = req.body.date;
+  const colour = req.body.colour;
 
-  if (!name || !owner || !members || members.length <= 0 || !date) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!name || !members || members.length <= 0 || !date) {
+    return res.status(400).json({ error: "Missing required fields." });
   }
 
-  try {
-    const ownerUser = await User.findOne({
-      where: {
-        id: owner,
-      },
-    });
-    if (!ownerUser) {
-      return res.status(404).json({ error: "Owner not found" });
-    }
-
-    let membersList = [];
-    for (const member of members) {
-      const user = await User.findOne({
-        where: {
-          username: member,
-        },
-      });
-      if (!user) {
-        return res.status(404).json({ error: "Member not found" });
-      }
-      membersList.push(user.id);
-    }
-
-    const plan = await Plan.create({
-      ownerId: ownerUser.id,
-      memberCount: members.length,
-      name: name,
-      category: category ? category : "",
-      address: address ? address : "",
-      date: date,
-    });
-
-    await plan.addMembers(membersList);
-
-    let planWithMembers = await Plan.findByPk(plan.id, {
-      include: [
-        {
-          model: User,
-          as: "members",
-          attributes: ["username", "id", "picture"],
-        },
-      ],
-    });
-
-    membersList.forEach((member) => {
-      req.io.in("user" + member).emit("planCreate", planWithMembers);
-    });
-
-    return res.json(planWithMembers);
-  } catch {
-    return res.status(422).json({ error: "Failed to create plan" });
+  const users = await Promise.all(members.map(member => User.findOne({ where: { username: member }, attributes: ["id"] })));
+  if (users.some(member => !member)) {
+    return res.status(404).json({ error: "Member not found" });
   }
+  const membersList = users.map(member => member.id);
+  const plan = await Plan.create({
+    ownerId: req.user.id,
+    memberCount: members.length,
+    name: name,
+    category: category,
+    date: date,
+    colour: colour,
+  });
+  await plan.addMembers(membersList);
+  const planResponse = plan.toJSON();
+  planResponse.members = membersList;
+  return res.json(planResponse);
 });
 
 //get all plans for the member

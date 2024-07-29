@@ -12,10 +12,6 @@ export const Plan = sequelize.define("Plan", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  ownerId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   category: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -28,6 +24,10 @@ export const Plan = sequelize.define("Plan", {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  colour: {
+    type: DataTypes.STRING,
+    defaultValue: "#4dc48a",
+  }
 });
 
 // A User can own many Plans

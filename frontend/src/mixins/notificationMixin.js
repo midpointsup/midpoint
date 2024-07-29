@@ -2,14 +2,14 @@ import { useNotificationStore } from "@/stores/notificationStore.js";
 
 export const notificationMixin = {
   methods: {
-    notifyError(message) {
-      useNotificationStore().add(message, "alert-danger");
+    notifyError(message, persist) {
+      useNotificationStore().add(message, "alert-danger", persist);
     },
-    notifySuccess(message) {
-      useNotificationStore().add(message, "alert-success");
+    notifySuccess(message, persist) {
+      useNotificationStore().add(message, "alert-success", persist);
     },
-    notifyWarning(message) {
-      useNotificationStore().add(message, "alert-warning");
+    notifyWarning(message, persist) {
+      useNotificationStore().add(message, "alert-warning", persist);
     },
   },
 };

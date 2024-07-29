@@ -149,8 +149,8 @@
 import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
-import userService from "../services/userService.js";
-import planService from "../services/planService.js";
+import userService from "@/services/userService.js";
+import planService from "@/services/planService.js";
 export default {
   components: {
     MiddleForm,

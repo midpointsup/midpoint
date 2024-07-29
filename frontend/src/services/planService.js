@@ -2,10 +2,10 @@ const planService = (function () {
   "use strict";
 
   const module = {};
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = "http://localhost:3000/api/plans";
 
   module.getPlans = async function () {
-    return fetch(`${baseUrl}/api/plans`, {
+    return fetch(`${baseUrl}/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -14,7 +14,7 @@ const planService = (function () {
   };
 
   module.getPlansForMember = async function (memberId) {
-    return fetch(`${baseUrl}/api/plans/members/${memberId}`, {
+    return fetch(`${baseUrl}/members/${memberId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -23,7 +23,7 @@ const planService = (function () {
   };
 
   module.getPlan = async function (id) {
-    return fetch(`${baseUrl}/api/plans/${id}`, {
+    return fetch(`${baseUrl}/${id}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -32,7 +32,7 @@ const planService = (function () {
   };
 
   module.deletePlan = async function (id) {
-    return fetch(`${baseUrl}/api/plans/${id}`, {
+    return fetch(`${baseUrl}/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -42,26 +42,22 @@ const planService = (function () {
 
   module.createPlan = async function (
     name,
-    ownerId,
     members,
     category,
-    address,
-    date
+    date,
+    colour,
   ) {
-    category = category ? category : "";
-    address = address ? address : "";
-    date = date ? date : Date.now();
-    return fetch(`${baseUrl}/api/plans`, {
+    return fetch(`${baseUrl}/`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, ownerId, members, category, address, date }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+      body: JSON.stringify({ name, members, category, date, colour }),
     }).then((res) => {
       return res.json();
     });
   };
 
   module.updatePlan = async function (id, plan) {
-    return fetch(`${baseUrl}/api/plans/${id}`, {
+    return fetch(`${baseUrl}/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(plan),
@@ -71,7 +67,7 @@ const planService = (function () {
   };
 
   module.createTrip = async function (planId, memberId, trip) {
-    return fetch(`${baseUrl}/api/plans/${planId}/members/${memberId}/trip`, {
+    return fetch(`${baseUrl}/${planId}/members/${memberId}/trip`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(trip),
@@ -82,7 +78,7 @@ const planService = (function () {
 
   module.updateTrip = async function (planId, memberId, tripId, trip) {
     return fetch(
-      `${baseUrl}/api/plans/${planId}/members/${memberId}/trip/${tripId}`,
+      `${baseUrl}/${planId}/members/${memberId}/trip/${tripId}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -94,7 +90,7 @@ const planService = (function () {
   };
 
   module.getTrip = async function (planId, memberId) {
-    return fetch(`${baseUrl}/api/plans/${planId}/members/${memberId}/trip`, {
+    return fetch(`${baseUrl}/${planId}/members/${memberId}/trip`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {

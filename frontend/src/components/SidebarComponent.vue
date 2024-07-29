@@ -1,6 +1,7 @@
 <template>
   <div class="sidebar-wrapper">
-    <h5>{{ currentPage }}</h5>
+    <h5 class="my-3">{{ currentPage }}</h5>
+    <hr class="mb-1"/>
     <slot></slot>
   </div>
   <br/>
@@ -24,7 +25,7 @@ export default {
 <style>
 .sidebar-wrapper {
   background-color: var(--color-background-secondary);
-  padding: 20px 30px;
+  padding: 20px;
   position: fixed;
   width: 100%;
   bottom: var(--menu-height);
