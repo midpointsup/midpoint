@@ -48,6 +48,9 @@ routesRouter.get("/middle", async (req, res) => {
         `https://maps.googleapis.com/maps/api/geocode/json?address=${location.startLocation}&key=${process.env.GOOGLE_MAPS_API}`
       );
       const data = await geoResponse.json();
+      if (!data.results) {
+        return res.status(400).json({ error: "No location found" });
+      }
       return {
         latitude: data.results[0].geometry.location.lat,
         longitude: data.results[0].geometry.location.lng,

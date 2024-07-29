@@ -64,6 +64,10 @@ planRouter.post("/", async (req, res) => {
       ],
     });
 
+    membersList.forEach((member) => {
+      req.io.in("user" + member).emit("planCreate", planWithMembers);
+    });
+
     return res.json(planWithMembers);
   } catch {
     return res.status(422).json({ error: "Failed to create plan" });
@@ -167,6 +171,18 @@ planRouter.get("/:id", async (req, res) => {
 planRouter.delete("/:id", async (req, res) => {
   try {
     const plan = await Plan.findOne({
+      include: [
+        {
+          model: User,
+          as: "members",
+          attributes: ["id"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
+        },
+      ],
       where: {
         id: req.params.id,
       },
@@ -182,7 +198,13 @@ planRouter.delete("/:id", async (req, res) => {
     //     .status(403)
     //     .json({ error: "Not authorized to delete this plan" });
     // }
+
+    plan.members.forEach((member) => {
+      req.io.in("user" + member.id).emit("planDelete", plan.id);
+    });
+
     await plan.destroy();
+
     return res.json({ message: "Plan deleted" });
   } catch {
     return res.status(500).json({ error: "Failed to delete plan" });
@@ -207,8 +229,6 @@ planRouter.post("/:id/members/:memberId/trip", async (req, res) => {
       PlanId: req.params.id,
       UserId: req.params.memberId,
     });
-
-    req.io.emit("trip", trip);
 
     return res.json(trip);
   } catch (e) {
@@ -238,6 +258,8 @@ planRouter.patch("/:id", async (req, res) => {
     plan.date = date;
 
     await plan.save();
+
+    req.io.in("room" + req.params.id).emit("planUpdate", plan);
 
     return res.json(plan);
   } catch {
@@ -280,7 +302,6 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
     await trip.save();
 
     const roomId = req.params.id.toString();
-    console.log("Emitting trip to room", roomId);
     req.io.in("room" + roomId).emit("trip", trip);
     return res.json({ trip: trip });
   } catch {
