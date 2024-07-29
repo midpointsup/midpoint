@@ -10,10 +10,17 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path ../.gitignore"
   },
   "dependencies": {
+    "@googlemaps/extended-component-library": "^0.6.11",
+    "@popperjs/core": "^2.11.8",
+    "@vuepic/vue-datepicker": "^9.0.1",
+    "@vueuse/components": "^10.11.0",
+    "@vueuse/core": "^10.11.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "cors": "^2.8.5",
+    "i": "^0.3.7",
     "mapbox-gl": "^3.4.0",
+    "npm": "^10.8.2",
     "pinia": "^2.0.21",
     "socket.io-client": "^4.7.5",
     "vue": "^3.2.38",

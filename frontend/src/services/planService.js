@@ -4,17 +4,20 @@ const planService = (function () {
   const module = {};
   const baseUrl = "https://api.midpoint.live";
 
-  module.getPlans = async function () {
-    return fetch(`${baseUrl}/api/plans`, {
+  module.getPlans = function () {
+    return fetch(`${baseUrl}/`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((res) => {
       return res.json();
     });
   };
 
   module.getPlansForMember = async function (memberId) {
-    return fetch(`${baseUrl}/api/plans/members/${memberId}`, {
+    return fetch(`${baseUrl}/members/${memberId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -23,16 +26,19 @@ const planService = (function () {
   };
 
   module.getPlan = async function (id) {
-    return fetch(`${baseUrl}/api/plans/${id}`, {
+    return fetch(`${baseUrl}/${id}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((res) => {
       return res.json();
     });
   };
 
   module.deletePlan = async function (id) {
-    return fetch(`${baseUrl}/api/plans/${id}`, {
+    return fetch(`${baseUrl}/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -40,28 +46,21 @@ const planService = (function () {
     });
   };
 
-  module.createPlan = async function (
-    name,
-    ownerId,
-    members,
-    category,
-    address,
-    date
-  ) {
-    category = category ? category : "";
-    address = address ? address : "";
-    date = date ? date : Date.now();
-    return fetch(`${baseUrl}/api/plans`, {
+  module.createPlan = function (name, members, category, date, colour) {
+    return fetch(`${baseUrl}/`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, ownerId, members, category, address, date }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ name, members, category, date, colour }),
     }).then((res) => {
       return res.json();
     });
   };
 
   module.updatePlan = async function (id, plan) {
-    return fetch(`${baseUrl}/api/plans/${id}`, {
+    return fetch(`${baseUrl}/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(plan),
@@ -71,7 +70,7 @@ const planService = (function () {
   };
 
   module.createTrip = async function (planId, memberId, trip) {
-    return fetch(`${baseUrl}/api/plans/${planId}/members/${memberId}/trip`, {
+    return fetch(`${baseUrl}/${planId}/members/${memberId}/trip`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(trip),
@@ -81,20 +80,17 @@ const planService = (function () {
   };
 
   module.updateTrip = async function (planId, memberId, tripId, trip) {
-    return fetch(
-      `${baseUrl}/api/plans/${planId}/members/${memberId}/trip/${tripId}`,
-      {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(trip),
-      }
-    ).then((res) => {
+    return fetch(`${baseUrl}/${planId}/members/${memberId}/trip/${tripId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(trip),
+    }).then((res) => {
       return res.json();
     });
   };
 
   module.getTrip = async function (planId, memberId) {
-    return fetch(`${baseUrl}/api/plans/${planId}/members/${memberId}/trip`, {
+    return fetch(`${baseUrl}/${planId}/members/${memberId}/trip`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {
@@ -103,7 +99,7 @@ const planService = (function () {
   };
 
   module.getTrips = async function (planId) {
-    return fetch(`${baseUrl}/api/plans/${planId}/members/trip`, {
+    return fetch(`${baseUrl}/${planId}/members/trip`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {

@@ -6,7 +6,7 @@
 
 <script>
 import { googleSdkLoaded } from "vue3-google-login";
-import userService from "@/services/user-service.js";
+import userService from "@/services/userService.js";
 import { useUserStore } from "@/stores/userStore.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 
@@ -53,7 +53,7 @@ export default {
                   this.notifySuccess(
                     this.isSignIn
                       ? "Signed in successfully."
-                      : "Signed in with existing account."
+                      : "Signed in with an existing account."
                   );
                   const userStore = useUserStore();
                   userStore.setUser(res);

@@ -8,70 +8,51 @@ import { Trip } from "../models/trip.js";
 
 export const planRouter = Router();
 
-planRouter.post("/", async (req, res) => {
+planRouter.post("/", isAuthenticated, async (req, res) => {
   const name = req.body.name;
   const members = req.body.members;
-  const owner = req.body.ownerId;
   const category = req.body.category;
-  const address = req.body.address;
   const date = req.body.date;
+  const colour = req.body.colour;
 
-  if (!name || !owner || !members || members.length <= 0 || !date) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!name || !members || members.length <= 0 || !date) {
+    return res.status(400).json({ error: "Missing required fields." });
   }
 
-  try {
-    const ownerUser = await User.findOne({
-      where: {
-        id: owner,
-      },
-    });
-    if (!ownerUser) {
-      return res.status(404).json({ error: "Owner not found" });
-    }
-
-    let membersList = [];
-    for (const member of members) {
-      const user = await User.findOne({
-        where: {
-          username: member,
-        },
-      });
-      if (!user) {
-        return res.status(404).json({ error: "Member not found" });
-      }
-      membersList.push(user.id);
-    }
-
-    const plan = await Plan.create({
-      ownerId: ownerUser.id,
-      memberCount: members.length,
-      name: name,
-      category: category ? category : "",
-      address: address ? address : "",
-      date: date,
-    });
-
-    await plan.addMembers(membersList);
-
-    let planWithMembers = await Plan.findByPk(plan.id, {
-      include: [
-        {
-          model: User,
-          as: "members",
-          attributes: ["username", "id", "picture"],
-        },
-      ],
-    });
-
-    membersList.forEach((member) => {
-      req.io.in("user" + member).emit("planCreate", planWithMembers);
-    });
-
-    return res.json(planWithMembers);
-  } catch {
-    return res.status(422).json({ error: "Failed to create plan" });
+  const users = await Promise.all(
+    members.map((member) =>
+      User.findOne({ where: { username: member }, attributes: ["id"] })
+    )
+  );
+  if (users.some((member) => !member)) {
+    return res.status(404).json({ error: "Member not found" });
   }
+  const membersList = users.map((member) => member.id);
+  const plan = await Plan.create({
+    ownerId: req.user.id,
+    memberCount: members.length,
+    name: name,
+    category: category,
+    date: date,
+    colour: colour,
+  });
+  await plan.addMembers(membersList);
+  const planResponse = plan.toJSON();
+  planResponse.members = membersList;
+  membersList.push(req.user.id);
+  for (let i = 0; i < membersList.length; i++) {
+    await Trip.create({
+      startLocation: "",
+      startTime: new Date(date).toTimeString().split(" ")[0],
+      endLocation: "",
+      transportationMethod: "",
+      radius: 100,
+      PlanId: plan.id,
+      UserId: membersList[i],
+    });
+    req.io.in("user" + membersList[i]).emit("planCreate", planResponse);
+  }
+  return res.json(planResponse);
 });
 
 //get all plans for the member
@@ -131,24 +112,28 @@ planRouter.get("/members/:memberId", async (req, res) => {
   }
 });
 
-planRouter.get("/", async (req, res) => {
-  try {
-    const plans = await Plan.findAll({
-      include: [
-        {
-          model: User,
-          as: "owner",
-          attributes: ["username"],
-        },
-      ],
-    });
-    return res.json(plans);
-  } catch {
-    return res.status(500).json({ error: "Failed to fetch plans" });
-  }
+planRouter.get("/", isAuthenticated, async (req, res) => {
+  let plans = await Plan.findAll({
+    include: [
+      {
+        model: User,
+        as: "owner",
+        attributes: ["username", "id", "picture"],
+      },
+      {
+        model: User,
+        as: "members",
+        attributes: ["username", "id", "picture"],
+      },
+    ],
+    where: {
+      [Op.or]: [{ "$owner.id$": req.user.id }, { "$members.id$": req.user.id }],
+    },
+  });
+  return res.json(plans);
 });
 
-planRouter.get("/:id", async (req, res) => {
+planRouter.get("/:id", isAuthenticated, async (req, res) => {
   try {
     const plan = await Plan.findOne({
       where: {
@@ -158,10 +143,34 @@ planRouter.get("/:id", async (req, res) => {
         {
           model: User,
           as: "owner",
-          attributes: ["username"],
+          attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+              where: {
+                PlanId: req.params.id,
+              },
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "members",
+          attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+              where: {
+                PlanId: req.params.id,
+              },
+            },
+          ],
         },
       ],
     });
+    if (!plan.members.some((member) => member.id === plan.owner.id)) {
+      plan.members.push(plan.owner);
+    }
     return res.json(plan);
   } catch {
     return res.status(500).json({ error: "Failed to fetch plan" });
@@ -191,19 +200,11 @@ planRouter.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Plan not found" });
     }
 
-    // TODO: Uncomment this code after implementing authentication
-    // if (plan.ownerId !== req.user.id) {
-    //   // User trying to delete the plan is not the owner
-    //   return res
-    //     .status(403)
-    //     .json({ error: "Not authorized to delete this plan" });
-    // }
+    await plan.destroy();
 
     plan.members.forEach((member) => {
       req.io.in("user" + member.id).emit("planDelete", plan.id);
     });
-
-    await plan.destroy();
 
     return res.json({ message: "Plan deleted" });
   } catch {
