@@ -1,3 +1,5 @@
+Link to youtube video: https://youtu.be/uES8UcpQp7k
+
 # Midpoint
 
 Midpoint is a web application designed to help users find convenient meeting locations. Key features include:
@@ -92,9 +94,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 - Complete real-time features:
   - Live changing routes
   - Live cursor tracking
-- Finalize user profile settings
 - Enhance and clean up existing features
-- Add extra features: multiple stops, calendar, pinned restaurants
 - Prepare presentation
 
 ## Resources
