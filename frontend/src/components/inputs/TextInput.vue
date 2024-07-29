@@ -1,12 +1,13 @@
 <template>
   <div class="form-floating">
     <input
-      :type="text"
+      :type="type"
       class="form-control text-overflow"
       :id="id"
       :name="name"
       :placeholder="placeholder"
       required
+      :autocomplete="autocomplete"
     />
     <label :for="id" class="d-inline-block text-truncate w-100">{{
       label
@@ -41,6 +42,11 @@ export default {
     type: {
       type: String,
       default: "text",
+    },
+  },
+  computed: {
+    autocomplete() {
+      return this.type === "password" ? "current-password" : "off";
     },
   },
 };

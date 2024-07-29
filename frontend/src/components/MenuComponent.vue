@@ -13,25 +13,27 @@
         <img v-else src="@/assets/static/user.png" alt="" class="pfp" />
       </a>
       <div class="dropdown-menu text-small shadow">
-        <a class="dropdown-item" href="#">Settings</a>
-        <a class="dropdown-item" href="#">Profile</a>
-        <hr class="dropdown-divider" />
         <button class="dropdown-item" @click="signout">Sign out</button>
       </div>
     </div>
   </div>
 
   <SidebarComponent v-if="isSidebarOpen" :currentPage="currentPage">
-    <ul v-if="currentPage === 'My Plans'">
-      <li v-for="plan in plans" :key="plan" class="planContainer" @click="selectPlan(plan)">
-        <a href="#" class="nav-link link-dark" :id="plan.id">
-          {{ plan.name }}
-          <hr />
-          <p>{{ plan.address ? plan.address : "TBD" }}</p>
-          <span class="badge">{{
-            plan.date && plan.date.slice(0, 10)
-          }}</span>
-        </a>
+    <ul v-if="currentPage === 'My Plans'" class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper">
+      <li v-for="plan in plans" :key="'plan'+plan.id" :ref="'plan'+plan.id" class="planContainer" :style="{ 'border-color': plan.colour }" @click="selectPlan(plan)">
+        <h6 class="mt-2">{{ plan.name }}</h6>
+        <hr class="mt-1"/>
+        <span>{{ plan.address ? plan.address : "TBD" }}</span>
+        <div class="d-flex my-2">
+          <div v-for="member in plan.members.splice(0,4)">
+            <img v-if="member.picture" :src="member.picture" class="rounded-circle pfp-small"/>
+            <img v-else src="@/assets/static/user.png" class="rounded-circle pfp-small"/>
+          </div>
+          <div v-if="plan.members.length > 4" class="rounded-circle pfp-count text-truncate" :style="{ 'background-color': plan.colour}">{{ `+${plan.memberCount - 4}`}}</div>
+        </div>
+        <span class="badge">{{
+          plan.date && plan.date.slice(0, 10)
+        }}</span>
       </li>
     </ul>
     <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
@@ -44,6 +46,7 @@ import userService from "@/services/userService.js";
 import planService from '@/services/planService.js';
 import SidebarComponent from "@/components/SidebarComponent.vue";
 import AddPlanForm from "@/components/forms/AddPlanForm.vue";
+import { notificationMixin } from "@/mixins/notificationMixin.js";
 
 export default {
   mixins: [notificationMixin],
@@ -55,9 +58,10 @@ export default {
     return {
       isSidebarOpen: true,
       pages: ["Explore", "My Plans", "Add Plan"],
-      currentPage: "Add Plan",
+      currentPage: "My Plans",
       myPlans: [],
       presetPlans: [],
+      currentPlan: null,
     };
   },
   methods: {
@@ -69,6 +73,9 @@ export default {
       } else {
         this.isSidebarOpen = true;
         this.currentPage = content;
+      }
+      if (content === "My Plans") {
+        this.getMyPlans();
       }
     },
     getPageClasses(name) {
@@ -89,6 +96,21 @@ export default {
       useUserStore().setUser(null);
       this.$router.push("/signup");
     },
+    selectPlan(plan) {
+      console.log(this.currentPlan);
+      if (this.currentPlan) {
+        this.$refs[`plan${this.currentPlan.id}`][0].classList.remove("active");
+      }
+      this.currentPlan = plan;
+      this.$refs[`plan${plan.id}`][0].classList.add("active");
+    },
+    getMyPlans() {
+      planService.getPlans().then((res) => {
+        if (!res.error) {
+          this.myPlans = res;
+        }
+      });
+    },
   },
   computed: {
     currentUser() {
@@ -96,17 +118,13 @@ export default {
       return useUserStore().getUser();
     },
     plans() {
+      console.log(this.myPlans);
       return this.currentPage === "My Plans" ? this.myPlans : this.presetPlans;
     },
   },
   mounted() {
     if (this.currentUser.userId) {
-      planService.getPlansForMember(this.currentUser.userId).then((res) => {
-        if (!res.error) {
-          this.myPlans = res;
-          console.log(this.myPlans);
-        }
-      });
+      this.getMyPlans();
     }
   },
 };
@@ -244,5 +262,48 @@ export default {
     width: 40px;
     height: 40px;
   }
+}
+
+.plansWrapper {
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 80px;
+}
+
+.planContainer {
+  list-style-type: none;
+  background-color: var(--color-background);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--color-background-secondary);
+  }
+
+  &.active {
+    background-color: var(--secondary);
+  }
+
+  &:active {
+    transform: translateY(3px);
+  }
+}
+
+.pfp-small {
+  width: 25px;
+  margin-right: -5px;
+}
+
+.pfp-count {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 </style>

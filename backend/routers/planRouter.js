@@ -95,21 +95,56 @@ planRouter.get("/members/:memberId", async (req, res) => {
   }
 });
 
-planRouter.get("/", async (req, res) => {
-  try {
-    const plans = await Plan.findAll({
-      include: [
-        {
-          model: User,
-          as: "owner",
-          attributes: ["username"],
-        },
+planRouter.get("/", isAuthenticated, async (req, res) => {
+  let plans = await Plan.findAll({
+    include: [
+      {
+        model: User,
+        as: "owner",
+        attributes: ["username", "id", "picture"],
+        include: [
+          {
+            model: Trip,
+          },
+        ],
+      },
+      {
+        model: User,
+        as: "members",
+        attributes: ["username", "id", "picture"],
+        include: [
+          {
+            model: Trip,
+          },
+        ],
+      },
+    ],
+    where: {
+      [Op.or]: [
+        { "$owner.id$": req.user.id },
+        { "$members.id$": req.user.id },
       ],
+    },
+  });
+
+  plans = plans.map((plan) => plan.toJSON());
+  plans.forEach((plan) => {
+    if (!plan.members.some((member) => member.id === plan.owner.id)) {
+      plan.members.push(plan.owner);
+    }
+  });
+
+  plans.forEach((plan, index) => {
+    plan.members.forEach((member, memberIndex) => {
+      if (member.Trips) {
+        plans[index].members[memberIndex].Trips = member.Trips.filter(
+          (trip) => trip.PlanId === plan.id
+        );
+      }
     });
-    return res.json(plans);
-  } catch {
-    return res.status(500).json({ error: "Failed to fetch plans" });
-  }
+  });
+
+  return res.json(plans);
 });
 
 planRouter.get("/:id", async (req, res) => {

@@ -116,7 +116,7 @@ export default {
       cache: {},
       fetchedUsers: [],
       membersList: [],
-      categories: [ "Restaurants", "Cafe", "Grocery", "Schools", "Parks", "Shopping", "Recreation Center", "Bathrooms" ],
+      categories: [ "Restaurants", "Cafe", "Grocery", "Schools", "Parks", "Shopping", "Recreation Centers", "Bathrooms", "Theatres" ],
       planCategory: null,
       date: new Date(),
       datePickerState: null,

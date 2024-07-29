@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-wrapper">
+  <div class="sidebar-wrapper" :style="currentPage === 'My Plans' ? {'overflow-y' : 'hidden'} : {}">
     <h5 class="my-3">{{ currentPage }}</h5>
     <hr class="mb-1"/>
     <slot></slot>

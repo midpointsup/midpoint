@@ -8,10 +8,7 @@ import { Server } from "socket.io";
 import { webhookRouter } from "./routers/webhookRouter.js";
 import { userRouter } from "./routers/userRouter.js";
 import { googleOAuthRouter } from "./routers/oauthRouter.js";
-import { registerIOListeners } from "./socket.js";
-import cors from "cors";
 import { planRouter } from "./routers/planRouter.js";
-import http from "http";
 import { routesRouter } from "./routers/routeRouter.js";
 import { emailRouter } from "./routers/emailRouter.js";
 

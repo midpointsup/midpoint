@@ -4,10 +4,10 @@ const planService = (function () {
   const module = {};
   const baseUrl = "http://localhost:3000/api/plans";
 
-  module.getPlans = async function () {
+  module.getPlans = function () {
     return fetch(`${baseUrl}/`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
       return res.json();
     });
@@ -22,14 +22,14 @@ const planService = (function () {
     });
   };
 
-  module.getPlan = async function (id) {
-    return fetch(`${baseUrl}/${id}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }).then((res) => {
-      return res.json();
-    });
-  };
+  // module.getPlan = async function (id) {
+  //   return fetch(`${baseUrl}/${id}`, {
+  //     method: "GET",
+  //     headers: { "Content-Type": "application/json" },
+  //   }).then((res) => {
+  //     return res.json();
+  //   });
+  // };
 
   module.deletePlan = async function (id) {
     return fetch(`${baseUrl}/${id}`, {
@@ -40,7 +40,7 @@ const planService = (function () {
     });
   };
 
-  module.createPlan = async function (
+  module.createPlan = function (
     name,
     members,
     category,
