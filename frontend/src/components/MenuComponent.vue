@@ -69,8 +69,10 @@
     </button>
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
+    <ExploreList v-if="currentPage === 'Explore'" />
+    <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
     <ul
-      v-if="currentPage === 'My Plans'"
+      v-else-if="currentPage === 'My Plans'"
       class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
     >
       <li
@@ -115,10 +117,6 @@
         <p class="form-text">No plans yet. Add a plan to get started!</p>
       </li>
     </ul>
-    <AddPlanForm
-      v-else-if="currentPage === 'Add Plan'"
-      :currentUser="currentUser"
-    />
   </SidebarComponent>
 </template>
 
@@ -133,6 +131,7 @@ import io from "socket.io-client";
 import MiddleForm from "@/components/forms/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
 import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
+import ExploreList from "@/components/ExploreList.vue";
 
 export default {
   mixins: [notificationMixin],
@@ -142,11 +141,12 @@ export default {
     MiddleForm,
     MembersList,
     RouteDisplayTabs,
+    ExploreList,
   },
   data() {
     return {
       isSidebarOpen: false,
-      pages: ["My Plans", "Add Plan"],
+      pages: ["Explore", "My Plans", "Add Plan"],
       currentPage: "",
       myPlans: [],
       presetPlans: [],
