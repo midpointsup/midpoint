@@ -239,6 +239,14 @@ export default {
       this.notifySuccess("You have been added to a new plan!");
     });
 
+    this.socket.on("planDelete", (planId) => {
+      this.getPlans(this.currentUser.userId);
+      this.notifyWarning("A plan you were part of has been deleted.");
+      if (this.selectPlan && this.selectedPlan.id === planId) {
+        this.selectedPlan = null;
+      }
+    });
+
     userService.getMe().then((res) => {
       if (!res.error) {
         console.log("Profile Picture:", res);
