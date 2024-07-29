@@ -35,9 +35,19 @@ planRouter.post("/", isAuthenticated, async (req, res) => {
   await plan.addMembers(membersList);
   const planResponse = plan.toJSON();
   planResponse.members = membersList;
-  membersList.forEach((member) => {
-    req.io.in("user" + member).emit("planCreate", planResponse);
-  });
+  membersList.push(req.user.id);
+  for (let i = 0; i < membersList.length; i++) {
+    await Trip.create({
+      startLocation: "",
+      startTime: new Date(date).toTimeString().split(" ")[0],
+      endLocation: "",
+      transportationMethod: "",
+      radius: 100,
+      PlanId: plan.id,
+      UserId: membersList[i],
+    });
+    req.io.in("user" + membersList[i]).emit("planCreate", planResponse);
+  }
   return res.json(planResponse);
 });
 
@@ -105,21 +115,11 @@ planRouter.get("/", isAuthenticated, async (req, res) => {
         model: User,
         as: "owner",
         attributes: ["username", "id", "picture"],
-        include: [
-          {
-            model: Trip,
-          },
-        ],
       },
       {
         model: User,
         as: "members",
         attributes: ["username", "id", "picture"],
-        include: [
-          {
-            model: Trip,
-          },
-        ],
       },
     ],
     where: {
@@ -129,24 +129,6 @@ planRouter.get("/", isAuthenticated, async (req, res) => {
       ],
     },
   });
-
-  plans = plans.map((plan) => plan.toJSON());
-  plans.forEach((plan) => {
-    if (!plan.members.some((member) => member.id === plan.owner.id)) {
-      plan.members.push(plan.owner);
-    }
-  });
-
-  plans.forEach((plan, index) => {
-    plan.members.forEach((member, memberIndex) => {
-      if (member.Trips) {
-        plans[index].members[memberIndex].Trips = member.Trips.filter(
-          (trip) => trip.PlanId === plan.id
-        );
-      }
-    });
-  });
-
   return res.json(plans);
 });
 
@@ -160,7 +142,22 @@ planRouter.get("/:id", async (req, res) => {
         {
           model: User,
           as: "owner",
-          attributes: ["username"],
+          attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "members",
+          attributes: ["username", "id", "picture"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
         },
       ],
     });

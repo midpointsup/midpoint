@@ -9,7 +9,7 @@
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center link-dark text-decoration-none rounded-circle"
         data-bs-toggle="dropdown" aria-expanded="false">
-        <img v-if="currentUser.picture" :src="currentUser.picture" class="pfp" />
+        <img v-if="currentUser?.picture" :src="currentUser.picture" class="pfp" />
         <img v-else src="@/assets/static/user.png" alt="" class="pfp" />
       </a>
       <div class="dropdown-menu text-small shadow">
@@ -18,9 +18,38 @@
     </div>
   </div>
 
-  <SidebarComponent v-if="isSidebarOpen" :currentPage="currentPage">
+  <SidebarComponent
+    v-if="selectedPlan && isSidebarOpen && currentPage === 'My Plans'"
+    class="nav nav-pills flex-column mb-auto"
+    :currentPage="selectedPlan.name"
+    :canGoBack="true"
+    @goBack="selectedPlan = null"
+  >
+    <MiddleForm
+      :startLocation="selectedPlan.owner.Trips[0].startLocation"
+      :selectedPlan="selectedPlan"
+      :currentUser="currentUser"
+      @add-location="updateCurrentLocation"
+      @generate-midpoint="updateMiddle"
+    >
+      <MembersList
+        :members="selectedPlan.members"
+        :selectedPlan="selectedPlan"
+        :you="currentUser"
+      ></MembersList>
+    </MiddleForm>
+    <button @click="clearSelection" class="btn mt-3">Back</button>
+    <button
+      v-if="selectedPlan.ownerId === currentUser.userId"
+      @click="confirmDelete(selectedPlan.id)"
+      class="btn btn-danger mt-3"
+    >
+      Delete Plan
+    </button>
+  </SidebarComponent>
+  <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
     <ul v-if="currentPage === 'My Plans'" class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper">
-      <li v-for="plan in plans" :key="'plan'+plan.id" :ref="'plan'+plan.id" class="planContainer" :style="{ 'border-color': plan.colour }" @click="selectPlan(plan)">
+      <li v-for="plan in myPlans" :key="'plan'+plan.id" :ref="'plan'+plan.id" class="planContainer" :style="{ 'border-color': plan.colour }" @click="selectPlan(plan)">
         <h6 class="mt-2">{{ plan.name }}</h6>
         <hr class="mt-1"/>
         <span>{{ plan.address ? plan.address : "TBD" }}</span>
@@ -48,12 +77,18 @@ import SidebarComponent from "@/components/SidebarComponent.vue";
 import AddPlanForm from "@/components/forms/AddPlanForm.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import io from "socket.io-client";
+import MiddleForm from "@/components/forms/MiddleForm.vue";
+import MembersList from "@/components/MembersList.vue";
+import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
 
 export default {
   mixins: [notificationMixin],
   components: {
     SidebarComponent,
     AddPlanForm,
+    MiddleForm,
+    MembersList,
+    RouteDisplayTabs,
   },
   data() {
     return {
@@ -63,6 +98,7 @@ export default {
       myPlans: [],
       presetPlans: [],
       currentPlan: null,
+      selectedPlan: null,
       socket: null,
     };
   },
@@ -102,14 +138,18 @@ export default {
       if (this.currentPlan) {
         this.$refs[`plan${this.currentPlan.id}`][0].classList.remove("active");
       }
+      planService.getPlan(+plan.id).then((res) => {
+        if (!res.error) {
+          this.selectedPlan = res;
+        }
+      });
       this.currentPlan = plan;
+      console.log(this.currentPlan)
       this.$refs[`plan${plan.id}`][0].classList.add("active");
     },
     getMyPlans() {
       planService.getPlans().then((res) => {
-        if (!res.error) {
-          this.myPlans = res;
-        }
+        this.myPlans = !res.error ? res : null;
       });
     },
     disconnectSocket() {
@@ -117,13 +157,38 @@ export default {
         this.socket.disconnect();
       }
     },
+    updateMiddle(midpoint) {
+      planService
+        .updatePlan(this.selectedPlan.id, {
+          address: midpoint,
+          name: this.selectedPlan.name,
+          category: this.selectedPlan.category,
+          date: this.selectedPlan.date,
+        })
+        .then((res) => {});
+      this.selectedPlan.address = midpoint;
+    },
+    updateCurrentLocation(location) {
+      this.selectedPlan.members.forEach((member) => {
+        if (member.id === this.currentUser.userId) {
+          member.Trips[0].startLocation = location;
+          planService
+            .updateTrip(
+              this.selectedPlan.id,
+              this.currentUser.userId,
+              member.Trips[0].id,
+              {
+                startLocation: location,
+              }
+            )
+            .then((resTrip) => {});
+        }
+      });
+    },
   },
   computed: {
     currentUser() {
       return useUserStore().getUser();
-    },
-    plans() {
-      return this.currentPage === "My Plans" ? this.myPlans : this.presetPlans;
     },
   },
   mounted() {

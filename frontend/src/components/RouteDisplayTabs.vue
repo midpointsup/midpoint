@@ -134,10 +134,10 @@
 
 <script>
 import groupRouteCard from "@/components/groupRouteCard.vue";
-import planService from "../services/plan-service.js";
+import planService from "@/services/planService.js";
 import io from "socket.io-client";
-import { useUserStore } from "../stores/userStore.js";
-import RouteCard from "./routeCard.vue";
+import { useUserStore } from "@/stores/userStore.js";
+import RouteCard from "@/components/routeCard.vue";
 
 export default {
   props: {

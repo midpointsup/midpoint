@@ -22,14 +22,14 @@ const planService = (function () {
     });
   };
 
-  // module.getPlan = async function (id) {
-  //   return fetch(`${baseUrl}/${id}`, {
-  //     method: "GET",
-  //     headers: { "Content-Type": "application/json" },
-  //   }).then((res) => {
-  //     return res.json();
-  //   });
-  // };
+  module.getPlan = async function (id) {
+    return fetch(`${baseUrl}/${id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => {
+      return res.json();
+    });
+  };
 
   module.deletePlan = async function (id) {
     return fetch(`${baseUrl}/${id}`, {
@@ -99,7 +99,7 @@ const planService = (function () {
   };
 
   module.getTrips = async function (planId) {
-    return fetch(`${baseUrl}/api/plans/${planId}/members/trip`, {
+    return fetch(`${baseUrl}/${planId}/members/trip`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((res) => {

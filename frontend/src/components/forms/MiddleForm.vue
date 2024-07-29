@@ -2,7 +2,7 @@
   <div class="middle-form-wrapper" v-if="showInput">
     What is your starting location?
     <form class="outer-middle-form">
-      <form class="middle-form">
+      <form class="d-flex gap-1">
         <gmpx-place-picker
           placeholder="Enter a place"
           id="place-picker"
@@ -87,6 +87,7 @@
 </template>
 
 <script>
+import '@googlemaps/extended-component-library/place_picker.js';
 import routeService from "@/services/routeService.js";
 import planService from "@/services/planService.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
@@ -101,16 +102,10 @@ export default {
       startLoc: this.startLocation ?? "",
       midpoint: this.selectedPlan?.address ?? "",
       travelMode:
-        this.selectedPlan?.members.find(
-          (member) => member.id === this.currentUser.userId
-        ).Trips[0].transportationMethod === ""
+        this.selectedPlan.owner.Trips[0].transportationMethod === ""
           ? "DRIVE"
-          : this.selectedPlan?.members.find(
-              (member) => member.id === this.currentUser.userId
-            ).Trips[0].transportationMethod,
-      radius: this.selectedPlan?.members.find(
-        (member) => member.id === this.currentUser.userId
-      ).Trips[0].radius,
+          : this.selectedPlan.owner.Trips[0].transportationMethod,
+      radius: this.selectedPlan.owner.Trips[0].radius,
       allLocationsVerified: this.selectedPlan.members.every(
         (member) => member.Trips[0].startLocation !== ""
       ),
@@ -123,6 +118,7 @@ export default {
     selectedPlan: Object,
     currentUser: Object,
   },
+  emits: ['addLocation', 'generateMidpoint'],
   mounted() {
     this.initPlacePicker("place-picker");
     this.initPlacePicker("place-picker-midpoint");
@@ -363,4 +359,5 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 </style>
