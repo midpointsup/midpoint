@@ -5,13 +5,11 @@ export const useNotificationStore = defineStore("notifications", {
     notifications: [],
   }),
   actions: {
-    add(message, className = "alert-primary", persist = false) {
+    add(message, className = "alert-primary") {
       this.notifications.push({ message, className });
-      if (!persist) {
-        setTimeout(() => {
-          this.notifications.shift();
-        }, 3000);
-      }
+      setTimeout(() => {
+        this.notifications.shift();
+      }, 3000);
     },
     remove(index) {
       const offset = Math.max(this.notifications.length - 10, 0);

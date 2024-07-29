@@ -171,13 +171,6 @@ planRouter.get("/:id", isAuthenticated, async (req, res) => {
     if (!plan.members.some((member) => member.id === plan.owner.id)) {
       plan.members.push(plan.owner);
     }
-    plan.members.forEach((member, memberIndex) => {
-      if (member.Trips) {
-        plan.members[memberIndex].Trips = member.Trips.filter(
-          (trip) => trip.PlanId === plan.id
-        );
-      }
-    });
     return res.json(plan);
   } catch {
     return res.status(500).json({ error: "Failed to fetch plan" });
