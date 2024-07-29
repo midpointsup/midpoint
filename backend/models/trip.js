@@ -23,6 +23,10 @@ export const Trip = sequelize.define("Trip", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  waypoints: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+  },
 });
 
 Trip.belongsTo(User);

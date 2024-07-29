@@ -1,11 +1,11 @@
 <template>
   <div class="members-list">
     <h6>
-      Members <span>({{ members.length }} members)</span>
+      Members <span>({{ membersList.length }} members)</span>
     </h6>
     <ul class="members">
       <li
-        v-for="member in members"
+        v-for="member in membersList"
         :key="member"
         :class="{ loading: !member.Trips[0].startLocation }"
       >
@@ -31,7 +31,14 @@
 </template>
 
 <script>
+import io from "socket.io-client";
 export default {
+  data() {
+    return {
+      socket: null,
+      membersList: [],
+    };
+  },
   props: {
     members: {
       type: Array,
@@ -40,6 +47,39 @@ export default {
     you: {
       type: Object,
       default: () => ({}),
+    },
+    selectedPlan: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  mounted() {
+    this.membersList = this.members;
+    this.socket = io("https://api.midpoint.live");
+
+    this.socket.on("connect", () => {
+      this.socket.emit("join-room", "room" + this.selectedPlan.id);
+    });
+
+    this.socket.on("trip", (data) => {
+      this.membersList = this.membersList.map((member) => {
+        if (member.id === data.UserId) {
+          if (member.Trips && member.Trips.length > 0) {
+            member.Trips[0] = data;
+          }
+        }
+        return member;
+      });
+    });
+  },
+  beforeUnmount() {
+    this.disconnectSocket();
+  },
+  methods: {
+    disconnectSocket() {
+      if (this.socket) {
+        this.socket.disconnect();
+      }
     },
   },
 };
