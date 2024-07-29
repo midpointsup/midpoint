@@ -26,7 +26,11 @@
     @goBack="selectedPlan = null"
   >
     <MiddleForm
-      :startLocation="selectedPlan.owner.Trips[0].startLocation"
+      :startLocation="
+        selectedPlan.members.find(
+          (member) => member.id === currentUser.userId
+        ).Trips[0].startLocation
+      "
       :selectedPlan="selectedPlan"
       :currentUser="currentUser"
       @add-location="updateCurrentLocation"
@@ -68,6 +72,9 @@
           plan.date && plan.date.slice(0, 10)
         }}</span>
       </li>
+      <li v-if="myPlans.length === 0">
+        <p class="form-text">No plans yet. Add a plan to get started!</p>
+      </li>
     </ul>
     <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
   </SidebarComponent>
@@ -96,9 +103,9 @@ export default {
   },
   data() {
     return {
-      isSidebarOpen: true,
-      pages: ["Explore", "My Plans", "Add Plan"],
-      currentPage: "My Plans",
+      isSidebarOpen: false,
+      pages: ["My Plans", "Add Plan"],
+      currentPage: "",
       myPlans: [],
       presetPlans: [],
       currentPlan: null,
@@ -170,6 +177,7 @@ export default {
           date: this.selectedPlan.date,
         })
         .then((res) => {});
+
       this.selectedPlan.address = midpoint;
     },
     updateCurrentLocation(location) {
@@ -220,12 +228,12 @@ export default {
     });
 
     this.socket.on("planDelete", (planId) => {
-      this.getMyPlans();
       this.notifyWarning("A plan you were part of has been deleted.");
       if (this.currentPlan && this.currentPlan.id === planId) {
         this.currentPlan = null;
         this.selectedPlan = null;
       }
+      this.getMyPlans();
     });
 
     if (this.currentUser.userId) {

@@ -54,7 +54,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.members);
     this.membersList = this.members;
     this.socket = io("http://localhost:3000");
 
