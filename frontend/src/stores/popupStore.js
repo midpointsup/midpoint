@@ -15,16 +15,6 @@ export const usePopupStore = defineStore("popup", {
         key: "invite",
         bounding: null,
       },
-      {
-        component: markRaw(InviteForm),
-        show: false,
-        pos: {
-          x: 200,
-          y: 400,
-        },
-        key: "aaaaaaa",
-        bounding: null,
-      },
     ],
   }),
   actions: {

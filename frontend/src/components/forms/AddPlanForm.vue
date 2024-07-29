@@ -5,7 +5,7 @@
     novalidate
     ref="form"
   >
-    <span class="form-text">
+    <span class="form-text" v-if="!template">
       Create a plan and invite your friends to meet up!
     </span>
 
@@ -22,6 +22,8 @@
       />
       <div class="invalid-feedback">Plan name required</div>
     </div>
+
+    <slot v-if="template"></slot>
 
     <div>
       <label for="userSearch" class="form-label">Add members</label>
@@ -76,7 +78,7 @@
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" v-if="!template">
       <label class="form-label" data-tooltip="You can change this later"
         >Select a category *</label
       >
@@ -161,6 +163,14 @@ export default {
   },
   props: {
     currentUser: Object,
+    template: {
+      type: Boolean,
+      default: false,
+    },
+    templateName: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -206,49 +216,64 @@ export default {
       this.resetValidity();
       this.setValidity(form.userSearch, this.membersList.length > 0);
       this.setValidity(form.planName, this.planName.trim().length > 0);
-      this.setValidity(this.$refs.selectCategory, this.planCategory !== null);
+      if (!this.template) {
+        this.setValidity(this.$refs.selectCategory, this.planCategory !== null);
+      }
       this.datePickerState = this.date !== null;
-
+      const resetAll = () => {
+        this.resetValidity();
+        this.notifySuccess("Plan created successfully");
+        this.searchUsername = "";
+        this.membersList = [];
+        this.planName = "";
+        this.planCategory = null;
+        this.date = new Date();
+        this.planColour = "#4dc48a";
+      };
       if (
         this.membersList.length > 0 &&
         this.planName.trim().length > 0 &&
-        this.planCategory &&
+        (this.template || this.planCategory) &&
         this.datePickerState
       ) {
-        planService
-          .createPlan(
-            this.planName.trim(),
-            this.membersList,
-            this.planCategory,
-            this.date,
-            this.planColour
-          )
-          .then((res) => {
-            if (res.error) {
-              this.notifyError(res.error);
-            } else {
-              this.resetValidity();
-              this.notifySuccess("Plan created successfully");
-              this.searchUsername = "";
-              this.membersList = [];
-              this.planName = "";
-              this.planCategory = null;
-              this.date = new Date();
-              this.planColour = "#4dc48a";
-
-              if (this.emailNotify) {
-                res.members.forEach((member) => {
-                  if (member.id !== this.currentUser.userId) {
-                    emailService.sendEmail(member).then((res) => {
-                      if (res.error) {
-                        this.notifyError(res.error);
-                      }
-                    });
-                  }
-                });
-              }
-            }
+        if (this.template) {
+          this.$emit("createPlan", {
+            planName: this.planName.trim(),
+            membersList: this.membersList,
+            date: this.date,
+            planColour: this.planColour,
+            onSuccess: resetAll,
           });
+        } else {
+          planService
+            .createPlan(
+              this.planName.trim(),
+              this.membersList,
+              this.planCategory,
+              this.date,
+              this.planColour,
+              [this.planCategory]
+            )
+            .then((res) => {
+              if (res.error) {
+                this.notifyError(res.error);
+              } else {
+                resetAll();
+                if (this.emailNotify) {
+                  console.log("TODO: Send email notifications to members");
+                  // res.members.forEach((memberId) => {
+                  //   emailService.sendEmail(memberId).then((res) => {
+                  //     if (res.error) {
+                  //       this.notifyError(res.error);
+                  //     } else {
+                  //       this.notifySuccess("Email sent to " + member);
+                  //     }
+                  //   });
+                  // });
+                }
+              }
+            });
+        }
       }
     },
     setValidity(elem, isValid) {
@@ -258,7 +283,9 @@ export default {
       const form = this.$refs.form;
       form.userSearch.classList.remove("is-invalid", "is-valid");
       form.planName.classList.remove("is-invalid", "is-valid");
-      this.$refs.selectCategory.classList.remove("is-invalid", "is-valid");
+      if (!this.template) {
+        this.$refs.selectCategory.classList.remove("is-invalid", "is-valid");
+      }
       this.datePickerState = null;
     },
     addMember(username) {
@@ -294,6 +321,11 @@ export default {
     showInvite() {
       usePopupStore().show(0);
     },
+  },
+  mounted() {
+    if (this.template) {
+      this.planName = this.templateName;
+    }
   },
 };
 </script>
