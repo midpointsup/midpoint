@@ -49,17 +49,6 @@
 
 <script>
 export default {
-  /*data() {
-        return {
-            name: this.route.name,
-            startTime: this.route.startTime,
-            endTime: this.route.endTime,
-            startLocation: this.route.startLocation,
-            mode: this.route.mode,
-            duration: this.route.duration,
-            distance: this.route.distance
-        };
-    },*/
   props: {
     name: String,
     startTime: String,
@@ -73,11 +62,6 @@ export default {
     destination: String,
   },
   methods: {},
-  mounted() {
-    // this.getDirections().then (() => {
-    //  console.log("Directions rendered");
-    //})
-  },
 };
 </script>
 

@@ -336,6 +336,15 @@ export default {
               this.newPlanName = "";
               this.showInput = false;
               this.success = true;
+
+              new Promise((resolve, reject) => {
+                res.members.forEach((member) => {
+                  userService.sendEmail(member).then((res) => {});
+                });
+                resolve();
+              }).then(() => {
+                console.log("Emails sent");
+              });
             });
           });
       }

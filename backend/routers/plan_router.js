@@ -281,14 +281,6 @@ planRouter.patch("/:id/members/:memberId/trip/:tripId", async (req, res) => {
 
     const roomId = req.params.id.toString();
     console.log("Emitting trip to room", roomId);
-    //console.log("Emitting trip from socket", req.io.);
-
-    // req.io.on("connection", (socket) => {
-    //   console.log("a user connected");
-    //   console.log("socket id is:", socket.id);
-
-    //   socket.to(roomId).emit("trip", trip);
-    // })
     req.io.in("room" + roomId).emit("trip", trip);
     return res.json({ trip: trip });
   } catch {
