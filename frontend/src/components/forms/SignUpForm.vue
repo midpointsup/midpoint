@@ -34,6 +34,7 @@
       label="Password"
       :feedback="feedback.password"
       @focus="resetValidity"
+      type="password"
     />
     <TextInput
       id="reEnterPassword"
@@ -42,14 +43,15 @@
       label="Re-Enter Password"
       :feedback="feedback.reEnterPassword"
       @focus="resetValidity"
+      type="password"
     />
     <button type="submit" class="btn py-2">Create Account</button>
   </form>
 </template>
 
 <script>
-import TextInput from "@/components/TextInput.vue";
-import userService from "@/services/user-service.js";
+import TextInput from "@/components/inputs/TextInput.vue";
+import userService from "@/services/userService.js";
 import { useUserStore } from "@/stores/userStore.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 

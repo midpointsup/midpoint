@@ -31,4 +31,4 @@ export const Trip = sequelize.define("Trip", {
 });
 
 Trip.belongsTo(User);
-User.hasMany(Trip, { foreignKey: "UserId" });
+User.hasMany(Trip, { foreignKey: "UserId", onDelete: "cascade", hooks: true });

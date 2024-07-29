@@ -3,7 +3,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import HomePage from "@/views/HomePage.vue";
 import SignPage from "@/views/SignPage.vue";
 import { useUserStore } from "@/stores/userStore.js";
-import userService from "@/services/user-service.js";
+import userService from "@/services/userService.js";
 
 const routes = [
   { path: "/", component: HomePage },

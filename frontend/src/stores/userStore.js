@@ -8,7 +8,7 @@ export const useUserStore = defineStore("user", {
     setUser(user) {
       this.user = user;
     },
-    getUser(user) {
+    getUser() {
       return this.user;
     },
   },

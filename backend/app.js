@@ -5,11 +5,12 @@ import { registerIOListeners } from "./socket.js";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-import { planRouter } from "./routers/plan_router.js";
-import { routesRouter } from "./routers/routes_router.js";
-import { googleOAuthRouter } from "./routers/google_oauth_router.js";
-import { userRouter } from "./routers/user_router.js";
 import { webhookRouter } from "./routers/webhookRouter.js";
+import { userRouter } from "./routers/userRouter.js";
+import { googleOAuthRouter } from "./routers/oauthRouter.js";
+import { planRouter } from "./routers/planRouter.js";
+import { routesRouter } from "./routers/routeRouter.js";
+import { emailRouter } from "./routers/emailRouter.js";
 
 export const app = express();
 const PORT = process.env.PORT;
@@ -58,6 +59,7 @@ app.use("/api/oauth", googleOAuthRouter);
 app.use("/api/plans", planRouter);
 app.use("/api/routes", routesRouter);
 app.use("/ms/webhook", webhookRouter);
+app.use("/api/emails", emailRouter);
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body);

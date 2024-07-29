@@ -54,7 +54,7 @@
         <h6>Midpoint</h6>
         <div class="middle-form">
           <span v-if="!editMidpoint" class="display-info">{{
-            this.midpoint
+            this.midpoint ? this.midpoint : "No midpoint yet"
           }}</span>
           <gmpx-place-picker
             v-if="editMidpoint"
@@ -77,20 +77,27 @@
     </li>
   </ul>
   <slot></slot>
-  <button class="btn" :disabled="!allLocationsVerified" @click="generateMiddle">
-    Meet in the middle!
-  </button>
-  <br />
-  <button class="btn" :disabled="midpoint == ''" @click="getDirections">
-    Get Directions
-  </button>
+  <div class="middle-buttons">
+    <button
+      class="btn"
+      :disabled="!allLocationsVerified"
+      @click="generateMiddle"
+    >
+      Meet in the middle!
+    </button>
+    <br />
+    <button class="btn" :disabled="midpoint == ''" @click="getDirections">
+      Get Directions
+    </button>
+  </div>
 </template>
 
 <script>
-import routeService from "../services/route-service.js";
-import planService from "../services/plan-service.js";
+import routeService from "@/services/routeService.js";
+import planService from "@/services/planService.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import io from "socket.io-client";
+import "@googlemaps/extended-component-library/place_picker.js";
 
 export default {
   mixins: [notificationMixin],
@@ -346,6 +353,11 @@ export default {
   justify-content: center;
   gap: 10px;
   height: 100%;
+}
+
+.middle-buttons {
+  display: flex;
+  flex-direction: column;
 }
 
 .middle-info {

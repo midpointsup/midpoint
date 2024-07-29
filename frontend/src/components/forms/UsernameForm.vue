@@ -25,7 +25,6 @@
         placeholder="Username"
         label="Username"
         :feedback="feedback"
-        @focus="resetValidity"
         class="col-10 p-0"
       />
     </div>
@@ -34,8 +33,8 @@
 </template>
 
 <script>
-import TextInput from "@/components/TextInput.vue";
-import userService from "@/services/user-service.js";
+import TextInput from "@/components/inputs/TextInput.vue";
+import userService from "@/services/userService.js";
 import { useUserStore } from "@/stores/userStore.js";
 export default {
   components: {

@@ -1,400 +1,216 @@
 <template>
   <div class="menu-wrapper-outer gap-3">
     <ul class="menu-wrapper gap-3 ps-0 mb-0">
-      <h4 class="logo-header">idpoint</h4>
+      <h4 class="logo-header mb-0">idpoint</h4>
       <hr />
-      <!-- <li class="nav-btn explore-btn" @click="showPlans" data-content="Explore"></li> -->
       <li
-        class="nav-btn plans-btn"
-        @click="showPlans"
-        data-content="Your Plans"
-      ></li>
-      <li
-        class="nav-btn add-btn"
-        @click="showCreatePlan"
-        data-content="Add Plan"
+        v-for="page in pages"
+        :key="page"
+        :class="'nav-btn ' + getPageClasses(page)"
+        @click="openSidebar"
+        :data-content="page"
       ></li>
     </ul>
     <div class="dropdown">
       <a
         href="#"
-        class="d-flex align-items-center link-dark text-decoration-none"
+        class="d-flex align-items-center link-dark text-decoration-none rounded-circle"
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
         <img
-          v-if="currentUser.picture"
+          v-if="currentUser?.picture"
           :src="currentUser.picture"
           class="pfp"
         />
         <img v-else src="@/assets/static/user.png" alt="" class="pfp" />
       </a>
-      <ul class="dropdown-menu text-small shadow">
-        <li>
-          <button class="dropdown-item" @click="signout">Sign out</button>
-        </li>
-      </ul>
+      <div class="dropdown-menu text-small shadow">
+        <button class="dropdown-item" @click="signout">Sign out</button>
+      </div>
     </div>
   </div>
 
-  <div v-if="isSidebarOpen" id="menu">
-    <div
-      class="d-flex flex-column flex-shrink-0 p-3 bg-light"
-      id="menuContainer"
+  <SidebarComponent
+    v-if="selectedPlan && isSidebarOpen && currentPage === 'My Plans'"
+    class="nav nav-pills flex-column mb-auto"
+    :currentPage="selectedPlan.name"
+    :canGoBack="true"
+    @goBack="selectedPlan = null"
+  >
+    <MiddleForm
+      :startLocation="
+        selectedPlan.members.find((member) => member.id === currentUser.userId)
+          .Trips[0].startLocation
+      "
+      :selectedPlan="selectedPlan"
+      :currentUser="currentUser"
+      @add-location="updateCurrentLocation"
+      @generate-midpoint="updateMiddle"
     >
-      <a
-        href="/"
-        class="title d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none"
+      <MembersList
+        :members="selectedPlan.members"
+        :selectedPlan="selectedPlan"
+        :you="currentUser"
+      ></MembersList>
+    </MiddleForm>
+    <RouteDisplayTabs
+      v-if="selectedPlan.address"
+      :planId="selectedPlan.id"
+      :destination="selectedPlan.address"
+      @update:destination="updateTabProp"
+    ></RouteDisplayTabs>
+    <button
+      v-if="selectedPlan.ownerId === currentUser.userId"
+      @click="confirmDelete(selectedPlan.id)"
+      class="btn btn-danger mt-3"
+    >
+      Delete Plan
+    </button>
+  </SidebarComponent>
+  <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
+    <ul
+      v-if="currentPage === 'My Plans'"
+      class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
+    >
+      <li
+        v-for="plan in myPlans"
+        :key="'plan' + plan.id"
+        :ref="'plan' + plan.id"
+        class="planContainer"
+        :style="{ 'border-color': plan.colour }"
+        @click="selectPlan(plan)"
       >
-        <span class="fs-4">Midpoint</span>
-      </a>
-      <hr />
-      <div v-if="plansPage" class="nav nav-pills flex-column mb-auto">
-        <div v-if="selectedPlan" class="nav nav-pills flex-column mb-auto">
-          <h4>{{ selectedPlan.name }}</h4>
-          <MiddleForm
-            :startLocation="
-              selectedPlan.members.find(
-                (member) => member.id === currentUser.userId
-              ).Trips[0].startLocation
-            "
-            :selectedPlan="selectedPlan"
-            :currentUser="currentUser"
-            @add-location="updateCurrentLocation"
-            @generate-midpoint="updateMiddle"
-          >
-            <MembersList
-              :members="selectedPlan.members"
-              :selectedPlan="selectedPlan"
-              :you="currentUser"
-            ></MembersList>
-          </MiddleForm>
-          <RouteDisplayTabs
-            v-if="selectedPlan.address"
-            :planId="selectedPlan.id"
-            :destination="selectedPlan.address"
-            @update:destination="updateTabProp"
-          ></RouteDisplayTabs>
-          <button @click="clearSelection" class="btn mt-3">Back</button>
-          <button
-            v-if="selectedPlan.ownerId === currentUser.userId"
-            @click="confirmDelete(selectedPlan.id)"
-            class="btn btn-danger mt-3"
-          >
-            Delete Plan
-          </button>
-        </div>
-        <div v-else>
-          <h6>My Plans</h6>
-          <ul class="nav nav-pills flex-column mb-auto">
-            <li
-              v-for="plan in plans"
-              :key="plan"
-              class="planContainer"
-              @click="selectPlan(plan)"
-            >
-              <a href="#" class="nav-link link-dark" :id="plan.id">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  class="bi bi-people-fill icon"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"
-                  />
-                </svg>
-                {{ plan.name }}
-                <hr />
-                <p>{{ plan.address ? plan.address : "TBD" }}</p>
-                <span class="badge">{{
-                  plan.date && plan.date.slice(0, 10)
-                }}</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div v-else-if="createPlan" class="nav nav-pills flex-column mb-auto">
-        <h6>Create a Plan</h6>
-        Plan Name
-        <input
-          class="form-control"
-          type="text"
-          v-model="newPlanName"
-          placeholder="Enter plan name"
-          autofocus
-        />
-
-        <br />
-        Invite Members
-        <input
-          class="form-control"
-          type="text"
-          v-model="newMemberName"
-          @keyup.enter="addMember"
-          placeholder="Add member"
-        />
-
-        <div class="mt-3">
-          <span
-            class="badge badge-pill"
-            v-for="(member, index) in membersList"
-            :key="index"
-          >
-            {{ member }}
-            <button @click="removeMember(index)" class="btn btn-sm">x</button>
-          </span>
-        </div>
-
-        <br />
-        Select Category
-        <div id="categoryContainer">
+        <h6 class="mt-2">{{ plan.name }}</h6>
+        <hr class="mt-1" />
+        <span>{{ plan.address ? plan.address : "TBD" }}</span>
+        <div class="d-flex my-2">
           <div
-            v-for="category in categories"
-            :key="category.id"
-            :data-key="category.name"
-            class="category-icon"
-            @click="toggleCategorySelection(category.name)"
+            v-for="member in [...plan.members, plan.owner]
+              .filter((member) => member.id !== currentUser.userId)
+              .splice(0, 4)"
           >
-            <span>{{ category.name }}</span>
+            <img
+              v-if="member.picture"
+              :src="member.picture"
+              class="rounded-circle pfp-small"
+            />
+            <img
+              v-else
+              src="@/assets/static/user.png"
+              class="rounded-circle pfp-small"
+            />
+          </div>
+          <div
+            v-if="plan.members.length > 4"
+            class="rounded-circle pfp-count text-truncate"
+            :style="{ 'background-color': plan.colour }"
+          >
+            {{ `+${plan.memberCount - 4}` }}
           </div>
         </div>
-
-        <br />
-        Date
-        <input
-          id="date"
-          class="form-control"
-          type="text"
-          placeholder="Enter date"
-          autofocus
-        />
-        <button @click="addPlan" class="btn mt-3">Create</button>
-
-        <span v-if="success" class="alert alert-success" role="alert">
-          Plan created successfully!
-        </span>
-      </div>
-    </div>
-  </div>
+        <span class="badge">{{ plan.date && plan.date.slice(0, 10) }}</span>
+      </li>
+      <li v-if="myPlans.length === 0">
+        <p class="form-text">No plans yet. Add a plan to get started!</p>
+      </li>
+    </ul>
+    <AddPlanForm
+      v-else-if="currentPage === 'Add Plan'"
+      :currentUser="currentUser"
+    />
+  </SidebarComponent>
 </template>
 
 <script>
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
-import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
-import MiddleForm from "@/components/MiddleForm.vue";
-import MembersList from "@/components/MembersList.vue";
-import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
-import userService from "@/services/user-service.js";
-import planService from "@/services/plan-service.js";
 import { useUserStore } from "@/stores/userStore.js";
+import userService from "@/services/userService.js";
+import planService from "@/services/planService.js";
+import SidebarComponent from "@/components/SidebarComponent.vue";
+import AddPlanForm from "@/components/forms/AddPlanForm.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import io from "socket.io-client";
+import MiddleForm from "@/components/forms/MiddleForm.vue";
+import MembersList from "@/components/MembersList.vue";
+import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
+
 export default {
   mixins: [notificationMixin],
   components: {
+    SidebarComponent,
+    AddPlanForm,
     MiddleForm,
     MembersList,
     RouteDisplayTabs,
   },
   data() {
     return {
-      placePicker: null,
-      infowindowContent: null,
-      infowindow: null,
-      showInput: false,
-      date: "",
-      place: "",
-      newPlanName: "",
-      plans: [],
-      success: false,
-      selectedPlan: null,
-      newMemberName: "",
-      membersList: [],
-      categories: [
-        { id: 1, name: "Restaurants", icon: "" },
-        { id: 2, name: "Bathrooms", icon: "" },
-        { id: 3, name: "Cafe", icon: "" },
-        { id: 4, name: "Grocery", icon: "" },
-        { id: 5, name: "Schools", icon: "" },
-      ],
-      selectedCategory: "",
       isSidebarOpen: false,
-      plansPage: true,
-      createPlan: false,
+      pages: ["My Plans", "Add Plan"],
+      currentPage: "",
+      myPlans: [],
+      presetPlans: [],
+      currentPlan: null,
+      selectedPlan: null,
       socket: null,
     };
   },
-  mounted() {
-    this.socket = io("http://localhost:3000");
-
-    this.socket.on("connect", () => {
-      this.socket.emit("join-user", "user" + this.currentUser.userId);
-    });
-
-    this.socket.on("planCreate", (plans) => {
-      this.getPlans(this.currentUser.userId);
-      this.notifySuccess("You have been added to a new plan!");
-    });
-
-    this.socket.on("planDelete", (planId) => {
-      this.getPlans(this.currentUser.userId);
-      this.notifyWarning("A plan you were part of has been deleted.");
-      if (this.selectPlan && this.selectedPlan.id === planId) {
-        this.selectedPlan = null;
-      }
-    });
-
-    userService.getMe().then((res) => {
-      if (!res.error) {
-        this.getPlans(res.userId);
-      }
-    });
-  },
-  beforeUnmount() {
-    this.disconnectSocket();
-  },
   methods: {
+    openSidebar(event) {
+      const content = event.target.dataset.content;
+      if (this.isSidebarOpen && this.currentPage === content) {
+        this.isSidebarOpen = false;
+        this.currentPage = "";
+      } else {
+        this.isSidebarOpen = true;
+        this.currentPage = content;
+      }
+      if (content === "My Plans") {
+        this.getMyPlans();
+      }
+    },
+    getPageClasses(name) {
+      const selected =
+        this.isSidebarOpen && this.currentPage === name ? "selected" : "";
+      switch (name) {
+        case "Explore":
+          return selected + " explore-btn";
+        case "My Plans":
+          return selected + " plans-btn";
+        case "Add Plan":
+          return selected + " add-btn";
+        default:
+          return selected;
+      }
+    },
+    signout() {
+      userService.storeToken(null);
+      useUserStore().setUser(null);
+      this.$router.push("/signup");
+    },
+    selectPlan(plan) {
+      if (this.currentPlan) {
+        this.$refs[`plan${this.currentPlan.id}`][0].classList.remove("active");
+      }
+      planService.getPlan(+plan.id).then((res) => {
+        if (!res.error) {
+          this.selectedPlan = res;
+        }
+      });
+      this.currentPlan = plan;
+      this.$refs[`plan${plan.id}`][0].classList.add("active");
+    },
+    getMyPlans() {
+      planService.getPlans().then((res) => {
+        this.myPlans = !res.error ? res : null;
+      });
+    },
     disconnectSocket() {
       if (this.socket) {
         this.socket.disconnect();
       }
     },
-    updateTabProp(newVal) {
-      this.selectedPlan.address = newVal;
-    },
-    getPlans(userId) {
-      planService.getPlansForMember(userId).then((res) => {
-        if (!res.error) {
-          this.plans = res;
-        }
-      });
-    },
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-    },
-    showPlans() {
-      if (!this.isSidebarOpen) {
-        this.isSidebarOpen = true;
-      }
-      this.plansPage = true;
-      this.createPlan = false;
-    },
-    showCreatePlan() {
-      if (!this.isSidebarOpen) {
-        this.isSidebarOpen = true;
-      }
-
-      this.createPlan = true;
-      this.plansPage = false;
-    },
-    clearSelection() {
-      this.selectedPlan = null;
-    },
-    selectPlan(plan) {
-      this.selectedPlan = plan;
-    },
-    showInputField() {
-      this.showInput = true;
-    },
-    toggleCategorySelection(categoryName) {
-      if (this.selectedCategory === categoryName) {
-        document
-          .querySelector(`[data-key='${categoryName}']`)
-          .classList.remove("selected");
-      } else {
-        document
-          .querySelector(`[data-key='${categoryName}']`)
-          .classList.add("selected");
-      }
-      this.selectedCategory = categoryName;
-
-      //unselect all other categories
-      this.categories
-        .filter((category) => category.name !== categoryName)
-        .forEach((category) => {
-          document
-            .querySelector(`[data-key='${category.name}']`)
-            .classList.remove("selected");
-        });
-    },
-    addMember() {
-      if (this.newMemberName.trim() !== "") {
-        this.membersList.push(this.newMemberName);
-        this.newMemberName = "";
-      }
-    },
-    removeMember(index) {
-      this.membersList.splice(index, 1);
-    },
-    async addPlan() {
-      if (this.newPlanName.trim()) {
-        this.placePicker = document.querySelector("#place-picker");
-        if (this.placePicker) {
-          this.placePicker.addEventListener("gmpx-placechange", () => {
-            this.place = this.placePicker.value;
-          });
-        }
-
-        planService
-          .createPlan(
-            this.newPlanName.trim(),
-            this.currentUser.userId,
-            [...this.membersList, this.currentUser.username],
-            this.selectedCategory,
-            this.place.formattedAddress,
-            this.date
-          )
-          .then((res) => {
-            // create trips for all members with their ids
-            new Promise((resolve, reject) => {
-              res.members.forEach((member) => {
-                planService.createTrip(res.id, member.id, {});
-              });
-              resolve();
-            }).then(() => {
-              planService
-                .getPlansForMember(this.currentUser.userId)
-                .then((res) => {
-                  if (!res.error) {
-                    this.plans = res;
-                  }
-                });
-              this.membersList = [];
-              this.newPlanName = "";
-              this.showInput = false;
-              this.success = true;
-
-              new Promise((resolve, reject) => {
-                res.members.forEach((member) => {
-                  if (member.id !== this.currentUser.userId) {
-                    userService.sendEmail(member).then((res) => {});
-                  }
-                });
-                resolve();
-              }).then(() => {});
-            });
-          });
-      }
-    },
-    async confirmDelete(planId) {
-      if (confirm("Are you sure you want to delete this plan?")) {
-        await this.deletePlan(planId);
-      }
-    },
-    async deletePlan(planId) {
-      planService.deletePlan(planId).then((res) => {
-        if (!res.error) {
-          this.plans = this.plans.filter((plan) => plan.id !== planId);
-          this.selectedPlan = null;
-        }
-      });
-    },
-    async updateMiddle(midpoint) {
+    updateMiddle(midpoint) {
       planService
         .updatePlan(this.selectedPlan.id, {
           address: midpoint,
@@ -404,10 +220,9 @@ export default {
         })
         .then((res) => {});
 
-      //update the selected plan
       this.selectedPlan.address = midpoint;
     },
-    async updateCurrentLocation(location) {
+    updateCurrentLocation(location) {
       this.selectedPlan.members.forEach((member) => {
         if (member.id === this.currentUser.userId) {
           member.Trips[0].startLocation = location;
@@ -424,16 +239,54 @@ export default {
         }
       });
     },
-    signout() {
-      userService.storeToken(null);
-      useUserStore().setUser(null);
-      this.$router.push("/signup");
+    confirmDelete(planId) {
+      if (confirm("Are you sure you want to delete this plan?")) {
+        planService.deletePlan(planId).then((res) => {
+          if (!res.error) {
+            this.myPlans = this.myPlans.filter((plan) => plan.id !== planId);
+            this.selectedPlan = null;
+            this.currentPlan = null;
+            this.notifySuccess("Plan deleted successfully.");
+          }
+        });
+      }
+    },
+    updateTabProp(newVal) {
+      this.selectedPlan.address = newVal;
     },
   },
   computed: {
     currentUser() {
       return useUserStore().getUser();
     },
+  },
+  mounted() {
+    this.socket = io("http://localhost:3000");
+
+    this.socket.on("connect", () => {
+      this.socket.emit("join-user", "user" + this.currentUser.userId);
+    });
+
+    this.socket.on("planCreate", (plans) => {
+      this.getMyPlans();
+      this.notifySuccess("You have been added to a new plan!");
+    });
+
+    this.socket.on("planDelete", (planId) => {
+      this.notifyWarning("A plan you were part of has been deleted.");
+      if (this.currentPlan && this.currentPlan.id === planId) {
+        this.currentPlan = null;
+        this.selectedPlan = null;
+      }
+      this.getMyPlans();
+    });
+
+    if (this.currentUser.userId) {
+      this.getMyPlans();
+    }
+  },
+  beforeUnmount() {
+    this.disconnectSocket();
   },
 };
 </script>
@@ -443,12 +296,22 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 10px;
+  padding: 10px;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  z-index: 100;
+  background-color: var(--color-background);
+  width: 100%;
+  height: var(--menu-height);
 
   @media (min-width: 577px) {
+    position: relative;
     flex-direction: column;
     justify-content: space-between;
     height: 100vh;
+    width: max-content;
+    padding: 20px;
   }
 }
 
@@ -462,8 +325,20 @@ export default {
   }
 }
 
-.nav-btn,
 .pfp {
+  object-fit: contain;
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+  object-position: center;
+  margin-right: 1rem;
+
+  @media (min-width: 577px) {
+    margin-right: 2px;
+  }
+}
+
+.nav-btn {
   height: 32px;
   border-radius: var(--bs-border-radius);
   background-color: var(--color-background);
@@ -476,12 +351,8 @@ export default {
 
   &:hover,
   &:active,
-  .selected {
-    filter: brightness(0.9);
-  }
-
   &.selected {
-    box-shadow: 0 0 0 0.2em rgba(0, 123, 255, 0.6);
+    filter: brightness(0.9);
   }
 
   &::after {
@@ -500,14 +371,6 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   background-size: 26px;
-}
-
-.pfp {
-  object-fit: contain;
-  height: 32px;
-  width: 32px;
-  object-position: center;
-  cursor: pointer;
 }
 
 .explore-btn::before {
@@ -547,88 +410,61 @@ export default {
   .nav-btn::after {
     content: attr(data-content);
   }
+
   .nav-btn::before {
     background-size: 20px;
   }
+
   .logo-header {
     display: inline-block;
   }
-}
 
-.side-bar-icon {
-  margin-top: 18px;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.title {
-  width: 100%;
-}
-
-.column-display {
-  display: flex;
-  flex-direction: column;
-  float: top;
-  height: 100%;
-  align-items: center;
-  padding: 5px 5px 15px 5px;
-
-  .nav li {
-    font-size: 0.75rem;
+  .pfp {
+    width: 40px;
+    height: 40px;
   }
 }
 
-.category-icon {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin: 5px;
-  padding: 5px;
-}
-
-.category-icon.selected {
-  background-color: var(--secondary);
-}
-
-#categoryContainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  display: grid;
-  grid-template-columns: auto auto auto;
+.plansWrapper {
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 80px;
 }
 
 .planContainer {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid black;
-  border-radius: 10px;
-  margin-bottom: 15px;
+  list-style-type: none;
+  background-color: var(--color-background);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid;
+  cursor: pointer;
 
-  a {
-    /*!!! change this? add an id? */
-    padding-top: 15px;
+  &:hover {
+    background-color: var(--color-background-secondary);
+  }
+
+  &.active {
+    background-color: var(--secondary);
+  }
+
+  &:active {
+    transform: translateY(3px);
   }
 }
 
-#menuContainer {
-  width: 280px;
-  height: 100%;
-  overflow-y: auto;
+.pfp-small {
+  width: 25px;
+  margin-right: -5px;
 }
 
-.dropdown {
-  float: bottom;
-}
-
-.icon {
-  margin-right: 10px;
-}
-
-.badge {
-  background-color: var(--primary);
+.pfp-count {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 </style>
