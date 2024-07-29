@@ -55,9 +55,10 @@
       ></MembersList>
     </MiddleForm>
     <RouteDisplayTabs
-      v-if="selectedPlan.address"
-      :planId="selectedPlan.id"
-      :destination="selectedPlan.address"
+    v-if="selectedPlan.address"
+            :planId="selectedPlan.id"
+            :destination="selectedPlan.address"
+            @update:destination="updateTabProp"
     ></RouteDisplayTabs>
     <button
       v-if="selectedPlan.ownerId === currentUser.userId"
@@ -197,7 +198,6 @@ export default {
         }
       });
       this.currentPlan = plan;
-      console.log(this.currentPlan);
       this.$refs[`plan${plan.id}`][0].classList.add("active");
     },
     getMyPlans() {
@@ -250,6 +250,9 @@ export default {
           }
         });
       }
+    },
+    updateTabProp(newVal) {
+      this.selectedPlan.address = newVal;
     },
   },
   computed: {

@@ -18,29 +18,13 @@
     <div class="row">
       <div class="col-2"></div>
       <div class="col-10">
-        <div class="card-content">{{ startTime }} - {{ endTime }}</div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-2"></div>
-      <div class="col-10">
-        <div class="card-content">Stating at {{ startLocation }}</div>
+        <div class="card-content">{{ startLocation }}</div>
       </div>
     </div>
     <div class="row">
       <div class="col-4">
         <span class="badge">
           {{ mode }}
-        </span>
-      </div>
-      <div class="col-4">
-        <span class="badge">
-          {{ duration }}
-        </span>
-      </div>
-      <div class="col-4">
-        <span class="badge">
-          {{ distance }}
         </span>
       </div>
     </div>
@@ -52,11 +36,8 @@ export default {
   props: {
     name: String,
     startTime: String,
-    endTime: String,
     startLocation: String,
     mode: String,
-    duration: String,
-    distance: String,
     color: String,
     picture: String,
     destination: String,
