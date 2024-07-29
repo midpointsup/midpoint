@@ -38,7 +38,11 @@
         :you="currentUser"
       ></MembersList>
     </MiddleForm>
-    <button @click="clearSelection" class="btn mt-3">Back</button>
+    <RouteDisplayTabs
+      v-if="selectedPlan.address"
+      :planId="selectedPlan.id"
+      :destination="selectedPlan.address"
+    ></RouteDisplayTabs>
     <button
       v-if="selectedPlan.ownerId === currentUser.userId"
       @click="confirmDelete(selectedPlan.id)"
@@ -54,7 +58,7 @@
         <hr class="mt-1"/>
         <span>{{ plan.address ? plan.address : "TBD" }}</span>
         <div class="d-flex my-2">
-          <div v-for="member in plan.members.splice(0,4)">
+          <div v-for="member in [...plan.members, plan.owner].filter((member) => member.id !== currentUser.userId).splice(0,4)">
             <img v-if="member.picture" :src="member.picture" class="rounded-circle pfp-small"/>
             <img v-else src="@/assets/static/user.png" class="rounded-circle pfp-small"/>
           </div>
@@ -185,6 +189,18 @@ export default {
         }
       });
     },
+    confirmDelete(planId) {
+      if (confirm("Are you sure you want to delete this plan?")) {
+        planService.deletePlan(planId).then((res) => {
+          if (!res.error) {
+            this.myPlans = this.myPlans.filter((plan) => plan.id !== planId);
+            this.selectedPlan = null;
+            this.currentPlan = null;
+            this.notifySuccess("Plan deleted successfully.");
+          }
+        });
+      }
+    },
   },
   computed: {
     currentUser() {
@@ -201,6 +217,15 @@ export default {
     this.socket.on("planCreate", (plans) => {
       this.getMyPlans();
       this.notifySuccess("You have been added to a new plan!");
+    });
+
+    this.socket.on("planDelete", (planId) => {
+      this.getMyPlans();
+      this.notifyWarning("A plan you were part of has been deleted.");
+      if (this.currentPlan && this.currentPlan.id === planId) {
+        this.currentPlan = null;
+        this.selectedPlan = null;
+      }
     });
 
     if (this.currentUser.userId) {

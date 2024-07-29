@@ -161,6 +161,16 @@ planRouter.get("/:id", async (req, res) => {
         },
       ],
     });
+    if (!plan.members.some((member) => member.id === plan.owner.id)) {
+      plan.members.push(plan.owner);
+    }
+    plan.members.forEach((member, memberIndex) => {
+      if (member.Trips) {
+        plan.members[memberIndex].Trips = member.Trips.filter(
+          (trip) => trip.PlanId === plan.id
+        );
+      }
+    });
     return res.json(plan);
   } catch {
     return res.status(500).json({ error: "Failed to fetch plan" });
@@ -170,6 +180,18 @@ planRouter.get("/:id", async (req, res) => {
 planRouter.delete("/:id", async (req, res) => {
   try {
     const plan = await Plan.findOne({
+      include: [
+        {
+          model: User,
+          as: "members",
+          attributes: ["id"],
+          include: [
+            {
+              model: Trip,
+            },
+          ],
+        },
+      ],
       where: {
         id: req.params.id,
       },
@@ -185,7 +207,13 @@ planRouter.delete("/:id", async (req, res) => {
     //     .status(403)
     //     .json({ error: "Not authorized to delete this plan" });
     // }
+
+    plan.members.forEach((member) => {
+      req.io.in("user" + member.id).emit("planDelete", plan.id);
+    });
+
     await plan.destroy();
+
     return res.json({ message: "Plan deleted" });
   } catch {
     return res.status(500).json({ error: "Failed to delete plan" });
