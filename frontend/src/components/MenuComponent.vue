@@ -169,6 +169,9 @@ export default {
       if (content === "My Plans") {
         this.getMyPlans();
       }
+      if (!this.openSidebar) {
+        usePlanStore().setPlan(null);
+      }
     },
     getPageClasses(name) {
       const selected =
