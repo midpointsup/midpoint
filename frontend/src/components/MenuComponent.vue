@@ -70,8 +70,10 @@
             ></MembersList>
           </MiddleForm>
           <RouteDisplayTabs
+            v-if="selectedPlan.address"
             :planId="selectedPlan.id"
             :destination="selectedPlan.address"
+            @update:destination="updateTabProp"
           ></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
           <button
@@ -249,8 +251,6 @@ export default {
 
     userService.getMe().then((res) => {
       if (!res.error) {
-        console.log("Profile Picture:", res);
-
         this.getPlans(res.userId);
       }
     });
@@ -264,10 +264,12 @@ export default {
         this.socket.disconnect();
       }
     },
+    updateTabProp(newVal) {
+      this.selectedPlan.address = newVal;
+    },
     getPlans(userId) {
       planService.getPlansForMember(userId).then((res) => {
         if (!res.error) {
-          console.log("Plans:", res);
           this.plans = res;
         }
       });
@@ -430,7 +432,6 @@ export default {
   },
   computed: {
     currentUser() {
-      console.log(useUserStore().getUser());
       return useUserStore().getUser();
     },
   },
