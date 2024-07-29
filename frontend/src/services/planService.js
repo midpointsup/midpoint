@@ -2,7 +2,7 @@ const planService = (function () {
   "use strict";
 
   const module = {};
-  const baseUrl = "https://api.midpoint.live";
+  const baseUrl = "https://api.midpoint.live/api/plans";
 
   module.getPlans = function () {
     return fetch(`${baseUrl}/`, {

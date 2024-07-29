@@ -2,7 +2,7 @@ let emailService = (function () {
   "use strict";
 
   const module = {};
-  const baseUrl = "http://localhost:3000/api/emails";
+  const baseUrl = "https://api.midpoint.live/api/emails";
 
   module.sendEmail = async function (userId) {
     return fetch(`${baseUrl}/`, {

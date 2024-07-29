@@ -149,11 +149,11 @@
 </template>
 
 <script>
-import groupRouteCard from "@/components/groupRouteCard.vue";
+import groupRouteCard from "@/components/GroupRouteCard.vue";
 import planService from "@/services/planService.js";
 import io from "socket.io-client";
 import { useUserStore } from "@/stores/userStore.js";
-import RouteCard from "@/components/routeCard.vue";
+import RouteCard from "@/components/RouteCard.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 
 export default {

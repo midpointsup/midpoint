@@ -244,6 +244,13 @@ export default {
                         this.notifyError(res.error);
                       }
                     });
+                  } else {
+                    this.socket.on("emailSent", (data) => {
+                      this.notifySuccess("Email sent to " + data);
+                    });
+                    this.socket.on("emailOpened", (data) => {
+                      this.notifySuccess(data + " opened the email!");
+                    });
                   }
                 });
               }
