@@ -47,6 +47,7 @@ import planService from '@/services/planService.js';
 import SidebarComponent from "@/components/SidebarComponent.vue";
 import AddPlanForm from "@/components/forms/AddPlanForm.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
+import io from "socket.io-client";
 
 export default {
   mixins: [notificationMixin],
@@ -62,6 +63,7 @@ export default {
       myPlans: [],
       presetPlans: [],
       currentPlan: null,
+      socket: null,
     };
   },
   methods: {
@@ -97,7 +99,6 @@ export default {
       this.$router.push("/signup");
     },
     selectPlan(plan) {
-      console.log(this.currentPlan);
       if (this.currentPlan) {
         this.$refs[`plan${this.currentPlan.id}`][0].classList.remove("active");
       }
@@ -111,21 +112,38 @@ export default {
         }
       });
     },
+    disconnectSocket() {
+      if (this.socket) {
+        this.socket.disconnect();
+      }
+    },
   },
   computed: {
     currentUser() {
-      console.log(useUserStore().getUser());
       return useUserStore().getUser();
     },
     plans() {
-      console.log(this.myPlans);
       return this.currentPage === "My Plans" ? this.myPlans : this.presetPlans;
     },
   },
   mounted() {
+    this.socket = io("http://localhost:3000");
+
+    this.socket.on("connect", () => {
+      this.socket.emit("join-user", "user" + this.currentUser.userId);
+    });
+
+    this.socket.on("planCreate", (plans) => {
+      this.getMyPlans();
+      this.notifySuccess("You have been added to a new plan!");
+    });
+
     if (this.currentUser.userId) {
       this.getMyPlans();
     }
+  },
+  beforeUnmount() {
+    this.disconnectSocket();
   },
 };
 </script>

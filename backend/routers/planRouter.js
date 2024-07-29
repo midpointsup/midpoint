@@ -35,6 +35,9 @@ planRouter.post("/", isAuthenticated, async (req, res) => {
   await plan.addMembers(membersList);
   const planResponse = plan.toJSON();
   planResponse.members = membersList;
+  membersList.forEach((member) => {
+    req.io.in("user" + member).emit("planCreate", planResponse);
+  });
   return res.json(planResponse);
 });
 
