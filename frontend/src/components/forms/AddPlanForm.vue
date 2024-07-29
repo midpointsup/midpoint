@@ -159,6 +159,9 @@ export default {
   components: {
     VueDatePicker,
   },
+  props: {
+    currentUser: Object,
+  },
   data() {
     return {
       planName: "",
@@ -234,16 +237,15 @@ export default {
               this.planColour = "#4dc48a";
 
               if (this.emailNotify) {
-                console.log("TODO: Send email notifications to members");
-                // res.members.forEach((memberId) => {
-                //   emailService.sendEmail(memberId).then((res) => {
-                //     if (res.error) {
-                //       this.notifyError(res.error);
-                //     } else {
-                //       this.notifySuccess("Email sent to " + member);
-                //     }
-                //   });
-                // });
+                res.members.forEach((member) => {
+                  if (member.id !== this.currentUser.userId) {
+                    emailService.sendEmail(member).then((res) => {
+                      if (res.error) {
+                        this.notifyError(res.error);
+                      }
+                    });
+                  }
+                });
               }
             }
           });

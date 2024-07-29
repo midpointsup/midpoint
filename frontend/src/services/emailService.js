@@ -15,6 +15,17 @@ let emailService = (function () {
     }).then((res) => res.json());
   };
 
+  module.sendInvite = async function (email) {
+    return fetch(`${baseUrl}/invite`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ email }),
+    }).then((res) => res.json());
+  };
+
   return module;
 })();
 

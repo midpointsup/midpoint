@@ -114,7 +114,10 @@
         <p class="form-text">No plans yet. Add a plan to get started!</p>
       </li>
     </ul>
-    <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
+    <AddPlanForm
+      v-else-if="currentPage === 'Add Plan'"
+      :currentUser="currentUser"
+    />
   </SidebarComponent>
 </template>
 

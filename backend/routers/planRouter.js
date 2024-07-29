@@ -200,19 +200,11 @@ planRouter.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Plan not found" });
     }
 
-    // TODO: Uncomment this code after implementing authentication
-    // if (plan.ownerId !== req.user.id) {
-    //   // User trying to delete the plan is not the owner
-    //   return res
-    //     .status(403)
-    //     .json({ error: "Not authorized to delete this plan" });
-    // }
+    await plan.destroy();
 
     plan.members.forEach((member) => {
       req.io.in("user" + member.id).emit("planDelete", plan.id);
     });
-
-    await plan.destroy();
 
     return res.json({ message: "Plan deleted" });
   } catch {

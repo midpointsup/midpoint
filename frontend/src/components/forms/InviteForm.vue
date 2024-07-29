@@ -21,8 +21,10 @@
 
 <script>
 import emailService from "@/services/emailService.js";
+import { notificationMixin } from "@/mixins/notificationMixin.js";
 
 export default {
+  mixins: [notificationMixin],
   data() {
     return {
       email: "",
@@ -30,8 +32,14 @@ export default {
   },
   methods: {
     sendInvite() {
-      console.log("TODO: send invite to", this.email);
-      // emailService.sendInvite(this.email);
+      emailService.sendInvite(this.email).then((res) => {
+        if (res.error) {
+          this.notifyError(res.message.body);
+        } else {
+          this.notifySuccess("Invite sent to", this.email);
+          this.email = "";
+        }
+      });
     },
   },
 };
