@@ -54,7 +54,7 @@
         <h6>Midpoint</h6>
         <div class="middle-form">
           <span v-if="!editMidpoint" class="display-info">{{
-            this.midpoint
+            this.midpoint ? this.midpoint : "No midpoint yet"
           }}</span>
           <gmpx-place-picker
             v-if="editMidpoint"

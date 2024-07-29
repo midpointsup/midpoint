@@ -38,8 +38,7 @@
       role="tabpanel"
       aria-labelledby="my-route-tab"
     >
-      This is my route
-      <div>
+      <div v-if="myCurrRoute">
         My Current Route
         <ul class="list-group">
           <li class="list-group-item list-item" v-if="myCurrRoute">
@@ -52,8 +51,8 @@
           </li>
         </ul>
       </div>
-      <div>
-        Suggested Routes
+      <div v-if="myCurrRoute">
+        Other Suggested Routes
         <div>
           <ul class="list-group">
             <div
