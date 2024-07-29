@@ -177,27 +177,16 @@ export default {
     RouteCard,
   },
   mounted() {
-    //const directionsService = new google.maps.DirectionsService();
     this.socket = io("http://localhost:3000");
 
     this.socket.on("connect", () => {
-      console.log("connected");
       this.socket.emit("join-room", "room" + this.planId);
-      console.log("socket id is", this.socket.id);
     });
 
     // Listen for the 'joinedRoom' event to confirm joining
-    this.socket.on("joined-room", (roomId) => {
-      console.log(`Successfully joined room ${roomId}`);
-      // Additional logic upon successfully joining the room can be added here
-    });
-
-    //this.setDirectionRenderers();
+    this.socket.on("joined-room", (roomId) => {});
 
     this.socket.on("trip", (trip) => {
-      console.log("trip event");
-      console.log(trip);
-      //this.getGroupTrips();
       if (!trip.error) {
         //update route in data local
         this.routes.forEach((route, index) => {
