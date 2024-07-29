@@ -69,6 +69,10 @@
               :you="currentUser"
             ></MembersList>
           </MiddleForm>
+          <RouteDisplayTabs
+            :planId="selectedPlan.id"
+            :destination="selectedPlan.address"
+          ></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
           <button
             v-if="selectedPlan.ownerId === currentUser.userId"
@@ -182,13 +186,16 @@ import "bootstrap";
 import "https://unpkg.com/@googlemaps/extended-component-library@0.6";
 import MiddleForm from "@/components/MiddleForm.vue";
 import MembersList from "@/components/MembersList.vue";
+import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
 import userService from "@/services/user-service.js";
 import planService from "@/services/plan-service.js";
 import { useUserStore } from "@/stores/userStore.js";
+
 export default {
   components: {
     MiddleForm,
     MembersList,
+    RouteDisplayTabs,
   },
   data() {
     return {
