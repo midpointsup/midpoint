@@ -7,7 +7,13 @@ export function registerIOListeners(io) {
       console.log("joining room", roomId);
       socket.join(roomId);
       socket.emit("joined-room", roomId);
-      console.log("socket id is:", socket.id);
+      console.log("socket id is:",socket.id)
+    });
+
+    socket.on("leave-room", function (roomId) {
+      console.log("leaving room", roomId);
+      socket.leave(roomId);
+      socket.emit("left-room", roomId);
     });
 
     socket.on("disconnect", () => {
