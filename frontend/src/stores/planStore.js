@@ -13,6 +13,6 @@ export const usePlanStore = defineStore("plan", {
     },
     updateSelectedPlan(address) {
       this.plan.address = address;
-    }
+    },
   },
 });

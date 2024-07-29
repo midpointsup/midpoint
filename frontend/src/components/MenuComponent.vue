@@ -54,7 +54,12 @@
         :you="currentUser"
       ></MembersList>
     </MiddleForm>
-    <a v-if="selectedPlan?.address" @click="togglePopup" class="btn btn-primary w-100 mt-3">Toggle Routes</a>
+    <a
+      v-if="selectedPlan?.address"
+      @click="togglePopup"
+      class="btn btn-primary w-100 mt-3"
+      >Toggle Routes</a
+    >
     <button
       v-if="selectedPlan.ownerId === currentUser.userId"
       @click="confirmDelete(selectedPlan.id)"
@@ -249,7 +254,7 @@ export default {
       }
     },
     goBack() {
-      usePlanStore().setPlan(null)
+      usePlanStore().setPlan(null);
     },
     togglePopup() {
       usePopupStore().toggle(1);

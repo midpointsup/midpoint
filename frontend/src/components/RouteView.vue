@@ -7,7 +7,6 @@
   ></RouteDisplayTabs>
 </template>
 
-
 <script>
 import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
 import { usePlanStore } from "@/stores/planStore";
