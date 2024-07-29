@@ -9,6 +9,7 @@
     :initial-value="popup.pos"
   >
     <button
+      v-if="popup.key !== 'routeview'"
       @click="handleClose(index)"
       class="btn-close small popup-close"
     ></button>
@@ -68,6 +69,7 @@ export default {
       usePopupStore().move(index, pos);
     },
     handleClose(index) {
+      console.log("HELLOOOOO CLICKEDDDDDDD")
       usePopupStore().hide(index);
     },
   },
@@ -82,6 +84,8 @@ export default {
   border-radius: 5px;
   z-index: 100;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-height: 90%;
+  overflow-y: auto;
 }
 
 .hidden {
