@@ -64,10 +64,7 @@
             </div>
             <div class="row">
               <div class="collapse" :id="`collapseCurrent`">
-                <div
-                  class="card card-body"
-                  id="directionsDisplayCurrent"
-                ></div>
+                <div class="card card-body" id="directionsDisplayCurrent"></div>
               </div>
             </div>
           </li>
@@ -218,21 +215,23 @@ export default {
           this.displayGroupRoutesTab();
         }
       }
-      
     });
 
     this.socket.on("trip", (trip) => {
       if (!trip.error) {
         //update route in data local
         this.routes.forEach((route, index) => {
-         if (
+          if (
             route.id === trip.id &&
             useUserStore().getUser().userId !== route.UserId
-           ) {
+          ) {
             let oldRoute = JSON.parse(JSON.stringify(this.routes[index]));
             this.routes[index] = trip;
             this.drawRoute(trip, index, oldRoute);
-            if (route.startLocation !== trip.startLocation || route.transportationMethod !== trip.transportationMethod) {
+            if (
+              route.startLocation !== trip.startLocation ||
+              route.transportationMethod !== trip.transportationMethod
+            ) {
               this.drawRoute(trip, index, null);
             }
             // if (this.onMyRouteTab) {
@@ -240,10 +239,17 @@ export default {
             //   } else {
             //     this.displayGroupRoutesTab();
             //   }
-           }
-           if (route.id === trip.id &&
-           useUserStore().getUser().userId === route.UserId) {
-            if ((route.startLocation !== trip.startLocation && trip.startLocation !== "") || (route.transportationMethod !== trip.transportationMethod && trip.transportationMethod !== "")) {
+          }
+          if (
+            route.id === trip.id &&
+            useUserStore().getUser().userId === route.UserId
+          ) {
+            if (
+              (route.startLocation !== trip.startLocation &&
+                trip.startLocation !== "") ||
+              (route.transportationMethod !== trip.transportationMethod &&
+                trip.transportationMethod !== "")
+            ) {
               this.routes[index] = trip;
               if (this.onMyRouteTab) {
                 this.displayMyRoutesTab();
@@ -253,7 +259,7 @@ export default {
               this.currTrip = trip;
               this.setCurrentRouteRenderer();
             }
-           }
+          }
         });
       }
     });
@@ -421,7 +427,10 @@ export default {
                 });
             }
           });
-        } else if (status == "MAX_WAYPOINTS_EXCEEDED"  || status == "INVALID_REQUEST") {
+        } else if (
+          status == "MAX_WAYPOINTS_EXCEEDED" ||
+          status == "INVALID_REQUEST"
+        ) {
           let newRoute = JSON.parse(JSON.stringify(this.currTrip));
           newRoute.waypoints = [];
           planService.updateTrip(
@@ -475,7 +484,10 @@ export default {
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.currRouteRenderer.setDirections(result);
-          } else if (status == "MAX_WAYPOINTS_EXCEEDED"  || status == "INVALID_REQUEST") {
+          } else if (
+            status == "MAX_WAYPOINTS_EXCEEDED" ||
+            status == "INVALID_REQUEST"
+          ) {
             let newRoute = JSON.parse(JSON.stringify(this.currTrip));
             newRoute.waypoints = [];
             planService.updateTrip(
@@ -485,10 +497,10 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
-        }
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point"
+            );
+          }
           //handle zero results case
         });
       } else {
@@ -500,7 +512,10 @@ export default {
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.currRouteRenderer.setDirections(result);
-          } else if (status == "MAX_WAYPOINTS_EXCEEDED"  || status == "INVALID_REQUEST") {
+          } else if (
+            status == "MAX_WAYPOINTS_EXCEEDED" ||
+            status == "INVALID_REQUEST"
+          ) {
             //add route too complex error
             let newRoute = JSON.parse(JSON.stringify(this.currTrip));
             newRoute.waypoints = [];
@@ -511,10 +526,10 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
-        }
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point"
+            );
+          }
         });
       }
     },
@@ -733,7 +748,10 @@ export default {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
             // this.directionsRenderers[index].setMap(map);
-          } else if (status == "MAX_WAYPOINTS_EXCEEDED"  || status == "INVALID_REQUEST") {
+          } else if (
+            status == "MAX_WAYPOINTS_EXCEEDED" ||
+            status == "INVALID_REQUEST"
+          ) {
             let newRoute = JSON.parse(JSON.stringify(this.routes[index]));
             newRoute.waypoints = [];
             planService.updateTrip(
@@ -744,10 +762,10 @@ export default {
             );
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point."
-          );
-        }
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point."
+            );
+          }
           //handle zero results case
         });
       } else {
@@ -759,7 +777,10 @@ export default {
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
-          } else if (status == "MAX_WAYPOINTS_EXCEEDED"  || status == "INVALID_REQUEST") {
+          } else if (
+            status == "MAX_WAYPOINTS_EXCEEDED" ||
+            status == "INVALID_REQUEST"
+          ) {
             //add route too complex error
             let newRoute = JSON.parse(JSON.stringify(this.routes[index]));
             newRoute.waypoints = [];
@@ -770,10 +791,10 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
-        }
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point"
+            );
+          }
         });
       }
     },
