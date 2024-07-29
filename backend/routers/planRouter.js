@@ -133,7 +133,7 @@ planRouter.get("/", isAuthenticated, async (req, res) => {
   return res.json(plans);
 });
 
-planRouter.get("/:id", async (req, res) => {
+planRouter.get("/:id", isAuthenticated, async (req, res) => {
   try {
     const plan = await Plan.findOne({
       where: {
@@ -147,6 +147,9 @@ planRouter.get("/:id", async (req, res) => {
           include: [
             {
               model: Trip,
+              where: {
+                PlanId: req.params.id,
+              },
             },
           ],
         },
@@ -157,6 +160,9 @@ planRouter.get("/:id", async (req, res) => {
           include: [
             {
               model: Trip,
+              where: {
+                PlanId: req.params.id,
+              },
             },
           ],
         },

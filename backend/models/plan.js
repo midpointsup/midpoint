@@ -37,7 +37,12 @@ User.hasMany(Plan, { foreignKey: "ownerId" });
 Plan.belongsTo(User, { foreignKey: "ownerId", as: "owner" });
 
 // A Plan has many Trips
-Plan.hasMany(Trip, { foreignKey: "PlanId", as: "trips" });
+Plan.hasMany(Trip, {
+  foreignKey: "PlanId",
+  as: "trips",
+  onDelete: "cascade",
+  hooks: true,
+});
 
 // Many to many relationship between User and Plan
 Plan.belongsToMany(User, { through: "UserPlan", as: "members" });

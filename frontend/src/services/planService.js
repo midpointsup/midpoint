@@ -28,7 +28,10 @@ const planService = (function () {
   module.getPlan = async function (id) {
     return fetch(`${baseUrl}/${id}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((res) => {
       return res.json();
     });
