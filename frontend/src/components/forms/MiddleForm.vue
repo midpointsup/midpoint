@@ -77,13 +77,19 @@
     </li>
   </ul>
   <slot></slot>
-  <button class="btn" :disabled="!allLocationsVerified" @click="generateMiddle">
-    Meet in the middle!
-  </button>
-  <br />
-  <button class="btn" :disabled="midpoint == ''" @click="getDirections">
-    Get Directions
-  </button>
+  <div class="middle-buttons">
+    <button
+      class="btn"
+      :disabled="!allLocationsVerified"
+      @click="generateMiddle"
+    >
+      Meet in the middle!
+    </button>
+    <br />
+    <button class="btn" :disabled="midpoint == ''" @click="getDirections">
+      Get Directions
+    </button>
+  </div>
 </template>
 
 <script>
@@ -347,6 +353,11 @@ export default {
   justify-content: center;
   gap: 10px;
   height: 100%;
+}
+
+.middle-buttons {
+  display: flex;
+  flex-direction: column;
 }
 
 .middle-info {

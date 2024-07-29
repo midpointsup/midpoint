@@ -55,10 +55,10 @@
       ></MembersList>
     </MiddleForm>
     <RouteDisplayTabs
-    v-if="selectedPlan.address"
-            :planId="selectedPlan.id"
-            :destination="selectedPlan.address"
-            @update:destination="updateTabProp"
+      v-if="selectedPlan.address"
+      :planId="selectedPlan.id"
+      :destination="selectedPlan.address"
+      @update:destination="updateTabProp"
     ></RouteDisplayTabs>
     <button
       v-if="selectedPlan.ownerId === currentUser.userId"
