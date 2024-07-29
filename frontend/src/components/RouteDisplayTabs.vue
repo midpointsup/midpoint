@@ -157,8 +157,10 @@ import planService from "../services/plan-service.js";
 import io from "socket.io-client";
 import { useUserStore } from "../stores/userStore.js";
 import RouteCard from "./routeCard.vue";
+import { notificationMixin } from "@/mixins/notificationMixin.js";
 
 export default {
+  mixins: [notificationMixin],
   props: {
     planId: String,
     destination: String,
@@ -206,6 +208,21 @@ export default {
 
     // Listen for the 'joinedRoom' event to confirm joining
     this.socket.on("joined-room", (roomId) => {});
+
+    this.socket.on("planUpdate", (plan) => {
+      console.log("destination changed in plan", this.destination);
+      console.log("this is the plan", plan);
+      console.log("destinaiton is ", this.destination);
+      if (plan.address !== this.destination) {
+        this.updateProp(plan.address);
+        if (this.onMyRouteTab) {
+          this.displayMyRoutesTab();
+        } else {
+          this.displayGroupRoutesTab();
+        }
+      }
+      
+    });
 
     this.socket.on("trip", (trip) => {
       if (!trip.error) {
@@ -258,7 +275,15 @@ export default {
   beforeUnmount() {
     this.disconnectSocket();
   },
-
+  watch: {
+    destination() {
+      if (this.onMyRouteTab) {
+        this.displayMyRoutesTab();
+      } else {
+        this.displayGroupRoutesTab();
+      }
+    },
+  },
   unmounted() {
     this.directionsRenderer.setMap(null);
     this.currRouteRenderer.setMap(null);
@@ -266,20 +291,15 @@ export default {
       directionsRenderer.setMap(null);
     });
   },
-  watch: {
-    // destination(newDestination, oldDestination) {
-    //   if (this.onMyRouteTab) {
-    //     this.displayMyRoutesTab();
-    //   } else {
-    //     this.displayGroupRoutesTab();
-    //   }
-    // },
-  },
   methods: {
     disconnectSocket() {
       if (this.socket) {
         this.socket.disconnect();
       }
+    },
+
+    updateProp(newDestination) {
+      this.$emit("update:destination", newDestination);
     },
 
     toggleExpandedButton(index) {
@@ -419,6 +439,10 @@ export default {
             newRoute.id,
             newRoute
           );
+        } else if (status == "ZERO_RESULTS") {
+          this.notifyError(
+            "No route found. Please update your midpoint, transportation mode or starting point."
+          );
         }
       });
     },
@@ -469,7 +493,11 @@ export default {
               newRoute.id,
               newRoute
             );
-          }
+          } else if (status == "ZERO_RESULTS") {
+          this.notifyError(
+            "No route found. Please update your midpoint or starting point."
+          );
+        }
           //handle zero results case
         });
       } else {
@@ -491,7 +519,11 @@ export default {
               newRoute.id,
               newRoute
             );
-          }
+          } else if (status == "ZERO_RESULTS") {
+          this.notifyError(
+            "No route found. Please update your midpoint or starting point."
+          );
+        }
         });
       }
     },
@@ -536,6 +568,10 @@ export default {
           this.myRoutes = result.routes;
           this.directionsRenderer.setPanel(
             document.getElementById(`defaultDirectionsDisplay`)
+          );
+        } else if (status == "ZERO_RESULTS") {
+          this.notifyError(
+            "No route found. Please update your midpoint or starting point."
           );
         }
       });
@@ -724,7 +760,11 @@ export default {
               newRoute
             );
             this.drawRoute(newRoute, index, route);
-          }
+          } else if (status == "ZERO_RESULTS") {
+          this.notifyError(
+            "No route found. Please update your midpoint or starting point."
+          );
+        }
           //handle zero results case
         });
       } else {
@@ -746,7 +786,11 @@ export default {
               newRoute.id,
               newRoute
             );
-          }
+          } else if (status == "ZERO_RESULTS") {
+          this.notifyError(
+            "No route found. Please update your midpoint or starting point."
+          );
+        }
         });
       }
     },

@@ -72,6 +72,7 @@
           <RouteDisplayTabs
             :planId="selectedPlan.id"
             :destination="selectedPlan.address"
+            @update:destination="updateTabProp"
           ></RouteDisplayTabs>
           <button @click="clearSelection" class="btn mt-3">Back</button>
           <button
@@ -263,6 +264,10 @@ export default {
       if (this.socket) {
         this.socket.disconnect();
       }
+    },
+    updateTabProp(newVal) {
+      this.selectedPlan.address = newVal;
+      console.log("New Destination:", newVal);
     },
     getPlans(userId) {
       planService.getPlansForMember(userId).then((res) => {
