@@ -4,7 +4,6 @@ import { sequelize } from "./datasource.js";
 import { userRouter } from "./routers/user_router.js";
 import { googleOAuthRouter } from "./routers/google_oauth_router.js";
 import { Server } from "socket.io";
-//import { Server as SocketIOServer } from "socket.io";
 import { registerIOListeners } from "./socket.js";
 import cors from "cors";
 import { planRouter } from "./routers/plan_router.js";
@@ -43,18 +42,7 @@ try {
   console.error("Unable to connect to the database:", error);
 }
 
-// Initialize socket server
-//export const io = new Server(httpServer);
 registerIOListeners(io);
-
-/*
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
-});
-*/
 
 app.use(function (req, res, next) {
   req.io = io;
