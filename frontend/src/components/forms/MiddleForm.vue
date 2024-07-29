@@ -91,7 +91,7 @@ import routeService from "@/services/routeService.js";
 import planService from "@/services/planService.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import io from "socket.io-client";
-import '@googlemaps/extended-component-library/place_picker.js';
+import "@googlemaps/extended-component-library/place_picker.js";
 
 export default {
   mixins: [notificationMixin],

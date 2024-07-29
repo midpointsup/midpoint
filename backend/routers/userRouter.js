@@ -69,7 +69,7 @@ userRouter.post("/signin", async (req, res) => {
   });
 });
 
-userRouter.get("/me", isAuthenticated,  async (req, res) => {
+userRouter.get("/me", isAuthenticated, async (req, res) => {
   return res.status(200).json({
     username: req.user.username,
     email: req.user.email,
@@ -126,12 +126,16 @@ userRouter.post("/email", async (req, res) => {
   }
 });
 
-
 userRouter.get("/", isAuthenticated, async (req, res) => {
   try {
     const users = await User.findAll({
       where: {
-        username: {[Op.and]: { [Op.not]: req.user.username, [Op.iLike]: `${req.query.query}%` }}
+        username: {
+          [Op.and]: {
+            [Op.not]: req.user.username,
+            [Op.iLike]: `${req.query.query}%`,
+          },
+        },
       },
     });
     return res.status(200).json(users);

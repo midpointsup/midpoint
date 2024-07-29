@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 import { useElementBounding } from "@vueuse/core";
 
-export const useBoundingStore = defineStore('bounding', {
+export const useBoundingStore = defineStore("bounding", {
   state: () => ({
     bounding: {},
   }),
@@ -11,6 +11,6 @@ export const useBoundingStore = defineStore('bounding', {
     },
     getBounding(key) {
       return this.bounding[key];
-    }
+    },
   },
 });

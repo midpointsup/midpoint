@@ -27,7 +27,7 @@ export const Plan = sequelize.define("Plan", {
   colour: {
     type: DataTypes.STRING,
     defaultValue: "#4dc48a",
-  }
+  },
 });
 
 // A User can own many Plans

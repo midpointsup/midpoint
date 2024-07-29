@@ -1,11 +1,14 @@
 <template>
-  <div class="sidebar-wrapper" :style="currentPage === 'My Plans' ? {'overflow-y' : 'hidden'} : {}">
+  <div
+    class="sidebar-wrapper"
+    :style="currentPage === 'My Plans' ? { 'overflow-y': 'hidden' } : {}"
+  >
     <a @click="goBack" class="back-btn" v-if="canGoBack">Back</a>
     <h5 class="my-3">{{ currentPage }}</h5>
-    <hr class="mb-1"/>
+    <hr class="mb-1" />
     <slot></slot>
   </div>
-  <br/>
+  <br />
 </template>
 
 <script>
@@ -24,13 +27,13 @@ export default {
       default: false,
     },
   },
-  emits: ['goBack'],
+  emits: ["goBack"],
   inheritAttrs: false,
   methods: {
     goBack() {
       this.$emit("goBack");
     },
-  }
+  },
 };
 </script>
 

@@ -8,7 +8,10 @@
     ref="popupElement"
     :initial-value="popup.pos"
   >
-    <button @click="handleClose(index)" class="btn-close small popup-close"></button>
+    <button
+      @click="handleClose(index)"
+      class="btn-close small popup-close"
+    ></button>
     <component :is="popup.component" class="mt-4"></component>
   </UseDraggable>
 </template>
@@ -48,8 +51,14 @@ export default {
       return this.popupBounds[index]?.height ?? 0;
     },
     getPopupStyle(index, { x, y }) {
-      const left = Math.min(Math.max(x - window.innerWidth + this.offset, 10), this.offset - this.getPopupWidth(index) - 10);
-      const top = Math.min(Math.max(y, 10), window.innerHeight - this.getPopupHeight(index) - 10);
+      const left = Math.min(
+        Math.max(x - window.innerWidth + this.offset, 10),
+        this.offset - this.getPopupWidth(index) - 10
+      );
+      const top = Math.min(
+        Math.max(y, 10),
+        window.innerHeight - this.getPopupHeight(index) - 10
+      );
       return {
         left: `${left}px`,
         top: `${top}px`,
@@ -61,7 +70,7 @@ export default {
     handleClose(index) {
       usePopupStore().hide(index);
     },
-  }
+  },
 };
 </script>
 

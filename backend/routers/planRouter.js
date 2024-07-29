@@ -19,11 +19,15 @@ planRouter.post("/", isAuthenticated, async (req, res) => {
     return res.status(400).json({ error: "Missing required fields." });
   }
 
-  const users = await Promise.all(members.map(member => User.findOne({ where: { username: member }, attributes: ["id"] })));
-  if (users.some(member => !member)) {
+  const users = await Promise.all(
+    members.map((member) =>
+      User.findOne({ where: { username: member }, attributes: ["id"] })
+    )
+  );
+  if (users.some((member) => !member)) {
     return res.status(404).json({ error: "Member not found" });
   }
-  const membersList = users.map(member => member.id);
+  const membersList = users.map((member) => member.id);
   const plan = await Plan.create({
     ownerId: req.user.id,
     memberCount: members.length,
@@ -123,10 +127,7 @@ planRouter.get("/", isAuthenticated, async (req, res) => {
       },
     ],
     where: {
-      [Op.or]: [
-        { "$owner.id$": req.user.id },
-        { "$members.id$": req.user.id },
-      ],
+      [Op.or]: [{ "$owner.id$": req.user.id }, { "$members.id$": req.user.id }],
     },
   });
   return res.json(plans);

@@ -19,7 +19,7 @@
         v-model="planName"
         @focus="(e) => e.target.classList.remove('is-invalid')"
         required
-        />
+      />
       <div class="invalid-feedback">Plan name required</div>
     </div>
 
@@ -39,34 +39,74 @@
         Can't find who you're looking for?
         <a class="green" @click="showInvite">Send an Invite</a>
       </div>
-      <button v-if="searchUsername.length >= 1" type="button" class="btn-clear" @click="searchUsername = ''"></button>
-        <ul v-if="searchUsername.length >= 3" class="list-group member-dropdown">
-          <li v-if="isLoading" class="list-group-item">Loading...</li>
-          <li v-else-if="fetchedUsers?.length === 0" class="list-group-item">No results</li>
-          <li v-for="user in fetchedUsers" :key="user.id" :value="user.id" class="list-group-item list-group-item-action"
-            @click="addMember(user.username)" tabindex="0">{{ user.username }}</li>
-        </ul>
-        <div class="d-flex gap-1 my-2 flex-wrap overflow-x-hidden mw-100">
-          <div class="badge rounded-pill p-2 d-flex gap-1 mw-100" v-for="(member, index) in membersList" :key="index">
-            <span class="badge-text text-truncate">{{ member }}</span>
-            <button @click="removeMember(index)" class="btn btn-close badge-btn"></button>
-          </div>
+      <button
+        v-if="searchUsername.length >= 1"
+        type="button"
+        class="btn-clear"
+        @click="searchUsername = ''"
+      ></button>
+      <ul v-if="searchUsername.length >= 3" class="list-group member-dropdown">
+        <li v-if="isLoading" class="list-group-item">Loading...</li>
+        <li v-else-if="fetchedUsers?.length === 0" class="list-group-item">
+          No results
+        </li>
+        <li
+          v-for="user in fetchedUsers"
+          :key="user.id"
+          :value="user.id"
+          class="list-group-item list-group-item-action"
+          @click="addMember(user.username)"
+          tabindex="0"
+        >
+          {{ user.username }}
+        </li>
+      </ul>
+      <div class="d-flex gap-1 my-2 flex-wrap overflow-x-hidden mw-100">
+        <div
+          class="badge rounded-pill p-2 d-flex gap-1 mw-100"
+          v-for="(member, index) in membersList"
+          :key="index"
+        >
+          <span class="badge-text text-truncate">{{ member }}</span>
+          <button
+            @click="removeMember(index)"
+            class="btn btn-close badge-btn"
+          ></button>
         </div>
+      </div>
     </div>
 
     <div class="mb-3">
-      <label class="form-label" data-tooltip="You can change this later">Select a category *</label>
-      <div class="d-flex gap-1 flex-wrap overflow-x-hidden mw-100 form-check p-0" ref="selectCategory">
+      <label class="form-label" data-tooltip="You can change this later"
+        >Select a category *</label
+      >
+      <div
+        class="d-flex gap-1 flex-wrap overflow-x-hidden mw-100 form-check p-0"
+        ref="selectCategory"
+      >
         <div v-for="(category, index) in categories">
-          <input type="radio" class="btn-check" name="btnradio" :id="'btnradio' + index" @focus="() => $refs.selectCategory.classList.remove('is-invalid')" v-model="planCategory" :value="category" autocomplete="off">
-          <label class="radio-btn" :for="'btnradio' + index">{{ category }}</label>
+          <input
+            type="radio"
+            class="btn-check"
+            name="btnradio"
+            :id="'btnradio' + index"
+            @focus="() => $refs.selectCategory.classList.remove('is-invalid')"
+            v-model="planCategory"
+            :value="category"
+            autocomplete="off"
+          />
+          <label class="radio-btn" :for="'btnradio' + index">{{
+            category
+          }}</label>
         </div>
       </div>
       <div class="invalid-feedback">Category required</div>
     </div>
 
     <div class="form-group">
-      <label class="form-label" data-tooltip="You can change this later">Select a date *</label>
+      <label class="form-label" data-tooltip="You can change this later"
+        >Select a date *</label
+      >
       <VueDatePicker
         v-model="date"
         :teleport="true"
@@ -79,17 +119,28 @@
     </div>
 
     <div>
-      <label for="exampleColorInput" class="form-label">Pick an accent colour</label>
-      <input type="color" class="form-control form-control-color" id="exampleColorInput" v-model="planColour">
+      <label for="exampleColorInput" class="form-label"
+        >Pick an accent colour</label
+      >
+      <input
+        type="color"
+        class="form-control form-control-color"
+        id="exampleColorInput"
+        v-model="planColour"
+      />
     </div>
 
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" v-model="emailNotify" id="flexCheckDefault">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="emailNotify"
+        id="flexCheckDefault"
+      />
       <label class="form-check-label" for="flexCheckDefault">
         Send email notifications to members
       </label>
     </div>
-
 
     <button type="submit" class="btn my-2">Create Plan</button>
   </form>
@@ -98,15 +149,15 @@
 <script>
 import userService from "@/services/userService.js";
 import { usePopupStore } from "@/stores/popupStore";
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 import planService from "@/services/planService.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import emailService from "@/services/emailService.js";
 export default {
   mixins: [notificationMixin],
   components: {
-    VueDatePicker ,
+    VueDatePicker,
   },
   data() {
     return {
@@ -116,7 +167,17 @@ export default {
       cache: {},
       fetchedUsers: [],
       membersList: [],
-      categories: [ "Restaurants", "Cafe", "Grocery", "Schools", "Parks", "Shopping", "Recreation Centers", "Bathrooms", "Theatres" ],
+      categories: [
+        "Restaurants",
+        "Cafe",
+        "Grocery",
+        "Schools",
+        "Parks",
+        "Shopping",
+        "Recreation Centers",
+        "Bathrooms",
+        "Theatres",
+      ],
       planCategory: null,
       date: new Date(),
       datePickerState: null,
@@ -145,34 +206,47 @@ export default {
       this.setValidity(this.$refs.selectCategory, this.planCategory !== null);
       this.datePickerState = this.date !== null;
 
-      if (this.membersList.length > 0 && this.planName.trim().length > 0 && this.planCategory && this.datePickerState) {
-        planService.createPlan(this.planName.trim(), this.membersList, this.planCategory, this.date, this.planColour).then((res) => {
-          if (res.error) {
-            this.notifyError(res.error);
-          } else {
-            this.resetValidity();
-            this.notifySuccess("Plan created successfully");
-            this.searchUsername = "";
-            this.membersList = [];
-            this.planName = "";
-            this.planCategory = null;
-            this.date = new Date();
-            this.planColour = "#4dc48a";
+      if (
+        this.membersList.length > 0 &&
+        this.planName.trim().length > 0 &&
+        this.planCategory &&
+        this.datePickerState
+      ) {
+        planService
+          .createPlan(
+            this.planName.trim(),
+            this.membersList,
+            this.planCategory,
+            this.date,
+            this.planColour
+          )
+          .then((res) => {
+            if (res.error) {
+              this.notifyError(res.error);
+            } else {
+              this.resetValidity();
+              this.notifySuccess("Plan created successfully");
+              this.searchUsername = "";
+              this.membersList = [];
+              this.planName = "";
+              this.planCategory = null;
+              this.date = new Date();
+              this.planColour = "#4dc48a";
 
-            if (this.emailNotify) {
-              console.log("TODO: Send email notifications to members");
-              // res.members.forEach((memberId) => {
-              //   emailService.sendEmail(memberId).then((res) => {
-              //     if (res.error) {
-              //       this.notifyError(res.error);
-              //     } else {
-              //       this.notifySuccess("Email sent to " + member);
-              //     }
-              //   });
-              // });
+              if (this.emailNotify) {
+                console.log("TODO: Send email notifications to members");
+                // res.members.forEach((memberId) => {
+                //   emailService.sendEmail(memberId).then((res) => {
+                //     if (res.error) {
+                //       this.notifyError(res.error);
+                //     } else {
+                //       this.notifySuccess("Email sent to " + member);
+                //     }
+                //   });
+                // });
+              }
             }
-          }
-        });
+          });
       }
     },
     setValidity(elem, isValid) {
@@ -197,25 +271,29 @@ export default {
       this.isLoading = true;
 
       if (this.cache[username]) {
-        this.fetchedUsers = this.cache[username].filter((user) => !this.membersList.includes(user.username));
+        this.fetchedUsers = this.cache[username].filter(
+          (user) => !this.membersList.includes(user.username)
+        );
         this.isLoading = false;
         return;
       }
 
       userService.findUsers(username).then((response) => {
-        this.cache[username] = response.filter((user) => !this.membersList.includes(user.username));
+        this.cache[username] = response.filter(
+          (user) => !this.membersList.includes(user.username)
+        );
         this.fetchedUsers = this.cache[username];
         this.isLoading = false;
         setTimeout(() => {
           delete this.cache[username];
-        }, 60000 );
+        }, 60000);
       });
     },
     showInvite() {
-      usePopupStore().show(0)
+      usePopupStore().show(0);
     },
-  }
-}
+  },
+};
 </script>
 
 <style>

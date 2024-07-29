@@ -1,6 +1,6 @@
 <template>
   <MenuComponent></MenuComponent>
-  <div id="layout" ref=layout>
+  <div id="layout" ref="layout">
     <MapComponent></MapComponent>
     <PopupContainer></PopupContainer>
   </div>

@@ -3,13 +3,26 @@
     <ul class="menu-wrapper gap-3 ps-0 mb-0">
       <h4 class="logo-header mb-0">idpoint</h4>
       <hr />
-      <li v-for="page in pages" :key="page" :class="'nav-btn ' + getPageClasses(page)" @click="openSidebar"
-        :data-content="page"></li>
+      <li
+        v-for="page in pages"
+        :key="page"
+        :class="'nav-btn ' + getPageClasses(page)"
+        @click="openSidebar"
+        :data-content="page"
+      ></li>
     </ul>
     <div class="dropdown">
-      <a href="#" class="d-flex align-items-center link-dark text-decoration-none rounded-circle"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        <img v-if="currentUser?.picture" :src="currentUser.picture" class="pfp" />
+      <a
+        href="#"
+        class="d-flex align-items-center link-dark text-decoration-none rounded-circle"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <img
+          v-if="currentUser?.picture"
+          :src="currentUser.picture"
+          class="pfp"
+        />
         <img v-else src="@/assets/static/user.png" alt="" class="pfp" />
       </a>
       <div class="dropdown-menu text-small shadow">
@@ -27,9 +40,8 @@
   >
     <MiddleForm
       :startLocation="
-        selectedPlan.members.find(
-          (member) => member.id === currentUser.userId
-        ).Trips[0].startLocation
+        selectedPlan.members.find((member) => member.id === currentUser.userId)
+          .Trips[0].startLocation
       "
       :selectedPlan="selectedPlan"
       :currentUser="currentUser"
@@ -56,21 +68,47 @@
     </button>
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
-    <ul v-if="currentPage === 'My Plans'" class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper">
-      <li v-for="plan in myPlans" :key="'plan'+plan.id" :ref="'plan'+plan.id" class="planContainer" :style="{ 'border-color': plan.colour }" @click="selectPlan(plan)">
+    <ul
+      v-if="currentPage === 'My Plans'"
+      class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
+    >
+      <li
+        v-for="plan in myPlans"
+        :key="'plan' + plan.id"
+        :ref="'plan' + plan.id"
+        class="planContainer"
+        :style="{ 'border-color': plan.colour }"
+        @click="selectPlan(plan)"
+      >
         <h6 class="mt-2">{{ plan.name }}</h6>
-        <hr class="mt-1"/>
+        <hr class="mt-1" />
         <span>{{ plan.address ? plan.address : "TBD" }}</span>
         <div class="d-flex my-2">
-          <div v-for="member in [...plan.members, plan.owner].filter((member) => member.id !== currentUser.userId).splice(0,4)">
-            <img v-if="member.picture" :src="member.picture" class="rounded-circle pfp-small"/>
-            <img v-else src="@/assets/static/user.png" class="rounded-circle pfp-small"/>
+          <div
+            v-for="member in [...plan.members, plan.owner]
+              .filter((member) => member.id !== currentUser.userId)
+              .splice(0, 4)"
+          >
+            <img
+              v-if="member.picture"
+              :src="member.picture"
+              class="rounded-circle pfp-small"
+            />
+            <img
+              v-else
+              src="@/assets/static/user.png"
+              class="rounded-circle pfp-small"
+            />
           </div>
-          <div v-if="plan.members.length > 4" class="rounded-circle pfp-count text-truncate" :style="{ 'background-color': plan.colour}">{{ `+${plan.memberCount - 4}`}}</div>
+          <div
+            v-if="plan.members.length > 4"
+            class="rounded-circle pfp-count text-truncate"
+            :style="{ 'background-color': plan.colour }"
+          >
+            {{ `+${plan.memberCount - 4}` }}
+          </div>
         </div>
-        <span class="badge">{{
-          plan.date && plan.date.slice(0, 10)
-        }}</span>
+        <span class="badge">{{ plan.date && plan.date.slice(0, 10) }}</span>
       </li>
       <li v-if="myPlans.length === 0">
         <p class="form-text">No plans yet. Add a plan to get started!</p>
@@ -83,7 +121,7 @@
 <script>
 import { useUserStore } from "@/stores/userStore.js";
 import userService from "@/services/userService.js";
-import planService from '@/services/planService.js';
+import planService from "@/services/planService.js";
 import SidebarComponent from "@/components/SidebarComponent.vue";
 import AddPlanForm from "@/components/forms/AddPlanForm.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
@@ -128,7 +166,8 @@ export default {
       }
     },
     getPageClasses(name) {
-      const selected = this.isSidebarOpen && this.currentPage === name ? "selected" : "";
+      const selected =
+        this.isSidebarOpen && this.currentPage === name ? "selected" : "";
       switch (name) {
         case "Explore":
           return selected + " explore-btn";
@@ -155,7 +194,7 @@ export default {
         }
       });
       this.currentPlan = plan;
-      console.log(this.currentPlan)
+      console.log(this.currentPlan);
       this.$refs[`plan${plan.id}`][0].classList.add("active");
     },
     getMyPlans() {
@@ -356,7 +395,7 @@ export default {
     height: 30px;
   }
 
-  +hr {
+  + hr {
     margin: 0;
   }
 }
