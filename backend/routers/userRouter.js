@@ -1,7 +1,6 @@
 import { User } from "../models/users.js";
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import { AccessToken } from "../models/accessTokens.js";
 import "dotenv/config";
 import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 import { generateAccessToken } from "../helpers/auth.js";

@@ -212,7 +212,7 @@ export default {
             startTime: this.selectedPlan.startTime,
             radius: this.radius,
           })
-          .then((response) => {
+          .then(() => {
             this.selectedPlan.members.find(
               (member) => member.id === this.currentUser.userId
             ).Trips[0].transportationMethod = this.travelMode;

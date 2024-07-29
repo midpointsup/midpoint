@@ -278,7 +278,7 @@ export default {
       this.socket.emit("join-user", "user" + this.currentUser.userId);
     });
 
-    this.socket.on("planCreate", (plans) => {
+    this.socket.on("planCreate", () => {
       this.getMyPlans();
       this.notifySuccess("You have been added to a new plan!");
     });

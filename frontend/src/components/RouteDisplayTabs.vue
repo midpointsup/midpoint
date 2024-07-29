@@ -712,10 +712,6 @@ export default {
       if (this.checkSameRoute(route, oldRoute)) {
         return;
       }
-      // const map = new google.maps.Map(document.getElementById("map"), {
-      //   zoom: 7,
-      // });
-      // this.directionsRenderers[index].setMap(map);
       const travelModes = {
         DRIVE: google.maps.TravelMode.DRIVING,
         WALK: google.maps.TravelMode.WALKING,
@@ -737,7 +733,6 @@ export default {
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
-            // this.directionsRenderers[index].setMap(map);
           } else if (
             status == "MAX_WAYPOINTS_EXCEEDED" ||
             status == "INVALID_REQUEST"

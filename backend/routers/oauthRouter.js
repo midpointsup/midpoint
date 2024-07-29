@@ -92,16 +92,3 @@ const findUser = async (email, name) => {
   });
   return user;
 };
-
-const createUser = async (email, name, picture) => {
-  try {
-    const user = await User.create({
-      email: email,
-      username: name,
-      picture: picture,
-    });
-    return user;
-  } catch (error) {
-    return null;
-  }
-};

@@ -63,14 +63,6 @@ let userService = (function () {
     }).then((res) => res.json());
   };
 
-  // module.sendEmail = async function (member) {
-  //   return fetch(`${baseUrl}/api/users/email`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(member),
-  //   }).then((res) => res.json());
-  // };
-
   module.findUsers = function (query) {
     return fetch(`${baseUrl}/api/users?query=${query}`, {
       method: "GET",

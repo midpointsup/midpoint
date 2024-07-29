@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { User } from "../models/users.js";
 import { isAuthenticated } from "../middleware/auth.js";
-import crypto from "crypto";
 import { Op } from "sequelize";
 import { Plan } from "../models/plan.js";
 import { Trip } from "../models/trip.js";
