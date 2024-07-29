@@ -70,6 +70,7 @@
             ></MembersList>
           </MiddleForm>
           <RouteDisplayTabs
+            v-if="selectedPlan.address"
             :planId="selectedPlan.id"
             :destination="selectedPlan.address"
             @update:destination="updateTabProp"
@@ -250,8 +251,6 @@ export default {
 
     userService.getMe().then((res) => {
       if (!res.error) {
-        console.log("Profile Picture:", res);
-
         this.getPlans(res.userId);
       }
     });
@@ -267,12 +266,10 @@ export default {
     },
     updateTabProp(newVal) {
       this.selectedPlan.address = newVal;
-      console.log("New Destination:", newVal);
     },
     getPlans(userId) {
       planService.getPlansForMember(userId).then((res) => {
         if (!res.error) {
-          console.log("Plans:", res);
           this.plans = res;
         }
       });
@@ -435,7 +432,6 @@ export default {
   },
   computed: {
     currentUser() {
-      console.log(useUserStore().getUser());
       return useUserStore().getUser();
     },
   },

@@ -234,11 +234,6 @@ export default {
             ) {
               this.drawRoute(trip, index, null);
             }
-            // if (this.onMyRouteTab) {
-            //     this.displayMyRoutesTab();
-            //   } else {
-            //     this.displayGroupRoutesTab();
-            //   }
           }
           if (
             route.id === trip.id &&
@@ -315,11 +310,6 @@ export default {
           this.directionsRenderer.setPanel(
             document.getElementById(`directionsDisplay${index}`)
           );
-          // );
-          // this.previewDirectionsRenderer.setMap(null);
-          // this.previewDirectionsRenderer.setPanel(
-          //   document.getElementById(`directionsDisplay${index}`)
-          // );
         });
       }
     },
