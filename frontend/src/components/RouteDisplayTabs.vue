@@ -2,7 +2,7 @@
   <ul class="nav nav-tabs">
     <li class="nav-item" role="presentation">
       <button
-        class="nav-link active"
+        class="nav-link active route-title-btn"
         id="my-route-tab"
         data-bs-toggle="tab"
         data-bs-target="#my-route"
@@ -17,7 +17,7 @@
     </li>
     <li class="nav-item" role="presentation">
       <button
-        class="nav-link"
+        class="nav-link route-title-btn"
         id="home-tab"
         data-bs-toggle="tab"
         data-bs-target="#group-route"
@@ -38,29 +38,33 @@
       role="tabpanel"
       aria-labelledby="my-route-tab"
     >
-      <div>
-        <h6>My Current Route</h6>
+      <div class="mt-3">
+        My Current Route
         <ul class="list-group">
-          <li class="list-group-item list-item" v-if="myCurrRoute">
+          <li
+            class="list-group-item list-item route-list-item"
+            v-if="myCurrRoute"
+          >
             <RouteCard
               :route="myCurrRoute"
               :destination="destination"
               :mode="currTrip.transportationMethod"
               @click="displayCurrRouteOnMap"
-            ></RouteCard>
-            <div class="row">
-              <button
-                class="btn btn-route"
-                type="button"
-                data-bs-toggle="collapse"
-                :data-bs-target="`#collapseCurrent`"
-                aria-expanded="false"
-                :aria-controls="`collapseCurrent`"
-                @click="clickCurrentDirections"
-              >
-                Directions
-              </button>
-            </div>
+            >
+              <div class="row">
+                <a
+                  class="route-btn link btn-outline-primary mt-3"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  :data-bs-target="`#collapseCurrent`"
+                  aria-expanded="false"
+                  :aria-controls="`collapseCurrent`"
+                  @click="clickCurrentDirections"
+                >
+                  Get Directions
+                </a>
+              </div>
+            </RouteCard>
             <div class="row">
               <div class="collapse" :id="`collapseCurrent`">
                 <div class="card card-body" id="directionsDisplayCurrent"></div>
@@ -76,34 +80,35 @@
             <div
               v-for="(route, index) in myRoutes"
               :key="route.summary"
-              class="list-group-item list-item"
+              class="list-group-item list-item route-list-item"
             >
               <div>
                 <RouteCard
                   :route="route"
                   :destination="destination"
                   :mode="currTrip.transportationMethod"
-                ></RouteCard>
-                <div class="row">
-                  <button
-                    class="btn btn-route"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    :data-bs-target="`#collapse${index}`"
-                    aria-expanded="false"
-                    :aria-controls="`collapse${index}`"
-                    @click="toggleExpandedButton(index)"
-                  >
-                    Preview
-                  </button>
-                  <button
-                    class="btn btn-route"
-                    type="button"
-                    @click="selectRoute(index)"
-                  >
-                    Select Route
-                  </button>
-                </div>
+                >
+                  <div class="row route-btn-container">
+                    <a
+                      class="link btn-outline-primary route-btn"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      :data-bs-target="`#collapse${index}`"
+                      aria-expanded="false"
+                      :aria-controls="`collapse${index}`"
+                      @click="toggleExpandedButton(index)"
+                    >
+                      Preview
+                    </a>
+                    <a
+                      class="link btn-outline-primary route-btn"
+                      type="button"
+                      @click="selectRoute(index)"
+                    >
+                      Reset Route
+                    </a>
+                  </div>
+                </RouteCard>
               </div>
               <div class="row" v-if="expandedButton === index">
                 <div class="collapse show" :id="`collapse${index}`">
@@ -491,9 +496,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       } else {
@@ -519,9 +521,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       }
@@ -569,9 +568,6 @@ export default {
             document.getElementById(`defaultDirectionsDisplay`)
           );
         } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
         }
       });
     },
@@ -758,9 +754,6 @@ export default {
             );
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point."
-            );
           }
         });
       } else {
@@ -786,9 +779,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       }
