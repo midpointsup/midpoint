@@ -86,9 +86,6 @@
       Meet in the middle!
     </button>
     <br />
-    <button class="btn" :disabled="midpoint == ''" @click="getDirections">
-      Get Directions
-    </button>
   </div>
 </template>
 
@@ -299,38 +296,6 @@ export default {
     updateMidpoint(location) {
       this.midpoint = location;
       this.$emit("generate-midpoint", location);
-    },
-    async getDirections() {
-      const directionsService = new google.maps.DirectionsService();
-      const directionsRenderer = new google.maps.DirectionsRenderer();
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 7,
-      });
-      directionsRenderer.setMap(map);
-
-      const travelModes = {
-        DRIVE: google.maps.TravelMode.DRIVING,
-        WALK: google.maps.TravelMode.WALKING,
-        BIKE: google.maps.TravelMode.BICYCLING,
-        TRANSIT: google.maps.TravelMode.TRANSIT,
-      };
-
-      const request = {
-        origin: this.startLoc,
-        destination: this.midpoint,
-        travelMode: travelModes[this.travelMode],
-      };
-      directionsService.route(request, (result, status) => {
-        if (status == "OK") {
-          directionsRenderer.setDirections(result);
-        } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint or starting point."
-          );
-        } else {
-          this.notifyError("Directions request failed due to " + status);
-        }
-      });
     },
   },
 };
