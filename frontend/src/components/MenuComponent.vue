@@ -70,7 +70,10 @@
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
     <ExploreList v-if="currentPage === 'Explore'" />
-    <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
+    <AddPlanForm
+      v-else-if="currentPage === 'Add Plan'"
+      :currentUser="currentUser"
+    />
     <ul
       v-else-if="currentPage === 'My Plans'"
       class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
@@ -222,9 +225,18 @@ export default {
           category: this.selectedPlan.category,
           date: this.selectedPlan.date,
         })
-        .then((res) => {});
+        .then((res) => {
+          if (!res.error) {
+            this.myPlans = this.myPlans.map((plan) => {
+              if (plan.id === this.selectedPlan.id) {
+                plan.address = midpoint;
+              }
+              return plan;
+            });
+            this.selectedPlan.address = midpoint;
+          }
+        });
 
-      this.selectedPlan.address = midpoint;
       usePopupStore().show(1);
     },
     updateCurrentLocation(location) {

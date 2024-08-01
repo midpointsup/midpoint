@@ -260,16 +260,22 @@ export default {
               } else {
                 resetAll();
                 if (this.emailNotify) {
-                  console.log("TODO: Send email notifications to members");
-                  // res.members.forEach((memberId) => {
-                  //   emailService.sendEmail(memberId).then((res) => {
-                  //     if (res.error) {
-                  //       this.notifyError(res.error);
-                  //     } else {
-                  //       this.notifySuccess("Email sent to " + member);
-                  //     }
-                  //   });
-                  // });
+                  res.members.forEach((member) => {
+                    if (member.id !== this.currentUser.userId) {
+                      emailService.sendEmail(member).then((res) => {
+                        if (res.error) {
+                          this.notifyError(res.error);
+                        }
+                      });
+                    } else {
+                      this.socket.on("emailSent", (data) => {
+                        this.notifySuccess("Email sent to " + data);
+                      });
+                      this.socket.on("emailOpened", (data) => {
+                        this.notifySuccess(data + " opened the email!");
+                      });
+                    }
+                  });
                 }
               }
             });
