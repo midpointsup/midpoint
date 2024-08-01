@@ -74,7 +74,7 @@
         </ul>
       </div>
       <div>
-        Other Suggested Route(s)
+        <h6>Other Suggested Route(s)</h6>
         <div>
           <ul class="list-group">
             <div
@@ -141,7 +141,7 @@
             :startTime="route.startTime"
             :startLocation="route.startLocation"
             :mode="route.transportationMethod"
-            :color="colours[index % 10]"
+            :color="colours[index]"
             :picture="route.User.picture"
             :destination="destination"
           ></groupRouteCard>
@@ -159,6 +159,7 @@ import io from "socket.io-client";
 import { useUserStore } from "@/stores/userStore.js";
 import RouteCard from "@/components/routeCard.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
+import { usePlanStore } from "@/stores/planStore.js";
 
 export default {
   mixins: [notificationMixin],
@@ -182,19 +183,13 @@ export default {
       expandedButton: null,
       directionsService: new google.maps.DirectionsService(),
       directionsArray: [],
-      colours: [
-        "#00BFFF", // Deep Sky Blue
-        "#FF6347", // Tomato
-        "#32CD32", // Lime Green
-        "#FFD700", // Gold
-        "#FF69B4", // Hot Pink
-        "#1E90FF", // Dodger Blue
-        "#3CB371", // Medium Sea Green
-        "#FF7F50", // Coral
-        "#9932CC", // Dark Orchid
-        "#FFA500", // Orange
-      ],
     };
+  },
+  computed: {
+    colours() {
+      const plan = usePlanStore().getPlan();
+      return plan.members.map((member) => member.colour);
+    },
   },
   components: {
     groupRouteCard,
@@ -229,14 +224,16 @@ export default {
             route.id === trip.id &&
             useUserStore().getUser().userId !== route.UserId
           ) {
-            let oldRoute = JSON.parse(JSON.stringify(this.routes[index]));
-            this.routes[index] = trip;
-            this.drawRoute(trip, index, oldRoute);
             if (
               route.startLocation !== trip.startLocation ||
               route.transportationMethod !== trip.transportationMethod
             ) {
+              this.routes[index] = trip;
               this.drawRoute(trip, index, null);
+            } else {
+              let oldRoute = JSON.parse(JSON.stringify(this.routes[index]));
+              this.routes[index] = trip;
+              this.drawRoute(trip, index, oldRoute);
             }
           }
           if (
@@ -367,7 +364,6 @@ export default {
       });
       this.currRouteRenderer.setMap(map);
       this.currRouteRenderer.setOptions({
-        polylineOptions: { strokeColor: "#3CB371" },
         draggable: true,
       });
       let request = {
@@ -388,6 +384,10 @@ export default {
             };
           }),
         };
+      }
+
+      if (this.currTrip.transportationMethod === "TRANSIT") {
+        request.waypoints = [];
       }
 
       this.directionsService.route(request, (result, status) => {
@@ -475,6 +475,11 @@ export default {
           }),
           travelMode: travelModes[route.transportationMethod],
         };
+
+        if (route.transportationMethod === "TRANSIT") {
+          request.waypoints = [];
+        }
+
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.currRouteRenderer.setDirections(result);
@@ -618,7 +623,8 @@ export default {
     async displayMyRoutesTab() {
       // get all my routes
       this.directionsRenderers.forEach((directionsRenderer) => {
-        directionsRenderer.setMap(null);
+        this.directionsRenderer.setMap(null);
+        this.directionsRenderer = new google.maps.DirectionsRenderer();
       });
       await this.getCurrentRoute();
       this.getSuggestedRoutes();
@@ -630,6 +636,10 @@ export default {
       // get all group routes
       this.directionsRenderer.setMap(null);
       this.currRouteRenderer.setMap(null);
+      this.directionsRenderers.forEach((directionsRenderer) => {
+        this.directionsRenderer.setMap(null);
+        this.directionsRenderer = new google.maps.DirectionsRenderer();
+      });
       await this.getGroupTrips();
       this.onMyRouteTab = false;
     },
@@ -656,7 +666,7 @@ export default {
           directionsRenderer.setOptions({ draggable: false });
         }
         directionsRenderer.setOptions({
-          polylineOptions: { strokeColor: this.colours[index % 10] },
+          polylineOptions: { strokeColor: this.colours[index] },
         });
         this.directionsRenderers.push(directionsRenderer);
       });
@@ -724,6 +734,9 @@ export default {
           }),
           travelMode: travelModes[route.transportationMethod],
         };
+        if (route.transportationMethod === "TRANSIT") {
+          request.waypoints = [];
+        }
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
@@ -839,5 +852,11 @@ export default {
 <style>
 .list-item {
   padding: 5px;
+}
+
+.btn-route {
+  margin: 5px;
+  max-width: 80%;
+  width: 70%;
 }
 </style>

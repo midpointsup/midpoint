@@ -157,6 +157,18 @@ export default {
       presetPlans: [],
       currentPlan: null,
       socket: null,
+      colours: [
+        "#00BFFF", // Deep Sky Blue
+        "#FF6347", // Tomato
+        "#32CD32", // Lime Green
+        "#FFD700", // Gold
+        "#FF69B4", // Hot Pink
+        "#1E90FF", // Dodger Blue
+        "#3CB371", // Medium Sea Green
+        "#FF7F50", // Coral
+        "#9932CC", // Dark Orchid
+        "#FFA500", // Orange
+      ],
     };
   },
   methods: {
@@ -202,6 +214,12 @@ export default {
       planService.getPlan(+plan.id).then((res) => {
         if (!res.error) {
           usePlanStore().setPlan(res);
+          let plan = usePlanStore().getPlan();
+          plan.members = plan.members.map((member, index) => {
+            member.colour = this.colours[index % 10];
+            return member;
+          });
+          usePlanStore().setPlan(plan);
         }
       });
       this.currentPlan = plan;
