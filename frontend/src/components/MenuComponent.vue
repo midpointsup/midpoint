@@ -69,8 +69,11 @@
     </button>
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
-    <ExploreList v-if="currentPage === 'Explore'" />
-    <AddPlanForm v-else-if="currentPage === 'Add Plan'" />
+    <ExploreList v-if="currentPage === 'Explore'" :currentUser="currentUser" />
+    <AddPlanForm
+      v-else-if="currentPage === 'Add Plan'"
+      :currentUser="currentUser"
+    />
     <ul
       v-else-if="currentPage === 'My Plans'"
       class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
@@ -154,6 +157,18 @@ export default {
       presetPlans: [],
       currentPlan: null,
       socket: null,
+      colours: [
+        "#00BFFF", // Deep Sky Blue
+        "#FF6347", // Tomato
+        "#32CD32", // Lime Green
+        "#FFD700", // Gold
+        "#FF69B4", // Hot Pink
+        "#1E90FF", // Dodger Blue
+        "#3CB371", // Medium Sea Green
+        "#FF7F50", // Coral
+        "#9932CC", // Dark Orchid
+        "#FFA500", // Orange
+      ],
     };
   },
   methods: {
@@ -199,6 +214,12 @@ export default {
       planService.getPlan(+plan.id).then((res) => {
         if (!res.error) {
           usePlanStore().setPlan(res);
+          let plan = usePlanStore().getPlan();
+          plan.members = plan.members.map((member, index) => {
+            member.colour = this.colours[index % 10];
+            return member;
+          });
+          usePlanStore().setPlan(plan);
         }
       });
       this.currentPlan = plan;
@@ -222,9 +243,18 @@ export default {
           category: this.selectedPlan.category,
           date: this.selectedPlan.date,
         })
-        .then((res) => {});
+        .then((res) => {
+          if (!res.error) {
+            this.myPlans = this.myPlans.map((plan) => {
+              if (plan.id === this.selectedPlan.id) {
+                plan.address = midpoint;
+              }
+              return plan;
+            });
+            this.selectedPlan.address = midpoint;
+          }
+        });
 
-      this.selectedPlan.address = midpoint;
       usePopupStore().show(1);
     },
     updateCurrentLocation(location) {

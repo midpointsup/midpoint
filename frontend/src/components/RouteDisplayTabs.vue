@@ -2,7 +2,7 @@
   <ul class="nav nav-tabs">
     <li class="nav-item" role="presentation">
       <button
-        class="nav-link active"
+        class="nav-link active route-title-btn"
         id="my-route-tab"
         data-bs-toggle="tab"
         data-bs-target="#my-route"
@@ -17,7 +17,7 @@
     </li>
     <li class="nav-item" role="presentation">
       <button
-        class="nav-link"
+        class="nav-link route-title-btn"
         id="home-tab"
         data-bs-toggle="tab"
         data-bs-target="#group-route"
@@ -38,30 +38,33 @@
       role="tabpanel"
       aria-labelledby="my-route-tab"
     >
-      This is my route
-      <div>
+      <div class="mt-3">
         My Current Route
         <ul class="list-group">
-          <li class="list-group-item list-item" v-if="myCurrRoute">
+          <li
+            class="list-group-item list-item route-list-item"
+            v-if="myCurrRoute"
+          >
             <RouteCard
               :route="myCurrRoute"
               :destination="destination"
               :mode="currTrip.transportationMethod"
               @click="displayCurrRouteOnMap"
-            ></RouteCard>
-            <div class="row">
-              <button
-                class="btn btn-outline-primary"
-                type="button"
-                data-bs-toggle="collapse"
-                :data-bs-target="`#collapseCurrent`"
-                aria-expanded="false"
-                :aria-controls="`collapseCurrent`"
-                @click="clickCurrentDirections"
-              >
-                Directions
-              </button>
-            </div>
+            >
+              <div class="row">
+                <a
+                  class="route-btn link btn-outline-primary mt-3"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  :data-bs-target="`#collapseCurrent`"
+                  aria-expanded="false"
+                  :aria-controls="`collapseCurrent`"
+                  @click="clickCurrentDirections"
+                >
+                  Get Directions
+                </a>
+              </div>
+            </RouteCard>
             <div class="row">
               <div class="collapse" :id="`collapseCurrent`">
                 <div class="card card-body" id="directionsDisplayCurrent"></div>
@@ -71,40 +74,41 @@
         </ul>
       </div>
       <div>
-        Suggested Route
+        <h6>Other Suggested Route(s)</h6>
         <div>
           <ul class="list-group">
             <div
               v-for="(route, index) in myRoutes"
               :key="route.summary"
-              class="list-group-item list-item"
+              class="list-group-item list-item route-list-item"
             >
               <div>
                 <RouteCard
                   :route="route"
                   :destination="destination"
                   :mode="currTrip.transportationMethod"
-                ></RouteCard>
-                <div class="row">
-                  <button
-                    class="btn btn-outline-primary"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    :data-bs-target="`#collapse${index}`"
-                    aria-expanded="false"
-                    :aria-controls="`collapse${index}`"
-                    @click="toggleExpandedButton(index)"
-                  >
-                    Preview
-                  </button>
-                  <button
-                    class="btn btn-outline-primary"
-                    type="button"
-                    @click="selectRoute(index)"
-                  >
-                    Select Route
-                  </button>
-                </div>
+                >
+                  <div class="row route-btn-container">
+                    <a
+                      class="link btn-outline-primary route-btn"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      :data-bs-target="`#collapse${index}`"
+                      aria-expanded="false"
+                      :aria-controls="`collapse${index}`"
+                      @click="toggleExpandedButton(index)"
+                    >
+                      Preview
+                    </a>
+                    <a
+                      class="link btn-outline-primary route-btn"
+                      type="button"
+                      @click="selectRoute(index)"
+                    >
+                      Reset Route
+                    </a>
+                  </div>
+                </RouteCard>
               </div>
               <div class="row" v-if="expandedButton === index">
                 <div class="collapse show" :id="`collapse${index}`">
@@ -137,7 +141,7 @@
             :startTime="route.startTime"
             :startLocation="route.startLocation"
             :mode="route.transportationMethod"
-            :color="colours[index % 10]"
+            :color="colours[index]"
             :picture="route.User.picture"
             :destination="destination"
           ></groupRouteCard>
@@ -155,6 +159,7 @@ import io from "socket.io-client";
 import { useUserStore } from "@/stores/userStore.js";
 import RouteCard from "@/components/RouteCard.vue";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
+import { usePlanStore } from "@/stores/planStore.js";
 
 export default {
   mixins: [notificationMixin],
@@ -178,19 +183,13 @@ export default {
       expandedButton: null,
       directionsService: new google.maps.DirectionsService(),
       directionsArray: [],
-      colours: [
-        "#00BFFF", // Deep Sky Blue
-        "#FF6347", // Tomato
-        "#32CD32", // Lime Green
-        "#FFD700", // Gold
-        "#FF69B4", // Hot Pink
-        "#1E90FF", // Dodger Blue
-        "#3CB371", // Medium Sea Green
-        "#FF7F50", // Coral
-        "#9932CC", // Dark Orchid
-        "#FFA500", // Orange
-      ],
     };
+  },
+  computed: {
+    colours() {
+      const plan = usePlanStore().getPlan();
+      return plan.members.map((member) => member.colour);
+    },
   },
   components: {
     groupRouteCard,
@@ -225,14 +224,16 @@ export default {
             route.id === trip.id &&
             useUserStore().getUser().userId !== route.UserId
           ) {
-            let oldRoute = JSON.parse(JSON.stringify(this.routes[index]));
-            this.routes[index] = trip;
-            this.drawRoute(trip, index, oldRoute);
             if (
               route.startLocation !== trip.startLocation ||
               route.transportationMethod !== trip.transportationMethod
             ) {
+              this.routes[index] = trip;
               this.drawRoute(trip, index, null);
+            } else {
+              let oldRoute = JSON.parse(JSON.stringify(this.routes[index]));
+              this.routes[index] = trip;
+              this.drawRoute(trip, index, oldRoute);
             }
           }
           if (
@@ -363,7 +364,6 @@ export default {
       });
       this.currRouteRenderer.setMap(map);
       this.currRouteRenderer.setOptions({
-        polylineOptions: { strokeColor: "#3CB371" },
         draggable: true,
       });
       let request = {
@@ -384,6 +384,10 @@ export default {
             };
           }),
         };
+      }
+
+      if (this.currTrip.transportationMethod === "TRANSIT") {
+        request.waypoints = [];
       }
 
       this.directionsService.route(request, (result, status) => {
@@ -471,6 +475,11 @@ export default {
           }),
           travelMode: travelModes[route.transportationMethod],
         };
+
+        if (route.transportationMethod === "TRANSIT") {
+          request.waypoints = [];
+        }
+
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.currRouteRenderer.setDirections(result);
@@ -487,11 +496,7 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
-          //handle zero results case
         });
       } else {
         const request = {
@@ -516,9 +521,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       }
@@ -566,9 +568,6 @@ export default {
             document.getElementById(`defaultDirectionsDisplay`)
           );
         } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
         }
       });
     },
@@ -624,7 +623,8 @@ export default {
     async displayMyRoutesTab() {
       // get all my routes
       this.directionsRenderers.forEach((directionsRenderer) => {
-        directionsRenderer.setMap(null);
+        this.directionsRenderer.setMap(null);
+        this.directionsRenderer = new google.maps.DirectionsRenderer();
       });
       await this.getCurrentRoute();
       this.getSuggestedRoutes();
@@ -636,6 +636,10 @@ export default {
       // get all group routes
       this.directionsRenderer.setMap(null);
       this.currRouteRenderer.setMap(null);
+      this.directionsRenderers.forEach((directionsRenderer) => {
+        this.directionsRenderer.setMap(null);
+        this.directionsRenderer = new google.maps.DirectionsRenderer();
+      });
       await this.getGroupTrips();
       this.onMyRouteTab = false;
     },
@@ -662,7 +666,7 @@ export default {
           directionsRenderer.setOptions({ draggable: false });
         }
         directionsRenderer.setOptions({
-          polylineOptions: { strokeColor: this.colours[index % 10] },
+          polylineOptions: { strokeColor: this.colours[index] },
         });
         this.directionsRenderers.push(directionsRenderer);
       });
@@ -730,6 +734,9 @@ export default {
           }),
           travelMode: travelModes[route.transportationMethod],
         };
+        if (route.transportationMethod === "TRANSIT") {
+          request.waypoints = [];
+        }
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
@@ -747,11 +754,7 @@ export default {
             );
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point."
-            );
           }
-          //handle zero results case
         });
       } else {
         const request = {
@@ -776,9 +779,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       }
@@ -787,7 +787,6 @@ export default {
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
       });
-      //let map;
       this.routes.forEach((route, index) => {
         if (
           !route ||
@@ -853,5 +852,11 @@ export default {
 <style>
 .list-item {
   padding: 5px;
+}
+
+.btn-route {
+  margin: 5px;
+  max-width: 80%;
+  width: 70%;
 }
 </style>

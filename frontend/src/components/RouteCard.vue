@@ -1,27 +1,15 @@
 <template>
   <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <h6 class="card-content card-title">{{ route.summary }}</h6>
-      </div>
+    <h6 class="card-content">{{ route.summary }}</h6>
+    <div class="description-container">
+      <span class="form-text mode-icon" :class="`mode-${mode.toLowerCase()}`">
+      </span>
+      <span class="form-text"> {{ route.legs[0].duration.text }}, </span>
+      <span class="form-text">
+        {{ route.legs[0].distance.text }}
+      </span>
     </div>
-    <div class="row">
-      <div class="col-4">
-        <span class="badge">
-          {{ mode }}
-        </span>
-      </div>
-      <div class="col-4">
-        <span class="badge">
-          {{ route.legs[0].duration.text }}
-        </span>
-      </div>
-      <div class="col-4">
-        <span class="badge">
-          {{ route.legs[0].distance.text }}
-        </span>
-      </div>
-    </div>
+    <slot></slot>
   </div>
 </template>
 
@@ -37,11 +25,38 @@ export default {
 </script>
 
 <style>
-.card-content {
-  margin-left: 4px;
+.container {
+  padding: 10px;
 }
 .profile-border {
   border: 3px solid;
   border-radius: 50%;
+}
+.description-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mode-icon {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.mode-drive {
+  background-image: url("@/assets/static/DRIVE.svg");
+}
+.mode-transit {
+  background-image: url("@/assets/static/TRANSIT.svg");
+}
+.mode-bike {
+  background-image: url("@/assets/static/BIKE.svg");
+}
+.mode-walk {
+  background-image: url("@/assets/static/WALK.svg");
 }
 </style>

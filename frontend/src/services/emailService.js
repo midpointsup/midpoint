@@ -4,7 +4,7 @@ let emailService = (function () {
   const module = {};
   const baseUrl = "https://api.midpoint.live/api/emails";
 
-  module.sendEmail = async function (userId) {
+  module.sendEmail = function (userId) {
     return fetch(`${baseUrl}/`, {
       method: "POST",
       headers: {
@@ -15,7 +15,7 @@ let emailService = (function () {
     }).then((res) => res.json());
   };
 
-  module.sendInvite = async function (email) {
+  module.sendInvite = function (email) {
     return fetch(`${baseUrl}/invite`, {
       method: "POST",
       headers: {

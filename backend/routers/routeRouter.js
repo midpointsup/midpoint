@@ -22,7 +22,7 @@ function getWeightedLocations(locations, radiuses) {
 
   let duplicatedLocations = [];
 
-  locations.forEach((location, index) => {
+  locations.forEach((location) => {
     const modeMultiplier =
       modeMultipliers[location.transportationMethod] || modeMultipliers.DRIVE;
     for (let i = 0; i < modeMultiplier; i++) {

@@ -12,7 +12,7 @@
         />
       </div>
       <div class="col-10">
-        <h6 class="card-content card-title">{{ name }}</h6>
+        <h6 class="card-content">{{ name }}</h6>
       </div>
     </div>
     <div class="row">
@@ -47,9 +47,6 @@ export default {
 </script>
 
 <style>
-.card-content {
-  margin-left: 4px;
-}
 .profile-border {
   border: 3px solid;
   border-radius: 50%;
