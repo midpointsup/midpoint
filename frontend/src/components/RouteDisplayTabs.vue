@@ -267,9 +267,6 @@ export default {
   },
   watch: {
     destination() {
-      this.clearRenderers();
-      this.clearWaypoints();
-      this.resetRenderers();
       if (this.onMyRouteTab) {
         this.displayMyRoutesTab();
       } else {
@@ -311,38 +308,6 @@ export default {
           );
         });
       }
-    },
-
-    clearRenderers() {
-      this.directionsRenderer.setMap(null);
-      this.currRouteRenderer.setMap(null);
-      this.directionsRenderers.forEach((directionsRenderer) => {
-        directionsRenderer.setMap(null);
-      });
-    },
-
-    resetRenderers() {
-      this.directionsRenderer = new google.maps.DirectionsRenderer();
-      this.currRouteRenderer = new google.maps.DirectionsRenderer();
-      this.setDirectionRenderers();
-    },
-
-    clearWaypoints() {
-      this.resetRenderers();
-      this.routes.forEach((route, index) => {
-        route.waypoints = [];
-        console.log("route waypoints changed", route);
-        planService
-          .updateTrip(this.planId, route.UserId, route.id, route)
-          .then((response) => {
-            if (!response.error) {
-              console.log("trip is ", response.trip);
-              this.routes[index] = response.trip;
-              console.log("updated route, ", this.routes[index]);
-            }
-          });
-      });
-      console.log("routes are ", this.routes);
     },
 
     async getCurrentRoute() {
