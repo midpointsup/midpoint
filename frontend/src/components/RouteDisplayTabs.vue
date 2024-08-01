@@ -514,9 +514,9 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            // this.notifyError(
-            //   "No route found. Please update your midpoint, transportation mode or starting point"
-            // );
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point"
+            );
           }
         });
       }
@@ -564,9 +564,9 @@ export default {
             document.getElementById(`defaultDirectionsDisplay`)
           );
         } else if (status == "ZERO_RESULTS") {
-          // this.notifyError(
-          //   "No route found. Please update your midpoint, transportation mode or starting point"
-          // );
+          this.notifyError(
+            "No route found. Please update your midpoint, transportation mode or starting point"
+          );
         }
       });
     },
@@ -745,11 +745,10 @@ export default {
             );
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
-            // this.notifyError(
-            //   "No route found. Please update your midpoint, transportation mode or starting point."
-            // );
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point."
+            );
           }
-          //handle zero results case
         });
       } else {
         const request = {
@@ -774,9 +773,9 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            // this.notifyError(
-            //   "No route found. Please update your midpoint, transportation mode or starting point"
-            // );
+            this.notifyError(
+              "No route found. Please update your midpoint, transportation mode or starting point"
+            );
           }
         });
       }
@@ -785,7 +784,6 @@ export default {
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
       });
-      //let map;
       this.routes.forEach((route, index) => {
         if (
           !route ||

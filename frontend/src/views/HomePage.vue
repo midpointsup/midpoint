@@ -12,7 +12,6 @@ import MapComponent from "@/components/MapComponent.vue";
 import PopupContainer from "@/components/PopupContainer.vue";
 import "@/../node_modules/mapbox-gl/dist/mapbox-gl.css";
 import { useBoundingStore } from "@/stores/offsetStore.js";
-// import { ref } from "vue";
 
 export default {
   components: {
@@ -20,9 +19,6 @@ export default {
     MenuComponent,
     PopupContainer,
   },
-  // setup() {
-  //   return { menuRef: ref(null) };
-  // },
   mounted() {
     const boundingStore = useBoundingStore();
     boundingStore.setBounding("layout", this.$refs.layout);
