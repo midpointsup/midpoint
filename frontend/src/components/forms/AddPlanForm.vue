@@ -156,6 +156,8 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import planService from "@/services/planService.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import emailService from "@/services/emailService.js";
+import io from "socket.io-client";
+
 export default {
   mixins: [notificationMixin],
   components: {
@@ -196,6 +198,7 @@ export default {
       datePickerState: null,
       planColour: "#4dc48a",
       emailNotify: false,
+      socket: null,
     };
   },
   watch: {
@@ -332,6 +335,13 @@ export default {
   mounted() {
     if (this.template) {
       this.planName = this.templateName;
+    }
+
+    this.socket = io("https://api.midpoint.live");
+  },
+  beforeUnmount() {
+    if (this.socket) {
+      this.socket.disconnect();
     }
   },
 };

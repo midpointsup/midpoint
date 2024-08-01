@@ -64,5 +64,5 @@ app.use(function (req, res, next) {
 
 httpServer.listen(PORT, (err) => {
   if (err) console.log(err);
-  else console.log("HTTPs server on http://localhost:%s", PORT);
+  else console.log("HTTP server on http://localhost:%s", PORT);
 });
