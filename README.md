@@ -1,19 +1,20 @@
-Link to youtube video: https://youtu.be/uES8UcpQp7k
+Link to youtube video: https://www.youtube.com/watch?v=HslFnn2j0iM
 
 # Midpoint
 
-Midpoint is a web application designed to help users find convenient meeting locations. Key features include:
+Discover the perfect meeting spot with our app, making it easy to find the ideal halfway point for you and your friends!
+
+Key features include:
 
 ### Main Features
 
 - **Meet in the Middle:** Finds meeting points based on average distance between users and API reviews.
-- **Recommendations:** Suggests preferred stores (e.g., restrooms, parks, movies, malls, restaurants - healthy, Japanese, American).
+- **Recommendations:** Suggests preferred stores (e.g., restrooms, parks, movies, malls, restaurants).
 - **Multiple Stops:** Users can add multiple stops where others can join.
 - **Group Routes:** All users in the same group can view shared routes.
 - **Explore Map:** Real-time map exploration and live route changes.
-- **Real-Time Interaction:** Follow other users' cursors and see live ratings for pinned places.
-- **User Profiles:** Show calendar availability, send email invites, import/export Google Calendar, and automatically add plans to calendars.
-- **Invite Friends**: Send emails to invite new users to join a plan using SendGrid API.
+- **Real-Time Interaction:** Follow other users' route changes and see live plan updates.
+- **Invite Friends**: Send emails to invite new users to join a plan using MailerSend API.
 
 ### Other Features
 
@@ -47,7 +48,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 
 ### Third-Party API Interaction
 
-- **Mapbox**, **Google Maps Platform** and **SendGrid**
+- **Mapbox**, **Google Maps Platform** and **MailerSend**
 
 ### Authentication
 
@@ -65,7 +66,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
   - Generating the midpoint based on average distance, user input, and ratings. Due to the complexity of processing user input, fetching and analyzing ratings with sentiment analysis, and computing an optimal midpoint, this operation may take 10+ seconds.
 
 - **Webhook Integration:**
-  - Users can view sent/read status on outgoing emails using SendGrid's webhooks.
+  - Users can view sent/read status on outgoing emails using MailerSend's webhooks.
 
 ## Milestones
 
@@ -93,7 +94,6 @@ Midpoint is a web application designed to help users find convenient meeting loc
 
 - Complete real-time features:
   - Live changing routes
-  - Live cursor tracking
 - Enhance and clean up existing features
 - Prepare presentation
 
@@ -113,7 +113,7 @@ Midpoint is a web application designed to help users find convenient meeting loc
 ### Additional Resources
 
 - [Bootstrap](https://getbootstrap.com/)
-- [Sendgrid API](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/api-getting-started)
+- [MailerSend API](https://www.mailersend.com/?source=google&medium=cpc&campaign=MS_NORAM%20-%20Brand&content=MailerSend%20Brand%20EXT&term=mailersend%20api&ml_campaignid=16269373584&ml_adsetid=133284875653&gad_source=1&gclid=CjwKCAjw5Ky1BhAgEiwA5jGujrcFusTsK2049UGafxhAzNmUrOmRPO3StICoK0AG8yrBuxQce2_9exoC49oQAvD_BwE)
 
 ### Our Documents
 
