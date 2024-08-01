@@ -220,7 +220,7 @@ export default {
         this.setValidity(this.$refs.selectCategory, this.planCategory !== null);
       }
       this.datePickerState = this.date !== null;
-      const resetAll = () => {
+      const callback = (res) => {
         this.resetValidity();
         this.notifySuccess("Plan created successfully");
         this.searchUsername = "";
@@ -229,6 +229,25 @@ export default {
         this.planCategory = null;
         this.date = new Date();
         this.planColour = "#4dc48a";
+
+        if (this.emailNotify) {
+          res.members.forEach((member) => {
+            if (member !== this.currentUser.userId) {
+              emailService.sendEmail(member).then((res) => {
+                if (res.error) {
+                  this.notifyError(res.error);
+                }
+              });
+            } else {
+              this.socket?.on("emailSent", (data) => {
+                this.notifySuccess("Email sent to " + data);
+              });
+              this.socket?.on("emailOpened", (data) => {
+                this.notifySuccess(data + " opened the email!");
+              });
+            }
+          });
+        }
       };
       if (
         this.membersList.length > 0 &&
@@ -242,7 +261,7 @@ export default {
             membersList: this.membersList,
             date: this.date,
             planColour: this.planColour,
-            onSuccess: resetAll,
+            onSuccess: callback,
           });
         } else {
           planService
@@ -258,25 +277,7 @@ export default {
               if (res.error) {
                 this.notifyError(res.error);
               } else {
-                resetAll();
-                if (this.emailNotify) {
-                  res.members.forEach((member) => {
-                    if (member.id !== this.currentUser.userId) {
-                      emailService.sendEmail(member).then((res) => {
-                        if (res.error) {
-                          this.notifyError(res.error);
-                        }
-                      });
-                    } else {
-                      this.socket.on("emailSent", (data) => {
-                        this.notifySuccess("Email sent to " + data);
-                      });
-                      this.socket.on("emailOpened", (data) => {
-                        this.notifySuccess(data + " opened the email!");
-                      });
-                    }
-                  });
-                }
+                callback(res);
               }
             });
         }

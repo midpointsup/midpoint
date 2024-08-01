@@ -18,10 +18,10 @@
   <div v-else>
     <a @click="selectedPreset = null" class="back-btn mt-3">Back</a>
     <AddPlanForm
+      :currentUser="currentUser"
       :template="true"
       :templateName="selectedPreset.name"
       @createPlan="createPlanFromTemplate"
-      :currentUser="currentUser"
     >
       <p class="preset-description">{{ selectedPreset.description }}</p>
       <ul class="activities-list">
@@ -41,6 +41,9 @@ import planService from "@/services/planService.js";
 export default {
   components: {
     AddPlanForm,
+  },
+  props: {
+    currentUser: Object,
   },
   data() {
     return {
@@ -90,18 +93,23 @@ export default {
   },
   methods: {
     selectPreset(preset) {
-      console.log("Selected Preset:", preset);
       this.selectedPreset = preset;
     },
     createPlanFromTemplate(preset) {
-      planService.createPlan(
-        preset.planName,
-        preset.membersList,
-        this.selectedPreset.activities[0].category,
-        preset.date,
-        preset.planColour
-      );
-      preset.onSuccess();
+      planService
+        .createPlan(
+          preset.planName,
+          preset.membersList,
+          this.selectedPreset.activities[0].category,
+          preset.date,
+          preset.planColour
+        )
+        .then((res) => {
+          if (res.error) {
+            return this.notifyError("Something went wrong. Please try again.");
+          }
+          preset.onSuccess(res);
+        });
     },
   },
 };

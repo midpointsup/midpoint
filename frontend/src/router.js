@@ -18,7 +18,6 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
-  console.log(userStore.getUser());
   if (
     userStore.getUser() !== null ||
     to.path === "/signin" ||
