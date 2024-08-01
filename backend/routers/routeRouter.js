@@ -37,7 +37,9 @@ function getWeightedLocations(locations, radiuses) {
 }
 
 routesRouter.get("/middle", async (req, res) => {
-  const category = req.query.category;
+  let category = req.query.category;
+  category = category.replace(" ", "_");
+  category = category.toLowerCase();
   const locations = JSON.parse(req.query.locations);
 
   let geoResponse;

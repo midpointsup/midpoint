@@ -132,7 +132,7 @@
       />
     </div>
 
-    <div v-if="!template" class="form-check">
+    <div class="form-check">
       <input
         class="form-check-input"
         type="checkbox"
@@ -183,15 +183,14 @@ export default {
       fetchedUsers: [],
       membersList: [],
       categories: [
-        "Restaurants",
+        "Restaurant",
         "Cafe",
-        "Grocery",
-        "Schools",
-        "Parks",
-        "Shopping",
-        "Recreation Centers",
-        "Bathrooms",
-        "Theatres",
+        "School",
+        "Park",
+        "Shopping Mall",
+        "Bakery",
+        "Movie Theater",
+        "Gym",
       ],
       planCategory: null,
       date: new Date(),

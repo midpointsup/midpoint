@@ -54,8 +54,8 @@ export default {
           name: "Movie Date",
           description: "Enjoy a relaxing movie date with dinner.",
           activities: [
-            { name: "Watch Movie", duration: 120, category: "Cinemas" },
-            { name: "Dinner", duration: 60, category: "Restaurants" },
+            { name: "Watch Movie", duration: 120, category: "Movie Theater" },
+            { name: "Dinner", duration: 60, category: "Restaurant" },
           ],
         },
         {
@@ -64,9 +64,9 @@ export default {
           description:
             "Explore the city with a museum visit, lunch, and a city walk.",
           activities: [
-            { name: "Visit Museum", duration: 90, category: "Museums" },
-            { name: "Lunch", duration: 60, category: "Restaurants" },
-            { name: "City Walk", duration: 120, category: "Parks" },
+            { name: "Visit Museum", duration: 90, category: "Museum" },
+            { name: "Lunch", duration: 60, category: "Restaurant" },
+            { name: "City Walk", duration: 120, category: "Park" },
           ],
         },
         {
@@ -75,8 +75,8 @@ export default {
           description:
             "Spend a day at the beach with swimming, sunbathing, and beach volleyball.",
           activities: [
-            { name: "Swimming", duration: 60, category: "Beaches" },
-            { name: "Beach Volleyball", duration: 90, category: "Sports" },
+            { name: "Swimming", duration: 60, category: "Aquarium" },
+            { name: "Beach Volleyball", duration: 90, category: "Zoo" },
           ],
         },
         {
@@ -84,8 +84,8 @@ export default {
           name: "Mountain Hike",
           description: "Enjoy a day of hiking and a picnic in the mountains.",
           activities: [
-            { name: "Hiking", duration: 180, category: "Hiking" },
-            { name: "Picnic", duration: 60, category: "Parks" },
+            { name: "Hiking", duration: 180, category: "Zoo" },
+            { name: "Picnic", duration: 60, category: "Park" },
           ],
         },
       ],
