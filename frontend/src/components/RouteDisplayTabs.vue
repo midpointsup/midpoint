@@ -38,7 +38,6 @@
       role="tabpanel"
       aria-labelledby="my-route-tab"
     >
-      This is my route
       <div>
         My Current Route
         <ul class="list-group">
@@ -71,7 +70,7 @@
         </ul>
       </div>
       <div>
-        Suggested Route
+        Other Suggested Route(s)
         <div>
           <ul class="list-group">
             <div
@@ -491,7 +490,6 @@ export default {
               "No route found. Please update your midpoint, transportation mode or starting point"
             );
           }
-          //handle zero results case
         });
       } else {
         const request = {
@@ -516,9 +514,9 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
+            // this.notifyError(
+            //   "No route found. Please update your midpoint, transportation mode or starting point"
+            // );
           }
         });
       }
@@ -566,9 +564,9 @@ export default {
             document.getElementById(`defaultDirectionsDisplay`)
           );
         } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
+          // this.notifyError(
+          //   "No route found. Please update your midpoint, transportation mode or starting point"
+          // );
         }
       });
     },
@@ -712,10 +710,6 @@ export default {
       if (this.checkSameRoute(route, oldRoute)) {
         return;
       }
-      // const map = new google.maps.Map(document.getElementById("map"), {
-      //   zoom: 7,
-      // });
-      // this.directionsRenderers[index].setMap(map);
       const travelModes = {
         DRIVE: google.maps.TravelMode.DRIVING,
         WALK: google.maps.TravelMode.WALKING,
@@ -737,7 +731,6 @@ export default {
         this.directionsService.route(request, (result, status) => {
           if (status == "OK") {
             this.directionsRenderers[index].setDirections(result);
-            // this.directionsRenderers[index].setMap(map);
           } else if (
             status == "MAX_WAYPOINTS_EXCEEDED" ||
             status == "INVALID_REQUEST"
@@ -752,9 +745,9 @@ export default {
             );
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point."
-            );
+            // this.notifyError(
+            //   "No route found. Please update your midpoint, transportation mode or starting point."
+            // );
           }
           //handle zero results case
         });
@@ -781,9 +774,9 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
+            // this.notifyError(
+            //   "No route found. Please update your midpoint, transportation mode or starting point"
+            // );
           }
         });
       }

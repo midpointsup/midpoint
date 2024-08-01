@@ -21,6 +21,7 @@
       :template="true"
       :templateName="selectedPreset.name"
       @createPlan="createPlanFromTemplate"
+      :currentUser="currentUser"
     >
       <p class="preset-description">{{ selectedPreset.description }}</p>
       <ul class="activities-list">

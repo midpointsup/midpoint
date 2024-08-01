@@ -179,9 +179,9 @@ export default {
 
             if (!place || !place.location) {
               this.notifyError(
-                "No details available for input. Please try again.'"
+                "No details available for input. Please try again."
               );
-              this.infowindow.close();
+              this.infowindow?.close();
               return;
             }
           }
@@ -190,9 +190,9 @@ export default {
     },
     handleLocationChange(newLocation, locationType) {
       if (locationType === "midpoint") {
-        this.editedMidpoint = newLocation.target.value.formattedAddress;
+        this.editedMidpoint = newLocation.target.value?.formattedAddress;
       } else if (locationType === "start") {
-        this.startLoc = newLocation.target.value.formattedAddress;
+        this.startLoc = newLocation.target.value?.formattedAddress;
       }
     },
     addLocation() {
@@ -276,7 +276,7 @@ export default {
         });
         marker.addListener("click", () => {
           if (this.currentInfoWindow) {
-            this.currentInfoWindow.close();
+            this.currentInfoWindow?.close();
           }
           infowindow.open(map, marker);
           this.currentInfoWindow = infowindow;
