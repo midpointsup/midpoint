@@ -4,9 +4,7 @@
     <div class="description-container">
       <span class="form-text mode-icon" :class="`mode-${mode.toLowerCase()}`">
       </span>
-      <span class="form-text">
-         {{ route.legs[0].duration.text }}, 
-      </span> 
+      <span class="form-text"> {{ route.legs[0].duration.text }}, </span>
       <span class="form-text">
         {{ route.legs[0].distance.text }}
       </span>
@@ -50,15 +48,15 @@ export default {
 }
 
 .mode-drive {
-  background-image: url('@/assets/static/DRIVE.svg');
+  background-image: url("@/assets/static/DRIVE.svg");
 }
 .mode-transit {
-  background-image: url('@/assets/static/TRANSIT.svg');
+  background-image: url("@/assets/static/TRANSIT.svg");
 }
 .mode-bike {
-  background-image: url('@/assets/static/BIKE.svg');
+  background-image: url("@/assets/static/BIKE.svg");
 }
 .mode-walk {
-  background-image: url('@/assets/static/WALK.svg');
+  background-image: url("@/assets/static/WALK.svg");
 }
 </style>

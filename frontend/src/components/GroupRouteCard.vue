@@ -47,7 +47,6 @@ export default {
 </script>
 
 <style>
-
 .profile-border {
   border: 3px solid;
   border-radius: 50%;
