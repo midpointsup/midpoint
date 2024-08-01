@@ -486,9 +486,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       } else {
@@ -514,9 +511,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       }
@@ -564,9 +558,6 @@ export default {
             document.getElementById(`defaultDirectionsDisplay`)
           );
         } else if (status == "ZERO_RESULTS") {
-          this.notifyError(
-            "No route found. Please update your midpoint, transportation mode or starting point"
-          );
         }
       });
     },
@@ -745,9 +736,6 @@ export default {
             );
             this.drawRoute(newRoute, index, route);
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point."
-            );
           }
         });
       } else {
@@ -773,9 +761,6 @@ export default {
               newRoute
             );
           } else if (status == "ZERO_RESULTS") {
-            this.notifyError(
-              "No route found. Please update your midpoint, transportation mode or starting point"
-            );
           }
         });
       }
