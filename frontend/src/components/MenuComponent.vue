@@ -69,7 +69,7 @@
     </button>
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
-    <ExploreList v-if="currentPage === 'Explore'" />
+    <ExploreList v-if="currentPage === 'Explore'" :currentUser="currentUser" />
     <AddPlanForm
       v-else-if="currentPage === 'Add Plan'"
       :currentUser="currentUser"

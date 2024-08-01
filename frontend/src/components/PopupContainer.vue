@@ -69,7 +69,6 @@ export default {
       usePopupStore().move(index, pos);
     },
     handleClose(index) {
-      console.log("HELLOOOOO CLICKEDDDDDDD");
       usePopupStore().hide(index);
     },
   },
