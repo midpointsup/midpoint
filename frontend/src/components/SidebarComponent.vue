@@ -1,7 +1,7 @@
 <template>
   <div
     class="sidebar-wrapper"
-    :style="currentPage === 'My Plans' ? { 'overflow-y': 'hidden' } : {}"
+    :class="selectedPlan ? 'sidebar-wide' : ''"
   >
     <a @click="goBack" class="back-btn" v-if="canGoBack">Back</a>
     <h5 class="my-3">{{ currentPage }}</h5>
@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { usePlanStore } from "@/stores/planStore.js";
+
 export default {
   props: {
     currentPage: {
@@ -32,6 +34,11 @@ export default {
   methods: {
     goBack() {
       this.$emit("goBack");
+    },
+  },
+  computed: {
+    selectedPlan() {
+      return usePlanStore().getPlan();
     },
   },
 };
@@ -58,5 +65,9 @@ export default {
 
 .badge {
   background-color: var(--primary);
+}
+
+.sidebar-wide {
+  min-width: 300px;
 }
 </style>

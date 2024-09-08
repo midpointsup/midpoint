@@ -28,6 +28,10 @@ export const Trip = sequelize.define("Trip", {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: true,
   },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 Trip.belongsTo(User);

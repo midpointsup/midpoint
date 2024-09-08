@@ -156,13 +156,13 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import planService from "@/services/planService.js";
 import { notificationMixin } from "@/mixins/notificationMixin.js";
 import emailService from "@/services/emailService.js";
+import { useUserStore } from "@/stores/userStore";
 export default {
   mixins: [notificationMixin],
   components: {
     VueDatePicker,
   },
   props: {
-    currentUser: Object,
     template: {
       type: Boolean,
       default: false,
@@ -208,6 +208,9 @@ export default {
   computed: {
     getInvalidClass() {
       return this.datePickerState === false ? "d-block" : "d-none";
+    },
+    currentUser() {
+      return useUserStore().getUser();
     },
   },
   methods: {
@@ -271,7 +274,7 @@ export default {
               this.planCategory,
               this.date,
               this.planColour,
-              [this.planCategory]
+              [{ category: this.planCategory, duration: 0 }]
             )
             .then((res) => {
               if (res.error) {

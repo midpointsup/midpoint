@@ -46,14 +46,14 @@ const planService = (function () {
     });
   };
 
-  module.createPlan = function (name, members, category, date, colour) {
+  module.createPlan = function (name, members, category, date, colour, activities) {
     return fetch(`${baseUrl}/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({ name, members, category, date, colour }),
+      body: JSON.stringify({ name, members, category, date, colour, activities }),
     }).then((res) => {
       return res.json();
     });
@@ -79,7 +79,7 @@ const planService = (function () {
     });
   };
 
-  module.updateTrip = async function (planId, memberId, tripId, trip) {
+  module.updateTrip = function (planId, memberId, tripId, trip) {
     return fetch(`${baseUrl}/${planId}/members/${memberId}/trip/${tripId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

@@ -33,50 +33,29 @@
 
   <SidebarComponent
     v-if="selectedPlan && isSidebarOpen && currentPage === 'My Plans'"
-    class="nav nav-pills flex-column mb-auto"
     :currentPage="selectedPlan.name"
     :canGoBack="true"
     @goBack="goBack"
   >
-    <MiddleForm
-      :startLocation="
-        selectedPlan.members.find((member) => member.id === currentUser.userId)
-          .Trips[0].startLocation
-      "
+    <TripsForm class="mb-3" @generate-midpoint="updateMiddle"></TripsForm>
+    <MembersList
+      :members="selectedPlan.members"
       :selectedPlan="selectedPlan"
-      :currentUser="currentUser"
-      @add-location="updateCurrentLocation"
-      @generate-midpoint="updateMiddle"
-    >
-      <MembersList
-        :members="selectedPlan.members"
-        :selectedPlan="selectedPlan"
-        :you="currentUser"
-      ></MembersList>
-    </MiddleForm>
+      :you="currentUser"
+    ></MembersList>
     <a
       v-if="selectedPlan?.address"
       @click="togglePopup"
       class="btn btn-primary w-100 mt-3"
       >Toggle Routes</a
     >
-    <button
-      v-if="selectedPlan.ownerId === currentUser.userId"
-      @click="confirmDelete(selectedPlan.id)"
-      class="btn btn-danger mt-3 w-100"
-    >
-      Delete Plan
-    </button>
   </SidebarComponent>
   <SidebarComponent v-else-if="isSidebarOpen" :currentPage="currentPage">
-    <ExploreList v-if="currentPage === 'Explore'" :currentUser="currentUser" />
-    <AddPlanForm
-      v-else-if="currentPage === 'Add Plan'"
-      :currentUser="currentUser"
-    />
+    <ExploreList v-if="currentPage === 'Explore'" />
+    <AddPlanForm  v-else-if="currentPage === 'Add Plan'" />
     <ul
       v-else-if="currentPage === 'My Plans'"
-      class="px-0 pt-2 d-flex flex-column gap-3 plansWrapper"
+      class="px-0 pt-2 d-flex flex-column gap-3"
     >
       <li
         v-for="plan in myPlans"
@@ -86,7 +65,15 @@
         :style="{ 'border-color': plan.colour }"
         @click="selectPlan(plan)"
       >
-        <h6 class="mt-2">{{ plan.name }}</h6>
+        <div class="d-flex justify-content-between mt-2 me-1">
+          <h6>{{ plan.name }}</h6>
+          <button
+            v-if="plan.ownerId === currentUser.userId"
+            @click="confirmDelete(plan.id)"
+            class="btn-delete"
+          >
+          </button>
+        </div>
         <hr class="mt-1" />
         <span>{{ plan.address ? plan.address : "TBD" }}</span>
         <div class="d-flex my-2">
@@ -116,9 +103,7 @@
         </div>
         <span class="badge">{{ plan.date && plan.date.slice(0, 10) }}</span>
       </li>
-      <li v-if="myPlans.length === 0">
-        <p class="form-text">No plans yet. Add a plan to get started!</p>
-      </li>
+      <p v-if="myPlans.length === 0" class="form-text">No plans yet. Add a plan to get started!</p>
     </ul>
   </SidebarComponent>
 </template>
@@ -137,6 +122,7 @@ import RouteDisplayTabs from "@/components/RouteDisplayTabs.vue";
 import ExploreList from "@/components/ExploreList.vue";
 import { usePlanStore } from "@/stores/planStore.js";
 import { usePopupStore } from "@/stores/popupStore";
+import TripsForm from "@/components/forms/TripsForm.vue";
 
 export default {
   mixins: [notificationMixin],
@@ -147,12 +133,13 @@ export default {
     MembersList,
     RouteDisplayTabs,
     ExploreList,
+    TripsForm,
   },
   data() {
     return {
-      isSidebarOpen: false,
+      isSidebarOpen: true,
       pages: ["Explore", "My Plans", "Add Plan"],
-      currentPage: "",
+      currentPage: "My Plans",
       myPlans: [],
       presetPlans: [],
       currentPlan: null,
@@ -184,9 +171,7 @@ export default {
       if (content === "My Plans") {
         this.getMyPlans();
       }
-      if (!this.openSidebar) {
-        usePlanStore().setPlan(null);
-      }
+      usePlanStore().setPlan(null);
     },
     getPageClasses(name) {
       const selected =
@@ -235,45 +220,6 @@ export default {
         this.socket.disconnect();
       }
     },
-    updateMiddle(midpoint) {
-      planService
-        .updatePlan(this.selectedPlan.id, {
-          address: midpoint,
-          name: this.selectedPlan.name,
-          category: this.selectedPlan.category,
-          date: this.selectedPlan.date,
-        })
-        .then((res) => {
-          if (!res.error) {
-            this.myPlans = this.myPlans.map((plan) => {
-              if (plan.id === this.selectedPlan.id) {
-                plan.address = midpoint;
-              }
-              return plan;
-            });
-            this.selectedPlan.address = midpoint;
-          }
-        });
-
-      usePopupStore().show(1);
-    },
-    updateCurrentLocation(location) {
-      this.selectedPlan.members.forEach((member) => {
-        if (member.id === this.currentUser.userId) {
-          member.Trips[0].startLocation = location;
-          planService
-            .updateTrip(
-              this.selectedPlan.id,
-              this.currentUser.userId,
-              member.Trips[0].id,
-              {
-                startLocation: location,
-              }
-            )
-            .then((resTrip) => {});
-        }
-      });
-    },
     confirmDelete(planId) {
       if (confirm("Are you sure you want to delete this plan?")) {
         planService.deletePlan(planId).then((res) => {
@@ -291,6 +237,27 @@ export default {
     },
     togglePopup() {
       usePopupStore().toggle(1);
+    },
+    updateMiddle(midpoint) {
+      planService
+        .updatePlan(this.selectedPlan.id, {
+          address: midpoint,
+          name: this.selectedPlan.name,
+          category: this.selectedPlan.category,
+          date: this.selectedPlan.date,
+        })
+        .then((res) => {
+          if (!res.error) {
+            this.myPlans = this.myPlans.map((plan) => {
+              if (plan.id === this.selectedPlan.id) {
+                plan.address = midpoint;
+              }
+              return plan;
+            });
+            this.selectedPlan.address = midpoint;
+            usePopupStore().show(1);
+          }
+        });
     },
   },
   computed: {
@@ -466,12 +433,6 @@ export default {
   }
 }
 
-.plansWrapper {
-  height: 100%;
-  overflow-y: auto;
-  padding-bottom: 80px;
-}
-
 .planContainer {
   list-style-type: none;
   background-color: var(--color-background);
@@ -507,5 +468,21 @@ export default {
   align-items: center;
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+.btn-delete {
+  background-image: url("@/assets/static/trash.svg");
+  background-size: 21px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 14px;
+  height: 20px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background-image: url("@/assets/static/trash-fill.svg");
+  }
 }
 </style>

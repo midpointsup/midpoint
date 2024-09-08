@@ -1,13 +1,20 @@
 <template>
   <div class="middle-form-wrapper" v-if="showInput">
-    What is your starting location?
     <form class="outer-middle-form">
       <form class="middle-form">
         <gmpx-place-picker
+          v-if="startLoc"
           placeholder="Enter a place"
           id="place-picker"
           for-map="map"
           :value="startLoc"
+          @gmpx-placechange="handleLocationChange($event, 'start')"
+        ></gmpx-place-picker>
+        <gmpx-place-picker
+          v-else
+          placeholder="Enter a place"
+          id="place-picker"
+          for-map="map"
           @gmpx-placechange="handleLocationChange($event, 'start')"
         ></gmpx-place-picker>
         <div id="infowindow-content">
@@ -21,7 +28,7 @@
       </form>
 
       <label for="travelMode">Travel Mode:</label>
-      <select class="form-select" v-model="travelMode">
+      <select class="form-select" v-model="travelMode" id="travelMode">
         <option value="DRIVE">Drive</option>
         <option value="WALK">Walk</option>
         <option value="BIKE">Bike</option>
@@ -128,6 +135,7 @@ export default {
     selectedPlan: Object,
     currentUser: Object,
   },
+  emits: ["generate-midpoint", "add-location"],
   mounted() {
     this.initPlacePicker("place-picker");
     this.initPlacePicker("place-picker-midpoint");

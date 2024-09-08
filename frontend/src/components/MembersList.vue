@@ -23,7 +23,7 @@
           width="24px"
           height="24px"
         />
-        <span v-if="member.username === you.name">{{ you.name }} (You)</span>
+        <span v-if="you && member.username === you.name">{{ you.name }} (You)</span>
         <span v-else>{{ member.username }}</span>
       </li>
     </ul>

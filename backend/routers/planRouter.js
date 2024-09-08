@@ -14,6 +14,7 @@ planRouter.post("/", isAuthenticated, async (req, res) => {
   const category = req.body.category;
   const date = req.body.date;
   const colour = req.body.colour;
+  const activities = req.body.activities;
 
   if (!name || !members || members.length <= 0 || !date) {
     return res.status(400).json({ error: "Missing required fields." });
@@ -41,15 +42,22 @@ planRouter.post("/", isAuthenticated, async (req, res) => {
   planResponse.members = membersList;
   membersList.push(req.user.id);
   for (let i = 0; i < membersList.length; i++) {
-    await Trip.create({
-      startLocation: "",
-      startTime: new Date(date).toTimeString().split(" ")[0],
-      endLocation: "",
-      transportationMethod: "",
-      radius: 100,
-      PlanId: plan.id,
-      UserId: membersList[i],
-    });
+    let date = new Date();
+    for (let j = 0; j < activities.length; j++) {
+      if (j > 0) {
+        date.setMinutes(date.getMinutes() + activities[j - 1].duration);
+      }
+      await Trip.create({
+        startLocation: "",
+        startTime: date.toTimeString().split(" ")[0],
+        endLocation: "",
+        transportationMethod: "",
+        radius: 100,
+        PlanId: plan.id,
+        UserId: membersList[i],
+        category: activities[j].category,
+      });
+    }
     req.io.in("user" + membersList[i]).emit("planCreate", planResponse);
   }
   return res.json(planResponse);

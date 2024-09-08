@@ -18,7 +18,6 @@
   <div v-else>
     <a @click="selectedPreset = null" class="back-btn mt-3">Back</a>
     <AddPlanForm
-      :currentUser="currentUser"
       :template="true"
       :templateName="selectedPreset.name"
       @createPlan="createPlanFromTemplate"
@@ -32,18 +31,17 @@
       </ul>
     </AddPlanForm>
   </div>
+  <VStepperVertical/>
 </template>
 
 <script>
 import AddPlanForm from "@/components/forms/AddPlanForm.vue";
 import planService from "@/services/planService.js";
 
+
 export default {
   components: {
     AddPlanForm,
-  },
-  props: {
-    currentUser: Object,
   },
   data() {
     return {
@@ -102,7 +100,8 @@ export default {
           preset.membersList,
           this.selectedPreset.activities[0].category,
           preset.date,
-          preset.planColour
+          preset.planColour,
+          this.selectedPreset.activities
         )
         .then((res) => {
           if (res.error) {

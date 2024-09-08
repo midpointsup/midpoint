@@ -4,7 +4,7 @@ const routeService = (function () {
   const module = {};
   const baseUrl = "http://localhost:3000";
 
-  module.middle = async function (locations, category, keyword) {
+  module.middle = function (locations, category, keyword) {
     const encodedLocations = encodeURIComponent(JSON.stringify(locations));
 
     return fetch(
