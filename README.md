@@ -3,6 +3,7 @@ Link to youtube video: https://www.youtube.com/watch?v=HslFnn2j0iM
 # Midpoint
 
 Discover the perfect meeting spot with our app, making it easy to find the ideal halfway point for you and your friends!
+![image](https://github.com/user-attachments/assets/d6cf76b9-aeb8-455a-84a6-b43ba9b2181c)
 
 Key features include:
 
